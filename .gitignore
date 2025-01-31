@@ -40,3 +40,9 @@ dist-ssr
 
 # Cache
 .cache/
+
+# Deployment
+deploy.sh
+*.pem
+id_rsa*
+*.key
