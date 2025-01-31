@@ -1,50 +1,70 @@
-# React + TypeScript + Vite
+# 个人博客前端项目
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 React + TypeScript + Vite 开发的个人博客前端项目。
 
-Currently, two official plugins are available:
+## 技术栈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18
+- TypeScript
+- Vite
+- Ant Design
+- Styled Components
+- Framer Motion
 
-## Expanding the ESLint configuration
+## 功能特性
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- 🌓 明暗主题切换
+- 📱 响应式布局
+- ✨ 自定义光标动画
+- 🎮 游戏彩蛋
+- 🎨 自定义加载动画
+- 📝 Markdown 文章渲染
 
-- Configure the top-level `parserOptions` property like this:
+## 开始使用
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. 克隆项目
+```bash
+git clone git@github.com:ZQDesigned/blog-fe.git
+cd blog-fe
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2. 安装依赖
+```bash
+npm install
+```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+3. 创建环境变量文件
+```bash
+cp .env.example .env
+```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+4. 启动开发服务器
+```bash
+npm run dev
+```
+
+## 构建部署
+
+```bash
+npm run build
+```
+
+## 开发规范
+
+- 使用 ESLint 进行代码规范检查
+- 使用 TypeScript 进行类型检查
+- 遵循组件化开发原则
+- 使用 CSS-in-JS 进行样式管理
+
+## 目录结构
+
+```
+src/
+  ├── components/     # 公共组件
+  ├── pages/         # 页面组件
+  ├── hooks/         # 自定义 Hooks
+  ├── styles/        # 全局样式
+  ├── constants/     # 常量定义
+  ├── types/         # TypeScript 类型定义
+  └── utils/         # 工具函数
 ```
