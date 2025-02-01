@@ -106,7 +106,7 @@ export const MainLayout: React.FC = () => {
         <HeaderLeft>
           <StyledAvatar
             size={40}
-            src="https://q1.qlogo.cn/g?b=qq&nk=2990918167&s=640"
+            src="https://www.loliapi.com/acg/pp/"
           />
         </HeaderLeft>
         <StyledMenu

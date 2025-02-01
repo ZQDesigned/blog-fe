@@ -65,7 +65,7 @@ const Home: React.FC = () => {
           </Paragraph>
         </WelcomeContent>
         <StyledAvatar
-          src="https://q1.qlogo.cn/g?b=qq&nk=2990918167&s=640"
+          src="https://www.loliapi.com/acg/pp/"
           alt="头像"
         />
       </WelcomeSection>
