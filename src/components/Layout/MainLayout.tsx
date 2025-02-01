@@ -79,6 +79,23 @@ const IcpLink = styled.a`
   }
 `;
 
+const FooterLinks = styled.div`
+  margin-top: ${globalStyles.spacing.md};
+  padding-top: ${globalStyles.spacing.md};
+  border-top: 1px solid ${globalStyles.colors.border};
+  color: ${globalStyles.colors.lightText};
+  font-size: 14px;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    margin: 0 ${globalStyles.spacing.sm};
+    &:hover {
+      color: ${globalStyles.colors.primary};
+    }
+  }
+`;
+
 const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -131,6 +148,12 @@ export const MainLayout: React.FC = () => {
             </IcpLink>
           </div>
         )}
+        <FooterLinks>
+          <span>友情链接：</span>
+          <a href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
+            LoliAPI
+          </a>
+        </FooterLinks>
       </StyledFooter>
 
       <Suspense fallback={
