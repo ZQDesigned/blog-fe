@@ -505,4 +505,150 @@ Authorization: Bearer <token>
 | blog_id | bigint | 文章ID |
 | ip | varchar(50) | 访问IP |
 | user_agent | varchar(500) | 用户代理 |
-| create_time | datetime | 访问时间 | 
+| create_time | datetime | 访问时间 |
+
+### 管理员表 (t_admin)
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | bigint | 主键 |
+| username | varchar(50) | 用户名 |
+| password | varchar(255) | 密码（加密存储） |
+| last_login_time | datetime | 最后登录时间 |
+| last_login_ip | varchar(50) | 最后登录IP |
+| status | tinyint | 状态（1-正常，0-禁用） |
+| create_time | datetime | 创建时间 |
+| update_time | datetime | 更新时间 |
+
+## 认证接口
+
+### 管理员登录
+
+#### 请求信息
+
+- 路径：`POST /api/auth/login`
+- 认证：不需要
+
+#### 请求体
+
+```json
+{
+  "username": "admin",
+  "password": "your-password"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresIn": 86400,
+    "tokenType": "Bearer"
+  }
+}
+```
+
+### 获取当前登录信息
+
+#### 请求信息
+
+- 路径：`GET /api/auth/info`
+- 认证：需要 JWT
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "username": "admin",
+    "lastLoginTime": "2024-03-15T12:00:00",
+    "lastLoginIp": "127.0.0.1"
+  }
+}
+```
+
+### 修改密码
+
+#### 请求信息
+
+- 路径：`PUT /api/auth/password`
+- 认证：需要 JWT
+
+#### 请求体
+
+```json
+{
+  "oldPassword": "old-password",
+  "newPassword": "new-password"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+### 退出登录
+
+#### 请求信息
+
+- 路径：`POST /api/auth/logout`
+- 认证：需要 JWT
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+### 刷新令牌
+
+#### 请求信息
+
+- 路径：`POST /api/auth/refresh`
+- 认证：需要 JWT（使用即将过期的令牌）
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresIn": 86400,
+    "tokenType": "Bearer"
+  }
+}
+```
+
+## 错误码说明
+
+| 错误码 | 说明 |
+|--------|------|
+| 200 | 成功 |
+| 400 | 请求参数错误 |
+| 401 | 未登录或登录已过期 |
+| 403 | 无权限访问 |
+| 404 | 资源不存在 |
+| 500 | 服务器内部错误 |
+| 1001 | 用户名或密码错误 |
+| 1002 | 账号已被禁用 |
+| 1003 | 旧密码错误 |
+| 1004 | 令牌已失效 | 
