@@ -272,6 +272,29 @@ Authorization: Bearer <token>
 |--------|------|------|------|
 | id | integer | 是 | 项目ID |
 
+#### 响应字段说明
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | integer | 项目ID |
+| title | string | 项目标题 |
+| description | string | 项目描述 |
+| content | string | 项目详细介绍 |
+| tags | array | 项目标签 |
+| github | object | GitHub 仓库信息 |
+| github.url | string | GitHub 仓库地址 |
+| github.disabled | boolean | 是否禁用源码按钮 |
+| github.disabledReason | string | 源码按钮禁用原因 |
+| demo | object | 在线演示信息 |
+| demo.url | string | 在线演示地址 |
+| demo.disabled | boolean | 是否禁用演示按钮 |
+| demo.disabledReason | string | 演示按钮禁用原因 |
+| status | string | 项目状态，可选值：developing(开发中), maintaining(维护中), paused(暂停维护) |
+| features | array | 项目特性列表 |
+| techStack | array | 使用的技术栈列表 |
+| createTime | string | 创建时间 |
+| updateTime | string | 更新时间 |
+
 #### 响应示例
 
 ```json
@@ -284,8 +307,16 @@ Authorization: Bearer <token>
     "description": "项目描述",
     "content": "项目详细介绍",
     "tags": ["React", "TypeScript"],
-    "github": "https://github.com/...",
-    "demo": "https://demo.com",
+    "github": {
+      "url": "https://github.com/...",
+      "disabled": false,
+      "disabledReason": null
+    },
+    "demo": {
+      "url": "https://demo.com",
+      "disabled": true,
+      "disabledReason": "演示环境部署中"
+    },
     "status": "maintaining",
     "features": [
       "特性1",
@@ -316,8 +347,16 @@ Authorization: Bearer <token>
   "description": "项目描述",
   "content": "项目详细介绍",
   "tags": ["React", "TypeScript"],
-  "github": "https://github.com/...",
-  "demo": "https://demo.com",
+  "github": {
+    "url": "https://github.com/...",
+    "disabled": false,
+    "disabledReason": null
+  },
+  "demo": {
+    "url": "https://demo.com",
+    "disabled": false,
+    "disabledReason": null
+  },
   "status": "maintaining",
   "features": [
     "特性1",
@@ -363,8 +402,16 @@ Authorization: Bearer <token>
   "description": "项目描述",
   "content": "项目详细介绍",
   "tags": ["React", "TypeScript"],
-  "github": "https://github.com/...",
-  "demo": "https://demo.com",
+  "github": {
+    "url": "https://github.com/...",
+    "disabled": false,
+    "disabledReason": null
+  },
+  "demo": {
+    "url": "https://demo.com",
+    "disabled": false,
+    "disabledReason": null
+  },
   "status": "maintaining",
   "features": [
     "特性1",
@@ -437,9 +484,13 @@ Authorization: Bearer <token>
 | description | varchar(500) | 描述 |
 | content | text | 详细介绍 |
 | tags | varchar(255) | 标签（JSON数组） |
-| github | varchar(255) | GitHub地址 |
-| demo | varchar(255) | 演示地址 |
-| status | varchar(20) | 状态 |
+| github_url | varchar(255) | GitHub仓库地址 |
+| github_disabled | tinyint | 是否禁用源码按钮 |
+| github_disabled_reason | varchar(255) | 源码按钮禁用原因 |
+| demo_url | varchar(255) | 演示地址 |
+| demo_disabled | tinyint | 是否禁用演示按钮 |
+| demo_disabled_reason | varchar(255) | 演示按钮禁用原因 |
+| status | varchar(20) | 状态（可选值：developing-开发中, maintaining-维护中, paused-暂停维护） |
 | features | text | 特性（JSON数组） |
 | tech_stack | text | 技术栈（JSON数组） |
 | is_deleted | tinyint | 是否删除 |
