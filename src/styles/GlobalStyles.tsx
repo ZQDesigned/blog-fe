@@ -1,11 +1,7 @@
 import { Global, css } from '@emotion/react';
 import { globalStyles } from './theme';
 
-interface GlobalStylesProps {
-  isDark: boolean;
-}
-
-const GlobalStyles: React.FC<GlobalStylesProps> = ({ isDark }) => {
+const GlobalStyles = () => {
   const globalCss = css`
     * {
       margin: 0;
@@ -23,8 +19,8 @@ const GlobalStyles: React.FC<GlobalStylesProps> = ({ isDark }) => {
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: ${isDark ? 'rgba(255, 255, 255, 0.85)' : globalStyles.colors.text};
-      background-color: ${isDark ? '#141414' : globalStyles.colors.secondary};
+      color: ${globalStyles.colors.text};
+      background-color: ${globalStyles.colors.secondary};
       line-height: 1.5;
       overflow-x: hidden;
       transition: all 0.3s;
@@ -71,29 +67,25 @@ const GlobalStyles: React.FC<GlobalStylesProps> = ({ isDark }) => {
                   transform ${globalStyles.transitions.default};
     }
 
-    // 深色模式下的代码块样式
     pre, code {
-      background-color: ${isDark ? '#1f1f1f' : globalStyles.colors.secondary};
+      background-color: ${globalStyles.colors.secondary};
     }
 
-    // 深色模式下的引用样式
     blockquote {
-      background-color: ${isDark ? '#1f1f1f' : globalStyles.colors.secondary};
-      border-left-color: ${isDark ? globalStyles.colors.primary : globalStyles.colors.border};
+      background-color: ${globalStyles.colors.secondary};
+      border-left-color: ${globalStyles.colors.border};
     }
 
-    // 深色模式下的表格样式
     table {
       th, td {
-        border-color: ${isDark ? '#303030' : globalStyles.colors.border};
+        border-color: ${globalStyles.colors.border};
       }
 
       th {
-        background-color: ${isDark ? '#1f1f1f' : globalStyles.colors.secondary};
+        background-color: ${globalStyles.colors.secondary};
       }
     }
 
-    // 对话框样式
     .ant-modal {
       .ant-modal-content {
         border-radius: 16px;
@@ -109,13 +101,12 @@ const GlobalStyles: React.FC<GlobalStylesProps> = ({ isDark }) => {
       }
     }
 
-    // 允许博客详情页面的内容选择
     .blog-detail-content {
       user-select: text;
     }
   `;
 
   return <Global styles={globalCss} />;
-};
+}
 
 export { GlobalStyles }; 
