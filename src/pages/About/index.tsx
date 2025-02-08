@@ -97,8 +97,9 @@ const About: React.FC = () => {
         >
           <Title level={2}>关于我</Title>
           <Paragraph>
-            你好！我是一名充满热情的全栈开发工程师，专注于创建优秀的 Web 应用程序。
-            我热爱编程，享受将创意转化为现实的过程。
+            👋 你好，我是 <strong>ZQDesigned</strong>，一名专注于 <strong>全栈开发 & 游戏开发</strong> 的工程师。
+            我热爱技术，擅长 <strong>Spring Boot 后端开发、Kotlin 移动端开发、云原生架构</strong>，同时也在探索 <strong>Unity + xLua</strong> 进行游戏开发。
+            这里是我的个人空间，记录我的思考、成长与项目经验。欢迎交流！
           </Paragraph>
 
           <Title level={3}>教育背景</Title>
@@ -110,6 +111,10 @@ const About: React.FC = () => {
             <EnvironmentOutlined />
             <Text>中国 安徽</Text>
           </ContactInfo>
+          <Paragraph style={{ marginTop: globalStyles.spacing.sm }}>
+            ⚡ 自学 & 实践驱动的开发者<br />
+            🎓 热爱探索新技术，持续学习并追求卓越
+          </Paragraph>
         </StyledCard>
 
         <StyledCard
@@ -121,24 +126,27 @@ const About: React.FC = () => {
           <Title level={3}>专业技能</Title>
           <Space direction="vertical" size="middle">
             <div>
-              <Text strong>前端开发</Text>
-              <Paragraph>
-                精通 React、TypeScript、Vue.js 等现代前端技术，
-                具有丰富的响应式设计和性能优化经验。
-              </Paragraph>
-            </div>
-            <div>
               <Text strong>后端开发</Text>
               <Paragraph>
-                熟练使用 Node.js、Python、Java 进行后端开发，
-                具有数据库设计和 API 开发经验。
+                Java • Kotlin • Spring Boot • gRPC • MySQL • PostgreSQL
               </Paragraph>
             </div>
             <div>
-              <Text strong>开发工具</Text>
+              <Text strong>移动端 & 全栈</Text>
               <Paragraph>
-                熟练使用 Git、Docker、Webpack 等开发工具，
-                具有 CI/CD 流程搭建经验。
+                Android • Kotlin • Flutter • TypeScript
+              </Paragraph>
+            </div>
+            <div>
+              <Text strong>游戏开发</Text>
+              <Paragraph>
+                Unity • xLua
+              </Paragraph>
+            </div>
+            <div>
+              <Text strong>工具 & 云原生</Text>
+              <Paragraph>
+                Docker • Kubernetes • GitHub Actions • JetBrains IDE
               </Paragraph>
             </div>
           </Space>
@@ -150,39 +158,12 @@ const About: React.FC = () => {
           animate="visible"
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Title level={3}>工作经历</Title>
-          <Timeline
-            items={[
-              {
-                color: 'blue',
-                children: (
-                  <>
-                    <Text strong>全栈开发工程师 @ XXX公司</Text>
-                    <br />
-                    <Text type="secondary">2022年 - 至今</Text>
-                    <Paragraph>
-                      负责公司核心产品的前端开发和维护工作，
-                      参与后端 API 设计和开发。
-                    </Paragraph>
-                  </>
-                ),
-              },
-              {
-                color: 'blue',
-                children: (
-                  <>
-                    <Text strong>前端开发实习生 @ YYY公司</Text>
-                    <br />
-                    <Text type="secondary">2021年 - 2022年</Text>
-                    <Paragraph>
-                      参与公司电商平台的前端开发工作，
-                      负责实现新功能和优化用户体验。
-                    </Paragraph>
-                  </>
-                ),
-              },
-            ]}
-          />
+          <Title level={3}>旅程</Title>
+          <Paragraph>
+            🌍 旅途仍在继续，探索从未止步。<br />
+            🔭 我追逐技术的光，穿梭于代码的星海。<br />
+            🛠️ 未来可期，愿与你共创更精彩的世界。
+          </Paragraph>
         </StyledCard>
 
         <ContactCard title="联系方式">
