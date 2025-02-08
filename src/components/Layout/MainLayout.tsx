@@ -140,7 +140,7 @@ export const MainLayout: React.FC = () => {
         <Outlet />
       </StyledContent>
       <StyledFooter>
-        <div>©{new Date().getFullYear()} 个人博客 - 基于 React + TypeScript 开发</div>
+        <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
         {icpNumber && (
           <div style={{ marginTop: 8 }}>
             <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
