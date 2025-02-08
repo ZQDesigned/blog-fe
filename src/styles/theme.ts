@@ -24,7 +24,7 @@ export const customTheme: ThemeConfig = {
 export const globalStyles = {
   colors: {
     primary: '#1890ff',
-    secondary: '#f5f5f5',
+    secondary: '#f0f7ff',
     text: '#333333',
     lightText: '#666666',
     border: '#e8e8e8',
