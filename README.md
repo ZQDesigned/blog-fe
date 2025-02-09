@@ -67,6 +67,31 @@ npm run build
 
 构建产物将生成在 `dist` 目录下。
 
+## 部署建议
+
+在生产环境中，建议使用 **Apache 服务器** 部署，以确保前端路由正常工作。  
+
+### **为什么不推荐使用 Nginx？**
+Nginx 默认不会自动重定向前端路由，例如访问 `https://example.com/about` 可能会导致 **404 错误**，除非手动修改 Nginx 配置。
+
+### **推荐使用 Apache**
+如果你使用 **Apache** 作为前端静态服务器，请确保服务器支持 `.htaccess` 规则。  
+本项目已包含 **`.htaccess` 文件**，部署时无需额外修改，即可自动处理 SPA 路由。
+
+> 📌 **如何确保 `.htaccess` 生效？**
+> 1. 确保 Apache 已启用 `mod_rewrite` 模块
+> 2. 服务器允许 `.htaccess`（在 Apache 配置中 `AllowOverride All`）
+> 3. 直接将 `dist/` 目录部署至 Apache，默认即可正常工作
+
+### **其他服务器**
+如果你无法使用 Apache，可以尝试以下方案：
+- **Nginx**：需要手动修改 `nginx.conf`，使用 `try_files` 规则处理 SPA 路由
+- **HashRouter**：修改前端代码，将 `BrowserRouter` 替换为 `HashRouter`（但 URL 会变为 `/#/about`，影响 SEO）
+- **Vercel / Netlify**：使用支持 SPA 重写规则的托管服务
+
+🚀 **推荐使用 Apache，开箱即用，无需额外配置！**
+
+
 ## 项目结构
 
 ```
