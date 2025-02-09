@@ -14,6 +14,7 @@ import { NAV_ITEMS } from '../../constants/routes';
 import { globalStyles } from '../../styles/theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
+import { formatDate } from '../../utils/dateUtils';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
@@ -94,6 +95,11 @@ const FooterLinks = styled.div`
   border-top: 1px solid ${globalStyles.colors.border};
   color: ${globalStyles.colors.lightText};
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: ${globalStyles.spacing.md};
 
   a {
     color: inherit;
@@ -103,6 +109,26 @@ const FooterLinks = styled.div`
       color: ${globalStyles.colors.primary};
     }
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: ${globalStyles.spacing.sm};
+  }
+`;
+
+const BuildInfo = styled.div`
+  color: ${globalStyles.colors.lightText};
+  font-size: 12px;
+  opacity: 0.8;
+  white-space: nowrap;
+`;
+
+const LinksGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.sm};
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const LoadingContainer = styled.div`
@@ -224,10 +250,15 @@ export const MainLayout: React.FC = () => {
           </div>
         )}
         <FooterLinks>
-          <span>友情链接：</span>
-          <a href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
-            LoliAPI
-          </a>
+          <BuildInfo>
+            构建于：{formatDate(window.__BUILD_TIME__)}
+          </BuildInfo>
+          <LinksGroup>
+            <span>友情链接：</span>
+            <a href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
+              LoliAPI
+            </a>
+          </LinksGroup>
         </FooterLinks>
       </StyledFooter>
 
