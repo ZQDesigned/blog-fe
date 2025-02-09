@@ -1,10 +1,19 @@
 import React, { Suspense } from 'react';
 import { Layout, Menu, Avatar, Spin } from 'antd';
+import {
+  HomeOutlined,
+  GithubOutlined,
+  ReloadOutlined,
+  ArrowUpOutlined,
+  CopyOutlined,
+  ShareAltOutlined
+} from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { NAV_ITEMS } from '../../constants/routes';
 import { globalStyles } from '../../styles/theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
+import ContextMenu from '../ContextMenu';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
@@ -113,6 +122,72 @@ export const MainLayout: React.FC = () => {
     navigate(path);
   };
 
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(window.location.href);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: document.title,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('分享失败:', error);
+      }
+    } else {
+      handleCopyUrl();
+    }
+  };
+
+  const contextMenuItems = [
+    {
+      key: 'home',
+      label: '返回首页',
+      icon: <HomeOutlined />,
+      onClick: () => navigate('/'),
+    },
+    {
+      key: 'reload',
+      label: '刷新页面',
+      icon: <ReloadOutlined />,
+      onClick: handleReload,
+    },
+    {
+      key: 'scrollTop',
+      label: '返回顶部',
+      icon: <ArrowUpOutlined />,
+      onClick: handleScrollToTop,
+    },
+    {
+      key: 'copy',
+      label: '复制链接',
+      icon: <CopyOutlined />,
+      onClick: handleCopyUrl,
+    },
+    {
+      key: 'share',
+      label: '分享页面',
+      icon: <ShareAltOutlined />,
+      onClick: handleShare,
+    },
+    {
+      key: 'github',
+      label: '访问 GitHub',
+      icon: <GithubOutlined />,
+      onClick: () => window.open('https://github.com/ZQDesigned/blog-fe', '_blank'),
+    },
+  ];
+
   // 从环境变量获取ICP信息
   const icpNumber = import.meta.env.VITE_ICP_NUMBER;
   const icpLink = import.meta.env.VITE_ICP_LINK;
@@ -155,6 +230,8 @@ export const MainLayout: React.FC = () => {
           </a>
         </FooterLinks>
       </StyledFooter>
+
+      <ContextMenu items={contextMenuItems} />
 
       <Suspense fallback={
         <LoadingContainer>
