@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Card, Timeline, Space, Modal } from 'antd';
+import { Typography, Card, Space, Modal } from 'antd';
 import {
   MailOutlined,
   GithubOutlined,

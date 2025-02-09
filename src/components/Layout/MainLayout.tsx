@@ -214,9 +214,10 @@ export const MainLayout: React.FC = () => {
     },
   ];
 
-  // 从环境变量获取ICP信息
+  // 从环境变量获取ICP信息和构建时间
   const icpNumber = import.meta.env.VITE_ICP_NUMBER;
   const icpLink = import.meta.env.VITE_ICP_LINK;
+  const buildTime = import.meta.env.VITE_BUILD_TIME || Date.now();
 
   return (
     <StyledLayout>
@@ -251,7 +252,7 @@ export const MainLayout: React.FC = () => {
         )}
         <FooterLinks>
           <BuildInfo>
-            构建于：{formatDate(window.__BUILD_TIME__)}
+            构建于：{formatDate(Number(buildTime))}
           </BuildInfo>
           <LinksGroup>
             <span>友情链接：</span>
