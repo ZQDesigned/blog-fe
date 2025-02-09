@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 让 Apache 忽略真实存在的文件和目录
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # 所有未匹配的请求都重定向到 index.html
+  RewriteRule . /index.html [L]
+</IfModule>
