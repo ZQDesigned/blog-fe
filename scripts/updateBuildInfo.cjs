@@ -34,7 +34,7 @@ function updateEnvFile() {
     }
 
     // 更新或添加构建时间和 Git Hash
-    const buildTime = Date.now();
+    const buildTime = isDev ? '' : Date.now().toString();
     const gitHash = getGitHash(isDev);
     
     const lines = envContent.split('\n');
@@ -59,7 +59,7 @@ function updateEnvFile() {
     // 写入更新后的内容
     fs.writeFileSync(envPath, newLines.join('\n'));
     console.log('Build info updated successfully:', {
-      buildTime: new Date(buildTime).toISOString(),
+      buildTime: isDev ? 'development' : new Date(Number(buildTime)).toISOString(),
       gitHash,
       environment: isDev ? 'development' : 'production'
     });
