@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, Typography, Space, Avatar } from 'antd';
+import { Card, Typography, Space } from 'antd';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
+import LazyImage from '../../components/LazyImage';
 
 const { Title, Paragraph } = Typography;
 
@@ -62,12 +63,14 @@ const WelcomeContent = styled.div`
   }
 `;
 
-const StyledAvatar = styled(Avatar)`
+const StyledAvatar = styled.div`
   width: 120px;
   height: 120px;
   border: 4px solid #fff;
   box-shadow: ${globalStyles.shadows.medium};
   transition: transform 0.3s ease;
+  border-radius: 50%;
+  overflow: hidden;
 
   &:hover {
     transform: scale(1.05);
@@ -128,10 +131,14 @@ const Home: React.FC = () => {
             这里是我的个人空间，记录我的成长、思考和项目经验。欢迎交流！
           </Paragraph>
         </WelcomeContent>
-        <StyledAvatar
-          src="/avatar.jpg"
-          alt="头像"
-        />
+        <StyledAvatar>
+          <LazyImage
+            src="/avatar.jpg"
+            alt="头像"
+            loadingSize={60}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </StyledAvatar>
       </WelcomeSection>
 
       <ContentWrapper>
