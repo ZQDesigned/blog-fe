@@ -129,7 +129,7 @@ const Home: React.FC = () => {
           </Paragraph>
         </WelcomeContent>
         <StyledAvatar
-          src="https://www.loliapi.com/acg/pp/"
+          src="/avatar.jpg"
           alt="头像"
         />
       </WelcomeSection>
