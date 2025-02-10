@@ -15,6 +15,7 @@ import { globalStyles } from '../../styles/theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
 import { formatDate } from '../../utils/dateUtils';
+import { useToast } from '../../hooks/useToast.ts';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
@@ -143,6 +144,7 @@ export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
+  const { showToast } = useToast();
 
   const handleMenuClick = (path: string) => {
     navigate(path);
@@ -156,8 +158,20 @@ export const MainLayout: React.FC = () => {
     window.location.reload();
   };
 
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(window.location.href);
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast('链接已复制到剪贴板', {
+        type: 'success',
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('复制链接失败:', error);
+      showToast('复制链接失败', {
+        type: 'error',
+        duration: 3000,
+      });
+    }
   };
 
   const handleShare = async () => {
@@ -167,11 +181,16 @@ export const MainLayout: React.FC = () => {
           title: document.title,
           url: window.location.href,
         });
+        showToast('分享成功', {
+          type: 'success',
+          duration: 2000,
+        });
       } catch (error) {
         console.error('分享失败:', error);
+        await handleCopyUrl();
       }
     } else {
-      handleCopyUrl();
+      await handleCopyUrl();
     }
   };
 
