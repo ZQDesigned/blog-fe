@@ -39,6 +39,8 @@ const ViewControls = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${globalStyles.spacing.lg};
+  position: relative;
+  z-index: 0;
 
   @media (max-width: 768px) {
     padding: ${globalStyles.spacing.lg};
