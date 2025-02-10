@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "node scripts/updateBuildTime.cjs && tsc -b && vite build",
+    "dev": "node scripts/updateBuildInfo.cjs --dev && vite --host",
+    "build": "node scripts/updateBuildInfo.cjs && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

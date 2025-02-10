@@ -122,6 +122,10 @@ const BuildInfo = styled.div`
   font-size: 12px;
   opacity: 0.8;
   white-space: nowrap;
+  display: flex;
+  gap: ${globalStyles.spacing.sm};
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const LinksGroup = styled.div`
@@ -329,7 +333,8 @@ export const MainLayout: React.FC = () => {
         )}
         <FooterLinks>
           <BuildInfo>
-            构建于：{formatDate(Number(buildTime))}
+            <span>构建于：{formatDate(Number(buildTime))}</span>
+            <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
           </BuildInfo>
           <LinksGroup>
             <span>友情链接：</span>
