@@ -42,7 +42,11 @@ dist-ssr
 .cache/
 
 # Deployment
-deploy.sh
+deploy.config.sh
 *.pem
 id_rsa*
 *.key
+
+# Keep deployment scripts in git
+!deploy.sh
+!deploy.config.example.sh
