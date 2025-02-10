@@ -158,16 +158,46 @@ export const MainLayout: React.FC = () => {
     window.location.reload();
   };
 
-  const handleCopyUrl = async () => {
+  // 纯复制逻辑，不包含 Toast 提示
+  const copyUrlToClipboard = async (): Promise<boolean> => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(window.location.href);
+        return true;
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = window.location.href;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          return successful;
+        } catch (err) {
+          document.body.removeChild(textArea);
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error('复制链接失败:', error);
+      return false;
+    }
+  };
+
+  const handleCopyUrl = async () => {
+    const successful = await copyUrlToClipboard();
+    if (successful) {
       showToast('链接已复制到剪贴板', {
         type: 'success',
         duration: 2000,
       });
-    } catch (error) {
-      console.error('复制链接失败:', error);
-      showToast('复制链接失败', {
+    } else {
+      showToast('复制链接失败，请手动复制', {
         type: 'error',
         duration: 3000,
       });
@@ -175,8 +205,11 @@ export const MainLayout: React.FC = () => {
   };
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
+    try {
+      if (navigator.share && navigator.canShare?.({
+        title: document.title,
+        url: window.location.href
+      })) {
         await navigator.share({
           title: document.title,
           url: window.location.href,
@@ -185,12 +218,37 @@ export const MainLayout: React.FC = () => {
           type: 'success',
           duration: 2000,
         });
-      } catch (error) {
-        console.error('分享失败:', error);
-        await handleCopyUrl();
+      } else {
+        const successful = await copyUrlToClipboard();
+        showToast(
+          successful 
+            ? '当前浏览器不支持分享功能，已复制链接到剪贴板' 
+            : '当前浏览器不支持分享功能，复制链接失败',
+          {
+            type: successful ? 'info' : 'error',
+            duration: 3000,
+          }
+        );
       }
-    } else {
-      await handleCopyUrl();
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        showToast('已取消分享', {
+          type: 'info',
+          duration: 2000,
+        });
+        return;
+      }
+      console.error('分享失败:', error);
+      const successful = await copyUrlToClipboard();
+      showToast(
+        successful 
+          ? '分享失败，已复制链接到剪贴板' 
+          : '分享失败，复制链接也失败了',
+        {
+          type: successful ? 'warning' : 'error',
+          duration: 3000,
+        }
+      );
     }
   };
 
