@@ -11,6 +11,7 @@ import {
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
+import { useTitle } from '../../hooks/useTitle';
 
 const { Title, Paragraph, Text, Link } = Typography;
 
@@ -80,6 +81,9 @@ const cardVariants = {
 };
 
 const About: React.FC = () => {
+  // 使用 useTitle hook，设置关于页面标题
+  useTitle('关于我', { restoreOnUnmount: true });
+
   const [isWechatModalVisible, setIsWechatModalVisible] = useState(false);
 
   const showWechatModal = () => {

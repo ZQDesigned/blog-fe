@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import LazyImage from '../../components/LazyImage';
+import { useTitle } from '../../hooks/useTitle';
 
 const { Title, Paragraph } = Typography;
 
@@ -120,6 +121,9 @@ const TechStackItem = styled.div`
 `;
 
 const Home: React.FC = () => {
+  // 使用 useTitle hook，设置首页标题
+  useTitle('首页', { restoreOnUnmount: false });
+
   return (
     <Container>
       <WelcomeSection>

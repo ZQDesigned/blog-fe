@@ -4,6 +4,7 @@ import { GithubOutlined, GlobalOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
+import { useTitle } from '../../hooks/useTitle';
 
 const { Title, Paragraph } = Typography;
 
@@ -204,6 +205,8 @@ const cardVariants = {
 };
 
 const Projects: React.FC = () => {
+  useTitle('项目', { restoreOnUnmount: true });
+
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null);
 
   return (

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { globalStyles } from '../../styles/theme';
 import { MOCK_BLOGS } from './mockData';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
+import { useTitle } from '../../hooks/useTitle';
 
 const { Title } = Typography;
 
@@ -209,6 +210,9 @@ interface BlogData {
 }
 
 const Blog: React.FC = () => {
+  // 使用 useTitle hook，设置博客列表页面标题
+  useTitle('博客', { restoreOnUnmount: true });
+
   const [isGrid, setIsGrid] = useState(() => {
     const savedViewMode = localStorage.getItem('blogViewMode');
     return savedViewMode === null ? true : savedViewMode === 'grid';

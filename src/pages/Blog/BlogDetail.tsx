@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { MOCK_BLOGS } from './mockData';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
+import { useTitle } from '../../hooks/useTitle';
 
 const { Title } = Typography;
 
@@ -63,6 +64,9 @@ const BlogDetail: React.FC = () => {
 
   // 查找博客数据
   const blog = MOCK_BLOGS.find(blog => blog.id === Number(id));
+
+  // 使用 useTitle hook，设置当前页面标题为博客标题
+  useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
 
   const handleBack = () => {
     navigate('/blog');
