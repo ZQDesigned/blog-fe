@@ -46,8 +46,8 @@ echo "打包完成，文件名为 $ARCHIVE_NAME"
 
 # 根据认证方式构建 SSH 命令
 if [ "$SSH_METHOD" = "key" ]; then
-  SSH_CMD="ssh -i $SSH_KEY -p $REMOTE_PORT"
-  SCP_CMD="scp -i $SSH_KEY -P $REMOTE_PORT"
+  SSH_CMD="ssh -i \"$SSH_KEY\" -p \"$REMOTE_PORT\""
+  SCP_CMD="scp -i \"$SSH_KEY\" -P \"$REMOTE_PORT\""
 else
   # 使用 sshpass 进行密码认证
   if ! command -v sshpass &> /dev/null; then
@@ -56,15 +56,12 @@ else
     echo "Linux: apt-get install sshpass 或 yum install sshpass"
     exit 1
   fi
-  SSH_CMD="sshpass -p $REMOTE_PASSWORD ssh -p $REMOTE_PORT"
-  SCP_CMD="sshpass -p $REMOTE_PASSWORD scp -P $REMOTE_PORT"
+  SSH_CMD="sshpass -p \"$REMOTE_PASSWORD\" ssh -p \"$REMOTE_PORT\""
+  SCP_CMD="sshpass -p \"$REMOTE_PASSWORD\" scp -P \"$REMOTE_PORT\""
 fi
 
 # 清理远程服务器上的旧文件
-$SSH_CMD "$REMOTE_USER@$REMOTE_HOST" <<EOF
-cd $REMOTE_PATH
-rm -rf ./*
-EOF
+eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'cd \"$REMOTE_PATH\" && rm -rf ./*'"
 
 if [ $? -eq 0 ]; then
   echo "远程文件清理完成！"
@@ -75,7 +72,7 @@ fi
 
 # 上传打包文件到远程服务器
 echo "正在上传 $ARCHIVE_NAME 到远程服务器..."
-$SCP_CMD "$ARCHIVE_NAME" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH"
+eval "$SCP_CMD \"$ARCHIVE_NAME\" \"$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH\""
 
 if [ $? -ne 0 ]; then
   echo "文件上传失败，请检查网络连接和认证配置。"
@@ -85,12 +82,7 @@ fi
 echo "文件上传成功，开始在远程服务器上解压..."
 
 # 解压并部署
-$SSH_CMD "$REMOTE_USER@$REMOTE_HOST" <<EOF
-cd $REMOTE_PATH
-unzip -o $ARCHIVE_NAME
-rm -f $ARCHIVE_NAME
-echo "项目部署完成！dist 中的文件已解压到 $REMOTE_PATH"
-EOF
+eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'cd \"$REMOTE_PATH\" && unzip -o \"$ARCHIVE_NAME\" && rm -f \"$ARCHIVE_NAME\" && echo \"项目部署完成！dist 中的文件已解压到 $REMOTE_PATH\"'"
 
 if [ $? -eq 0 ]; then
   echo "远程解压成功，部署完成！"
