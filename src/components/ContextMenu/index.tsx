@@ -29,6 +29,23 @@ const MenuContainer = styled(motion.div)`
   min-width: 200px;
   box-shadow: ${globalStyles.shadows.medium};
   z-index: 1000;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    border-radius: 16px 16px 0 0;
+    padding: ${globalStyles.spacing.md};
+    padding-bottom: calc(${globalStyles.spacing.md} + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
@@ -44,6 +61,7 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
   }};
   opacity: ${props => props.disabled ? 0.5 : 1};
   transition: all 0.3s ease;
+  border-radius: 4px;
 
   &:hover {
     background-color: ${props => props.disabled ? 'transparent' : globalStyles.colors.secondary};
@@ -52,6 +70,29 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
   .icon {
     font-size: 16px;
   }
+
+  @media (max-width: 768px) {
+    padding: ${globalStyles.spacing.md};
+    font-size: 16px;
+    border-radius: 8px;
+    margin-bottom: ${globalStyles.spacing.xs};
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+`;
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 `;
 
 const menuAnimation = {
@@ -61,15 +102,101 @@ const menuAnimation = {
   transition: { duration: 0.2 }
 };
 
+const mobileMenuAnimation = {
+  initial: { y: '100%', opacity: 0 },
+  animate: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      y: { type: 'spring', damping: 25, stiffness: 300 },
+      opacity: { duration: 0.2 }
+    }
+  },
+  exit: {
+    y: '100%',
+    opacity: 0,
+    transition: {
+      y: { type: 'spring', damping: 35, stiffness: 400 },
+      opacity: { duration: 0.2 }
+    }
+  }
+};
+
+const overlayAnimation = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.2,
+      ease: 'easeOut'
+    }
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+      ease: 'easeIn'
+    }
+  }
+};
+
+const MenuHandle = styled.div`
+  width: 36px;
+  height: 4px;
+  background-color: ${globalStyles.colors.border};
+  border-radius: 2px;
+  margin: 0 auto ${globalStyles.spacing.sm};
+  opacity: 0.8;
+`;
+
 export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
   const [position, setPosition] = useState<Position | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const longPressTimer = useRef<number | null>(null);
+  const touchStartTime = useRef<number>(0);
+  const isMobile = window.innerWidth <= 768;
 
   const handleContextMenu = (event: MouseEvent) => {
+    if (isMobile) return; // 移动端不响应右键事件
     event.preventDefault();
     const x = event.clientX;
     const y = event.clientY;
     setPosition({ x, y });
+  };
+
+  const handleTouchStart = (event: TouchEvent) => {
+    if (!isMobile) return;
+    const touch = event.touches[0];
+    touchStartTime.current = Date.now();
+    longPressTimer.current = window.setTimeout(() => {
+      const x = touch.clientX;
+      const y = touch.clientY;
+      setPosition({ x, y });
+      // 震动反馈（如果设备支持）
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }, 500); // 500ms 长按触发
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile) return;
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    // 如果是短按（小于500ms）并且菜单已经显示，则关闭菜单
+    if (Date.now() - touchStartTime.current < 500 && position) {
+      setPosition(null);
+    }
+  };
+
+  const handleTouchMove = () => {
+    if (!isMobile) return;
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
   };
 
   const handleClick = (e: MouseEvent) => {
@@ -81,50 +208,68 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
   useEffect(() => {
     document.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('click', handleClick);
-    
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchmove', handleTouchMove);
+
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('click', handleClick);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+      }
     };
   }, []);
 
   // 处理菜单位置，确保不会超出视窗
   const adjustedPosition = position ? {
-    x: Math.min(position.x, window.innerWidth - (menuRef.current?.offsetWidth || 0)),
-    y: Math.min(position.y, window.innerHeight - (menuRef.current?.offsetHeight || 0))
+    x: isMobile ? window.innerWidth / 2 : Math.min(position.x, window.innerWidth - (menuRef.current?.offsetWidth || 0)),
+    y: isMobile ? window.innerHeight - (menuRef.current?.offsetHeight || 0) - 20 : Math.min(position.y, window.innerHeight - (menuRef.current?.offsetHeight || 0))
   } : null;
 
   return (
     <AnimatePresence>
       {position && (
-        <MenuContainer
-          ref={menuRef}
-          style={{
-            left: adjustedPosition?.x,
-            top: adjustedPosition?.y,
-          }}
-          {...menuAnimation}
-        >
-          {items.map((item) => (
-            <MenuItem
-              key={item.key}
-              danger={item.danger}
-              disabled={item.disabled}
-              onClick={() => {
-                if (!item.disabled && item.onClick) {
-                  item.onClick();
-                  setPosition(null);
-                }
-              }}
-            >
-              {item.icon && <span className="icon">{item.icon}</span>}
-              {item.label}
-            </MenuItem>
-          ))}
-        </MenuContainer>
+        <>
+          {isMobile && (
+            <Overlay
+              {...overlayAnimation}
+              onClick={() => setPosition(null)}
+            />
+          )}
+          <MenuContainer
+            ref={menuRef}
+            style={!isMobile ? {
+              left: adjustedPosition?.x,
+              top: adjustedPosition?.y,
+            } : undefined}
+            {...(isMobile ? mobileMenuAnimation : menuAnimation)}
+          >
+            {isMobile && <MenuHandle />}
+            {items.map((item) => (
+              <MenuItem
+                key={item.key}
+                danger={item.danger}
+                disabled={item.disabled}
+                onClick={() => {
+                  if (!item.disabled && item.onClick) {
+                    item.onClick();
+                    setPosition(null);
+                  }
+                }}
+              >
+                {item.icon && <span className="icon">{item.icon}</span>}
+                {item.label}
+              </MenuItem>
+            ))}
+          </MenuContainer>
+        </>
       )}
     </AnimatePresence>
   );
 };
 
-export default ContextMenu; 
+export default ContextMenu;
