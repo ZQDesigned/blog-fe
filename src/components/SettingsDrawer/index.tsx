@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Typography, Radio, Space, Spin } from 'antd';
+import { Drawer, Typography, Space, Spin } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { globalStyles } from '../../styles/theme';
@@ -12,7 +12,7 @@ const PreviewContainer = styled.div`
   display: flex;
   gap: ${globalStyles.spacing.md};
   margin-top: ${globalStyles.spacing.md};
-  flex-wrap: wrap;
+  flex-direction: column;
 `;
 
 const PreviewCard = styled.div<{ $selected?: boolean }>`
@@ -24,9 +24,15 @@ const PreviewCard = styled.div<{ $selected?: boolean }>`
   position: relative;
   border: 2px solid ${props => props.$selected ? globalStyles.colors.primary : 'transparent'};
   transition: all 0.3s ease;
+  box-shadow: ${globalStyles.shadows.small};
 
   &:hover {
     transform: scale(1.02);
+    box-shadow: ${globalStyles.shadows.medium};
+  }
+
+  @media (max-width: 768px) {
+    aspect-ratio: 9/16;
   }
 `;
 
@@ -36,6 +42,7 @@ const DefaultPreview = styled(PreviewCard)`
   align-items: center;
   justify-content: center;
   color: ${globalStyles.colors.lightText};
+  font-size: 16px;
 `;
 
 const ImagePreview = styled(PreviewCard)`
@@ -93,23 +100,24 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <div>
           <Title level={5}>背景设置</Title>
-          <Radio.Group
-            value={backgroundType}
-            onChange={e => onBackgroundTypeChange(e.target.value)}
-          >
-            <Space direction="vertical">
-              <Radio value="default">默认背景</Radio>
-              <Radio value="anime">随机动漫图</Radio>
-            </Space>
-          </Radio.Group>
-
           <PreviewContainer>
-            <DefaultPreview $selected={backgroundType === 'default'}>
+            <DefaultPreview 
+              $selected={backgroundType === 'default'}
+              onClick={() => onBackgroundTypeChange('default')}
+            >
               默认背景
             </DefaultPreview>
-            <ImagePreview $selected={backgroundType === 'anime'}>
+            <ImagePreview 
+              $selected={backgroundType === 'anime'}
+              onClick={() => onBackgroundTypeChange('anime')}
+            >
               {backgroundType === 'anime' && (
-                <RefreshButton onClick={onRefreshBackground}>
+                <RefreshButton 
+                  onClick={(e) => {
+                    e.stopPropagation(); // 阻止事件冒泡
+                    onRefreshBackground();
+                  }}
+                >
                   <ReloadOutlined />
                 </RefreshButton>
               )}
@@ -141,6 +149,6 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
       </Space>
     </Drawer>
   );
-};
+}
 
 export default SettingsDrawer; 
