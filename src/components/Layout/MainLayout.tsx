@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Layout, Menu, Avatar, Spin } from 'antd';
 import {
   HomeOutlined,
@@ -16,14 +16,34 @@ import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
 import { formatDate } from '../../utils/dateUtils';
 import { useToast } from '../../hooks/useToast.ts';
+import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
+import SettingsDrawer from '../SettingsDrawer';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
 const { Header, Content, Footer } = Layout;
 
-const StyledLayout = styled(Layout)`
+const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null }>`
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: ${props => props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: ${props => props.$backgroundUrl ? 0.15 : 1};
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.3s ease;
+  }
 `;
 
 const StyledHeader = styled(Header)`
@@ -149,6 +169,14 @@ export const MainLayout: React.FC = () => {
   const location = useLocation();
   const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
   const { showToast } = useToast();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const {
+    backgroundType,
+    backgroundUrl,
+    isLoading,
+    setBackgroundType,
+    refreshBackground
+  } = useBackgroundSettings();
 
   const handleMenuClick = (path: string) => {
     navigate(path);
@@ -301,12 +329,13 @@ export const MainLayout: React.FC = () => {
   const buildTime = import.meta.env.VITE_BUILD_TIME || Date.now();
 
   return (
-    <StyledLayout>
+    <StyledLayout $backgroundUrl={backgroundType === 'anime' ? backgroundUrl : null}>
       <StyledHeader>
         <HeaderLeft>
           <StyledAvatar
             size={40}
             src="https://www.loliapi.com/acg/pp/"
+            onClick={() => setSettingsOpen(true)}
           />
         </HeaderLeft>
         <StyledMenu
@@ -354,6 +383,16 @@ export const MainLayout: React.FC = () => {
       }>
         {showGameModal && <GameModal open={showGameModal} onClose={handleCloseGameModal} />}
       </Suspense>
+
+      <SettingsDrawer
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        backgroundType={backgroundType}
+        backgroundUrl={backgroundUrl}
+        isLoading={isLoading}
+        onBackgroundTypeChange={setBackgroundType}
+        onRefreshBackground={refreshBackground}
+      />
     </StyledLayout>
   );
 };
