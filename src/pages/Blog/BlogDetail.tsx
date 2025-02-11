@@ -23,10 +23,12 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled(motion.div)`
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   padding: ${globalStyles.spacing.xl};
   border-radius: 8px;
   box-shadow: ${globalStyles.shadows.small};
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
   @media (max-width: 768px) {
     border-radius: 0;
