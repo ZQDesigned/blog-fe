@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
-import { GithubOutlined, GlobalOutlined } from '@ant-design/icons';
+import { GithubOutlined, GlobalOutlined, PictureOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
+import LazyImage from '../../components/LazyImage';
 
 const { Title, Paragraph } = Typography;
 
@@ -38,6 +39,12 @@ const StyledCard = styled(motion(Card))`
     transform: translateY(-4px);
     box-shadow: ${globalStyles.shadows.medium};
   }
+
+  &.image-error {
+    .ant-card-cover {
+      display: none;
+    }
+  }
 `;
 
 const ProjectTag = styled(Tag)`
@@ -64,6 +71,64 @@ const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused'
   right: 12px;
   padding: 0 ${globalStyles.spacing.sm};
   border-radius: 12px;
+`;
+
+const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(45deg, ${globalStyles.colors.secondary}80, ${globalStyles.colors.secondary});
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: ${globalStyles.colors.lightText};
+  gap: ${globalStyles.spacing.sm};
+  border-radius: ${props => props.$isModal ? '8px' : '8px 8px 0 0'};
+  padding: ${globalStyles.spacing.lg};
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .icon-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    padding: ${props => props.$isModal ? globalStyles.spacing.lg : globalStyles.spacing.md};
+    backdrop-filter: blur(4px);
+    margin-bottom: ${globalStyles.spacing.sm};
+  }
+
+  .error-text {
+    font-size: ${props => props.$isModal ? '16px' : '14px'};
+    text-align: center;
+    color: ${globalStyles.colors.lightText};
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .retry-text {
+    font-size: ${props => props.$isModal ? '14px' : '12px'};
+    opacity: 0.8;
+  }
 `;
 
 const getStatusColor = (status: 'developing' | 'maintaining' | 'paused') => {
@@ -208,6 +273,21 @@ const Projects: React.FC = () => {
   useTitle('项目', { restoreOnUnmount: true });
 
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null);
+  const [imageLoadError, setImageLoadError] = useState<{ [key: number]: boolean }>({});
+
+  const handleImageError = (projectId: number) => {
+    setImageLoadError(prev => ({ ...prev, [projectId]: true }));
+  };
+
+  const ErrorDisplay = ({ isModal = false }) => (
+    <ImageErrorContainer $isModal={isModal}>
+      <div className="icon-wrapper">
+        <PictureOutlined style={{ fontSize: isModal ? 48 : 32 }} />
+      </div>
+      <span className="error-text">图片加载失败</span>
+      <span className="retry-text">请刷新页面重试</span>
+    </ImageErrorContainer>
+  );
 
   return (
     <Container>
@@ -220,7 +300,18 @@ const Projects: React.FC = () => {
           {PROJECTS.map((project) => (
             <StyledCard
               key={project.id}
-              cover={<img alt={project.title} src={project.image} />}
+              className={imageLoadError[project.id] ? 'image-error' : ''}
+              cover={
+                !imageLoadError[project.id] && (
+                  <LazyImage
+                    src={project.image}
+                    alt={project.title}
+                    onError={() => handleImageError(project.id)}
+                    loadingSize={40}
+                    style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }}
+                  />
+                )
+              }
               onClick={() => setSelectedProject(project)}
               variants={cardVariants}
               initial="hidden"
@@ -254,11 +345,23 @@ const Projects: React.FC = () => {
         >
           {selectedProject && (
             <>
-              <img
-                src={selectedProject.image}
-                alt={selectedProject.title}
-                style={{ width: '100%', borderRadius: '8px', marginBottom: globalStyles.spacing.md }}
-              />
+              {imageLoadError[selectedProject.id] ? (
+                <ErrorDisplay isModal={true} />
+              ) : (
+                <LazyImage
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  onError={() => handleImageError(selectedProject.id)}
+                  loadingSize={60}
+                  style={{ 
+                    width: '100%', 
+                    borderRadius: '8px', 
+                    marginBottom: globalStyles.spacing.md,
+                    aspectRatio: '16/9',
+                    objectFit: 'cover'
+                  }}
+                />
+              )}
 
               <Title level={4}>项目描述</Title>
               <Paragraph>{selectedProject.description}</Paragraph>
