@@ -4,6 +4,7 @@ export const ROUTES = {
   BLOG_DETAIL: '/blog/:id',
   ABOUT: '/about',
   PROJECTS: '/projects',
+  GAMES: '/games',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

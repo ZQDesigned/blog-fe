@@ -28,6 +28,7 @@ export const globalStyles = {
     text: '#333333',
     lightText: '#666666',
     border: '#e8e8e8',
+    background: '#ffffff',
   },
   spacing: {
     xs: '4px',

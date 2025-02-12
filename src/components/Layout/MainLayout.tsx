@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { NAV_ITEMS } from '../../constants/routes';
+import {NAV_ITEMS, ROUTES} from '../../constants/routes';
 import { globalStyles } from '../../styles/theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
@@ -137,6 +137,18 @@ const FooterLinks = styled.div`
   }
 `;
 
+const GameLink = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.sm};
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: ${globalStyles.colors.primary};
+  }
+`;
+
 const BuildInfo = styled.div`
   color: ${globalStyles.colors.lightText};
   font-size: 12px;
@@ -205,7 +217,7 @@ export const MainLayout: React.FC = () => {
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
           const successful = document.execCommand('copy');
           document.body.removeChild(textArea);
@@ -253,8 +265,8 @@ export const MainLayout: React.FC = () => {
       } else {
         const successful = await copyUrlToClipboard();
         showToast(
-          successful 
-            ? '当前浏览器不支持分享功能，已复制链接到剪贴板' 
+          successful
+            ? '当前浏览器不支持分享功能，已复制链接到剪贴板'
             : '当前浏览器不支持分享功能，复制链接失败',
           {
             type: successful ? 'info' : 'error',
@@ -273,8 +285,8 @@ export const MainLayout: React.FC = () => {
       console.error('分享失败:', error);
       const successful = await copyUrlToClipboard();
       showToast(
-        successful 
-          ? '分享失败，已复制链接到剪贴板' 
+        successful
+          ? '分享失败，已复制链接到剪贴板'
           : '分享失败，复制链接也失败了',
         {
           type: successful ? 'warning' : 'error',
@@ -361,6 +373,10 @@ export const MainLayout: React.FC = () => {
           </div>
         )}
         <FooterLinks>
+          <GameLink onClick={() => navigate(ROUTES.GAMES)}>
+            <span>🎮</span>
+            <span>休闲游戏</span>
+          </GameLink>
           <BuildInfo>
             <span>构建于：{formatDate(Number(buildTime))}</span>
             <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>

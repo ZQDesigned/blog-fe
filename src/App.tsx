@@ -15,6 +15,7 @@ const BlogPage = lazy(() => import('./pages/Blog'));
 const BlogDetailPage = lazy(() => import('./pages/Blog/BlogDetail'));
 const ProjectsPage = lazy(() => import('./pages/Projects'));
 const AboutPage = lazy(() => import('./pages/About'));
+const GamesPage = lazy(() => import('./pages/Games'));
 
 function App() {
   return (
@@ -49,6 +50,11 @@ function App() {
                 <Route path={ROUTES.ABOUT} element={
                   <Suspense fallback={<PageLoading tip="加载个人信息" />}>
                     <AboutPage />
+                  </Suspense>
+                } />
+                <Route path={ROUTES.GAMES} element={
+                  <Suspense fallback={<PageLoading tip="加载游戏列表" />}>
+                    <GamesPage />
                   </Suspense>
                 } />
               </Route>
