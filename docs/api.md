@@ -48,12 +48,20 @@ Authorization: Bearer <token>
 
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| page | integer | 否 | 页码，默认 1 |
-| size | integer | 否 | 每页条数，默认 10 |
-| sort | string | 否 | 排序字段，可选值：createTime,viewCount |
-| order | string | 否 | 排序方式，可选值：asc,desc |
+| page | integer | 否 | 页码，默认 1，最小值：1 |
+| size | integer | 否 | 每页条数，默认 10，取值范围：1-100 |
+| sort | string | 否 | 排序字段，可选值：createTime（创建时间）,viewCount（访问量），默认：createTime |
+| order | string | 否 | 排序方式，可选值：asc（升序）,desc（降序），默认：desc |
 | tag | string | 否 | 标签筛选 |
 | category | string | 否 | 分类筛选 |
+
+#### 错误响应
+
+除了通用错误码外，本接口还可能返回以下错误：
+
+| 错误码 | 说明 |
+|--------|------|
+| 400 | 参数验证失败，如：页码小于1、每页条数超出范围、排序字段不正确等 |
 
 #### 响应示例
 
@@ -123,13 +131,22 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "title": "文章标题",
-  "content": "文章内容（Markdown格式）",
-  "summary": "文章摘要",
-  "category": "技术",
-  "tags": ["React", "TypeScript"]
+  "title": "文章标题",          // 必填
+  "content": "文章内容",        // 选填，Markdown格式
+  "summary": "文章摘要",        // 选填
+  "categoryId": 1,             // 必填，分类ID
+  "tagIds": [1, 2]            // 必填，标签ID列表
 }
 ```
+
+#### 错误响应
+
+除了通用错误码外，本接口还可能返回以下错误：
+
+| 错误码 | 说明 |
+|--------|------|
+| 400 | 参数验证失败，如：标题为空、分类ID为空、标签列表为空等 |
+| 404 | 分类或标签不存在 |
 
 #### 响应示例
 
@@ -160,13 +177,22 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "title": "文章标题",
-  "content": "文章内容（Markdown格式）",
-  "summary": "文章摘要",
-  "category": "技术",
-  "tags": ["React", "TypeScript"]
+  "title": "文章标题",          // 必填
+  "content": "文章内容",        // 选填，Markdown格式
+  "summary": "文章摘要",        // 选填
+  "categoryId": 1,             // 必填，分类ID
+  "tagIds": [1, 2]            // 必填，标签ID列表
 }
 ```
+
+#### 错误响应
+
+除了通用错误码外，本接口还可能返回以下错误：
+
+| 错误码 | 说明 |
+|--------|------|
+| 400 | 参数验证失败，如：标题为空、分类ID为空、标签列表为空等 |
+| 404 | 文章不存在，或分类/标签不存在 |
 
 #### 响应示例
 
@@ -457,6 +483,349 @@ Authorization: Bearer <token>
   "data": null
 }
 ```
+
+# 个人博客 API 文档
+
+[原有内容保持不变...]
+
+## 分类接口
+
+### 获取分类列表
+
+#### 请求信息
+
+- 路径：`GET /api/category/list`
+- 认证：不需要
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "技术",
+      "description": "技术相关文章",
+      "articleCount": 10,
+      "createTime": "2024-03-15T12:00:00",
+      "updateTime": "2024-03-15T12:00:00"
+    }
+  ]
+}
+```
+
+### 获取分类详情
+
+#### 请求信息
+
+- 路径：`GET /api/category/{id}`
+- 认证：不需要
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 分类ID |
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "技术",
+    "description": "技术相关文章",
+    "articleCount": 10,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 创建分类
+
+#### 请求信息
+
+- 路径：`POST /api/category`
+- 认证：需要 JWT
+
+#### 请求体
+
+```json
+{
+  "name": "技术",
+  "description": "技术相关文章"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "技术",
+    "description": "技术相关文章",
+    "articleCount": 0,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 修改分类
+
+#### 请求信息
+
+- 路径：`PUT /api/category/{id}`
+- 认证：需要 JWT
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 分类ID |
+
+#### 请求体
+
+```json
+{
+  "name": "技术",
+  "description": "技术相关文章"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "技术",
+    "description": "技术相关文章",
+    "articleCount": 10,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 删除分类
+
+#### 请求信息
+
+- 路径：`DELETE /api/category/{id}`
+- 认证：需要 JWT
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 分类ID |
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+## 标签接口
+
+### 获取标签列表
+
+#### 请求信息
+
+- 路径：`GET /api/tag/list`
+- 认证：不需要
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Spring Boot",
+      "description": "Spring Boot相关",
+      "articleCount": 5,
+      "createTime": "2024-03-15T12:00:00",
+      "updateTime": "2024-03-15T12:00:00"
+    }
+  ]
+}
+```
+
+### 获取标签详情
+
+#### 请求信息
+
+- 路径：`GET /api/tag/{id}`
+- 认证：不需要
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 标签ID |
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "Spring Boot",
+    "description": "Spring Boot相关",
+    "articleCount": 5,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 创建标签
+
+#### 请求信息
+
+- 路径：`POST /api/tag`
+- 认证：需要 JWT
+
+#### 请求体
+
+```json
+{
+  "name": "Spring Boot",
+  "description": "Spring Boot相关"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "Spring Boot",
+    "description": "Spring Boot相关",
+    "articleCount": 0,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 修改标签
+
+#### 请求信息
+
+- 路径：`PUT /api/tag/{id}`
+- 认证：需要 JWT
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 标签ID |
+
+#### 请求体
+
+```json
+{
+  "name": "Spring Boot",
+  "description": "Spring Boot相关"
+}
+```
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "Spring Boot",
+    "description": "Spring Boot相关",
+    "articleCount": 5,
+    "createTime": "2024-03-15T12:00:00",
+    "updateTime": "2024-03-15T12:00:00"
+  }
+}
+```
+
+### 删除标签
+
+#### 请求信息
+
+- 路径：`DELETE /api/tag/{id}`
+- 认证：需要 JWT
+
+#### 路径参数
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| id | integer | 是 | 标签ID |
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+## 数据库表结构
+
+### 分类表 (t_category)
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | bigint | 主键 |
+| name | varchar(50) | 分类名称 |
+| description | varchar(200) | 分类描述 |
+| article_count | int | 文章数量 |
+| create_time | datetime | 创建时间 |
+| update_time | datetime | 更新时间 |
+
+### 标签表 (t_tag)
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | bigint | 主键 |
+| name | varchar(50) | 标签名称 |
+| description | varchar(200) | 标签描述 |
+| article_count | int | 文章数量 |
+| create_time | datetime | 创建时间 |
+| update_time | datetime | 更新时间 |
+
+### 文章-标签关联表 (t_blog_tag)
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | bigint | 主键 |
+| blog_id | bigint | 文章ID |
+| tag_id | bigint | 标签ID |
+| create_time | datetime | 创建时间 |
 
 ## 数据库表结构
 
