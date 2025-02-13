@@ -43,7 +43,8 @@ root.render(<App />);
 \`\`\`
     `,
     tags: ['React', 'JavaScript', '前端框架', '性能优化'],
-    date: '2024-03-15'
+    date: '2024-03-15',
+    viewCount: 1234
   },
   {
     id: 2,
@@ -75,7 +76,8 @@ type Readonly<T> = {
 - Record<K, T>
     `,
     tags: ['TypeScript', 'JavaScript', '类型系统'],
-    date: '2024-03-14'
+    date: '2024-03-14',
+    viewCount: 856
   },
   {
     id: 3,
@@ -106,7 +108,8 @@ public class UserController {
 \`\`\`
     `,
     tags: ['Java', 'Spring Boot', '后端框架'],
-    date: '2024-03-13'
+    date: '2024-03-13',
+    viewCount: 789
   },
   {
     id: 4,
@@ -139,7 +142,8 @@ services:
 \`\`\`
     `,
     tags: ['Docker', '容器化', 'DevOps'],
-    date: '2024-03-12'
+    date: '2024-03-12',
+    viewCount: 654
   },
   {
     id: 5,
@@ -166,7 +170,8 @@ db.users.createIndex({ status: 1, createdAt: -1 })
 \`\`\`
     `,
     tags: ['MongoDB', '数据库', '性能优化'],
-    date: '2024-03-11'
+    date: '2024-03-11',
+    viewCount: 543
   },
   {
     id: 6,
@@ -189,6 +194,7 @@ db.users.createIndex({ status: 1, createdAt: -1 })
 - 消息队列
     `,
     tags: ['微服务', '系统设计', '架构设计'],
-    date: '2024-03-10'
+    date: '2024-03-10',
+    viewCount: 432
   }
 ];

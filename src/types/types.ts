@@ -6,4 +6,5 @@ export interface BlogData {
   tags: string[];
   category: string;
   date: string;
+  viewCount: number;
 } 

@@ -207,6 +207,7 @@ interface BlogData {
   category: string;
   date: string;
   content: string;
+  viewCount: number;
 }
 
 const Blog: React.FC = () => {
@@ -334,7 +335,10 @@ const Blog: React.FC = () => {
                 whileHover={{ scale: 1.02 }}
               >
                 <Title level={4}>{blog.title}</Title>
-                <Tag color="blue" style={{ marginBottom: globalStyles.spacing.sm }}>{blog.category}</Tag>
+                <Tag color="blue">{blog.category}</Tag>
+                <Space style={{ marginLeft: globalStyles.spacing.sm }}>
+                  <EyeOutlined /> {blog.viewCount} 次浏览
+                </Space>
                 <PreviewMarkdownRenderer content={blog.summary} />
                 <TagsContainer>
                   <Space>

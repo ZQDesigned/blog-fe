@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Space, Tag, Button, Skeleton } from 'antd';
-import { ArrowLeftOutlined, CalendarOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CalendarOutlined, EyeOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -101,6 +101,8 @@ const BlogDetail: React.FC = () => {
 
         <BlogMeta>
           <CalendarOutlined /> {blog.date}
+          <span style={{ margin: `0 ${globalStyles.spacing.sm}` }}>•</span>
+          <EyeOutlined /> {blog.viewCount} 次浏览
         </BlogMeta>
 
         <Space wrap>
