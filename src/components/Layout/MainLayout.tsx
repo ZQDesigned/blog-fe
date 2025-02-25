@@ -18,6 +18,7 @@ import { formatDate } from '../../utils/dateUtils';
 import { useToast } from '../../hooks/useToast.ts';
 import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
 import SettingsDrawer from '../SettingsDrawer';
+import FloatSidebar from '../FloatSidebar';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
@@ -110,6 +111,23 @@ const IcpLink = styled.a`
   }
 `;
 
+const BadgesGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.md};
+  flex-wrap: wrap;
+  justify-content: center;
+
+  a {
+    line-height: 0;
+  }
+
+  img {
+    height: 20px;
+    width: auto;
+  }
+`;
+
 const FooterLinks = styled.div`
   margin-top: ${globalStyles.spacing.md};
   padding-top: ${globalStyles.spacing.md};
@@ -174,6 +192,20 @@ const LoadingContainer = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
+`;
+
+const IcpContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${globalStyles.spacing.md};
+  margin-top: 8px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: ${globalStyles.spacing.sm};
+  }
 `;
 
 export const MainLayout: React.FC = () => {
@@ -362,16 +394,23 @@ export const MainLayout: React.FC = () => {
       </StyledHeader>
       <StyledContent>
         <Outlet />
+        <FloatSidebar />
       </StyledContent>
       <StyledFooter>
         <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
-        {icpNumber && (
-          <div style={{ marginTop: 8 }}>
-            <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
-              {icpNumber}
-            </IcpLink>
-          </div>
-        )}
+        <IcpContainer>
+          <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
+            {icpNumber}
+          </IcpLink>
+          <BadgesGroup>
+            <a href="https://ipw.cn/ssl/?site=blog.zqdesigned.city" title="本站支持SSL安全访问" target='_blank'>
+              <img alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s4.svg" />
+            </a>
+            <a href="https://ipw.cn/ipv6webcheck/?site=blog.zqdesigned.city" title="本站支持IPv6访问" target='_blank'>
+              <img alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s4.svg" />
+            </a>
+          </BadgesGroup>
+        </IcpContainer>
         <FooterLinks>
           <GameLink onClick={() => navigate(ROUTES.GAMES)}>
             <span>🎮</span>
