@@ -26,6 +26,42 @@ const GlobalStyles = () => {
       transition: all 0.3s;
     }
 
+    /* 自定义滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: ${globalStyles.colors.secondary};
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        45deg,
+        ${globalStyles.colors.primary}40,
+        ${globalStyles.colors.primary}80
+      );
+      border-radius: 4px;
+      border: 2px solid ${globalStyles.colors.secondary};
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(
+          45deg,
+          ${globalStyles.colors.primary}60,
+          ${globalStyles.colors.primary}a0
+        );
+      }
+    }
+
+    /* Firefox 滚动条样式 */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: ${globalStyles.colors.primary}60 ${globalStyles.colors.secondary};
+    }
+
     #root {
       width: 100%;
       min-height: 100vh;
