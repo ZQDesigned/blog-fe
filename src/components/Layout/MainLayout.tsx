@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Layout, Menu, Avatar, Spin } from 'antd';
 import {
   HomeOutlined,
@@ -6,7 +6,8 @@ import {
   ReloadOutlined,
   ArrowUpOutlined,
   CopyOutlined,
-  ShareAltOutlined
+  ShareAltOutlined,
+  ArrowRightOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
@@ -88,14 +89,12 @@ const StyledContent = styled(Content)`
     padding: 0;
   }
 `;
-
-const StyledFooter = styled(Footer)`
+styled(Footer)`
   text-align: center;
   background: #fff;
   width: 100%;
   padding: ${globalStyles.spacing.lg};
 `;
-
 const StyledMenu = styled(Menu)`
   flex: 1;
   border-bottom: none;
@@ -128,45 +127,93 @@ const BadgesGroup = styled.div`
   }
 `;
 
-const FooterLinks = styled.div`
-  margin-top: ${globalStyles.spacing.md};
-  padding-top: ${globalStyles.spacing.md};
-  border-top: 1px solid ${globalStyles.colors.border};
-  color: ${globalStyles.colors.lightText};
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: ${globalStyles.spacing.md};
+const FooterContainer = styled.div`
+  background: #fff;
+  padding: ${globalStyles.spacing.xl} 0 0;
+`;
 
-  a {
-    color: inherit;
-    text-decoration: none;
-    margin: 0 ${globalStyles.spacing.sm};
-    &:hover {
-      color: ${globalStyles.colors.primary};
-    }
-  }
+const FooterContent = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 ${globalStyles.spacing.xl};
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: ${globalStyles.spacing.xl};
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: ${globalStyles.spacing.sm};
+    grid-template-columns: 1fr;
+    padding: 0 ${globalStyles.spacing.lg};
+    gap: ${globalStyles.spacing.lg};
   }
 `;
 
-const GameLink = styled.div`
+const FooterColumn = styled.div`
   display: flex;
-  align-items: center;
-  gap: ${globalStyles.spacing.sm};
-  cursor: pointer;
+  flex-direction: column;
+  gap: ${globalStyles.spacing.md};
+`;
+
+const FooterTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 ${globalStyles.spacing.md};
+  color: ${globalStyles.colors.text};
+`;
+
+const FooterLink = styled.span<{ $isExternal?: boolean }>`
+  color: ${globalStyles.colors.lightText};
+  text-decoration: none;
   transition: color 0.3s ease;
+  font-size: 14px;
+  cursor: pointer;
 
   &:hover {
     color: ${globalStyles.colors.primary};
   }
 `;
 
+const ExternalLinkContainer = styled.div`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.xs};
+`;
+
+const ExternalLink = styled.a`
+  color: ${globalStyles.colors.lightText};
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 14px;
+
+  &:hover {
+    color: ${globalStyles.colors.primary};
+  }
+
+  &:hover + .link-icon {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const LinkIcon = styled(ArrowRightOutlined)`
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+  color: ${globalStyles.colors.primary};
+`;
+
+const FooterBottom = styled.div`
+  margin-top: ${globalStyles.spacing.xl};
+  padding: ${globalStyles.spacing.md} ${globalStyles.spacing.xl};
+  border-top: 1px solid ${globalStyles.colors.border};
+  text-align: center;
+  color: ${globalStyles.colors.lightText};
+  font-size: 14px;
+
+  @media (max-width: 768px) {
+    padding: ${globalStyles.spacing.md};
+  }
+`;
 const BuildInfo = styled.div`
   color: ${globalStyles.colors.lightText};
   font-size: 12px;
@@ -175,17 +222,9 @@ const BuildInfo = styled.div`
   display: flex;
   gap: ${globalStyles.spacing.sm};
   flex-wrap: wrap;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 `;
-
-const LinksGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${globalStyles.spacing.sm};
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
 const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -221,6 +260,14 @@ export const MainLayout: React.FC = () => {
     setBackgroundType,
     refreshBackground
   } = useBackgroundSettings();
+
+  // 监听路由变化，自动滚动到顶部
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }, [location.pathname]);
 
   const handleMenuClick = (path: string) => {
     navigate(path);
@@ -396,38 +443,80 @@ export const MainLayout: React.FC = () => {
         <Outlet />
         <FloatSidebar />
       </StyledContent>
-      <StyledFooter>
-        <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
-        <IcpContainer>
-          <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
-            {icpNumber}
-          </IcpLink>
-          <BadgesGroup>
-            <a href="https://ipw.cn/ssl/?site=blog.zqdesigned.city" title="本站支持SSL安全访问" target='_blank'>
-              <img alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s4.svg" />
-            </a>
-            <a href="https://ipw.cn/ipv6webcheck/?site=blog.zqdesigned.city" title="本站支持IPv6访问" target='_blank'>
-              <img alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s4.svg" />
-            </a>
-          </BadgesGroup>
-        </IcpContainer>
-        <FooterLinks>
-          <GameLink onClick={() => navigate(ROUTES.GAMES)}>
-            <span>🎮</span>
-            <span>休闲游戏</span>
-          </GameLink>
-          <BuildInfo>
-            <span>构建于：{formatDate(Number(buildTime))}</span>
-            <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
-          </BuildInfo>
-          <LinksGroup>
-            <span>友情链接：</span>
-            <a href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
-              LoliAPI
-            </a>
-          </LinksGroup>
-        </FooterLinks>
-      </StyledFooter>
+      <FooterContainer>
+        <FooterContent>
+          <FooterColumn>
+            <FooterTitle>关于</FooterTitle>
+            <FooterLink onClick={() => navigate('/')}>ZQDesigned's Blog</FooterLink>
+            <FooterLink onClick={() => navigate(ROUTES.ABOUT)}>关于我</FooterLink>
+            <FooterLink onClick={() => navigate(ROUTES.PROJECTS)}>项目展示</FooterLink>
+            <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
+          </FooterColumn>
+          <FooterColumn>
+            <FooterTitle>资源</FooterTitle>
+            <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
+            <ExternalLinkContainer>
+              <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
+                开源代码
+              </ExternalLink>
+              <LinkIcon className="link-icon" />
+            </ExternalLinkContainer>
+          </FooterColumn>
+          <FooterColumn>
+            <FooterTitle>我的</FooterTitle>
+            <ExternalLinkContainer>
+              <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
+                GitHub
+              </ExternalLink>
+              <LinkIcon className="link-icon" />
+            </ExternalLinkContainer>
+            <ExternalLinkContainer>
+              <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
+                联系我
+              </ExternalLink>
+              <LinkIcon className="link-icon" />
+            </ExternalLinkContainer>
+          </FooterColumn>
+          <FooterColumn>
+            <FooterTitle>友情链接</FooterTitle>
+            <ExternalLinkContainer>
+              <ExternalLink href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
+                LoliAPI
+              </ExternalLink>
+              <LinkIcon className="link-icon" />
+            </ExternalLinkContainer>
+            <ExternalLinkContainer>
+              <ExternalLink href="https://dev.qweather.com/" target="_blank" rel="noopener noreferrer">
+                和风天气
+              </ExternalLink>
+              <LinkIcon className="link-icon" />
+            </ExternalLinkContainer>
+          </FooterColumn>
+          <FooterColumn>
+            <FooterTitle>更多</FooterTitle>
+            <BuildInfo>
+              <span>构建于：{formatDate(Number(buildTime))}</span>
+              <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
+            </BuildInfo>
+          </FooterColumn>
+        </FooterContent>
+        <FooterBottom>
+          <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
+          <IcpContainer>
+            <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
+              {icpNumber}
+            </IcpLink>
+            <BadgesGroup>
+              <a href="https://ipw.cn/ssl/?site=blog.zqdesigned.city" title="本站支持SSL安全访问" target='_blank'>
+                <img alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s4.svg" />
+              </a>
+              <a href="https://ipw.cn/ipv6webcheck/?site=blog.zqdesigned.city" title="本站支持IPv6访问" target='_blank'>
+                <img alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s4.svg" />
+              </a>
+            </BadgesGroup>
+          </IcpContainer>
+        </FooterBottom>
+      </FooterContainer>
 
       <ContextMenu items={contextMenuItems} />
 

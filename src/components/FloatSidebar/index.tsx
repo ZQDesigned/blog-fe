@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import { Card, Typography, Space, Tag, Spin } from 'antd';
+import { Card, Typography, Space, Tag, Spin, Tooltip } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { globalStyles } from '../../styles/theme';
 import LazyImage from '../LazyImage';
 import { useWeather } from '../../hooks/useWeather';
@@ -102,6 +103,22 @@ const KeyboardShortcut = styled.span`
     border-radius: 3px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
     margin: 0 2px;
+  }
+`;
+
+const WeatherTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.xs};
+
+  .weather-tip {
+    color: ${globalStyles.colors.lightText};
+    cursor: help;
+    font-size: 14px;
+
+    &:hover {
+      color: ${globalStyles.colors.primary};
+    }
   }
 `;
 
@@ -207,7 +224,16 @@ const FloatSidebar: React.FC = () => {
         </ProfileContent>
       </ProfileCard>
 
-      <WeatherCard title="天气">
+      <WeatherCard 
+        title={
+          <WeatherTitle>
+            天气
+            <Tooltip title="此位置基于您的 IP，可能存在错误">
+              <QuestionCircleOutlined className="weather-tip" />
+            </Tooltip>
+          </WeatherTitle>
+        }
+      >
         {renderWeatherContent()}
       </WeatherCard>
     </SidebarContainer>

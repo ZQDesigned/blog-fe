@@ -16,6 +16,30 @@ interface LocationData {
   lon: string;
 }
 
+// 和风天气 API 错误码映射
+const QWeatherErrorCodes: Record<string, string> = {
+  '204': '请求成功，但你查询的地区暂时没有你需要的数据',
+  '400': '请求错误，可能包含错误的请求参数或缺少必选的请求参数',
+  '401': 'API key 错误或未找到',
+  '402': '超过访问次数或余额不足以支持继续访问服务',
+  '403': '无访问权限，可能是绑定的PackageID不正确或签名错误',
+  '404': '查询的数据或地区不存在',
+  '429': '超过限定的 QPM（每分钟访问次数）',
+  '500': '服务器内部错误'
+};
+
+const getQWeatherErrorMessage = (code: string): string => {
+  return QWeatherErrorCodes[code] || '未知错误';
+};
+
+const validateWeatherData = (data: any): boolean => {
+  return data 
+    && typeof data.temp === 'string'
+    && typeof data.humidity === 'string'
+    && typeof data.text === 'string'
+    && typeof data.windDir === 'string';
+};
+
 export const useWeather = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,34 +58,41 @@ export const useWeather = () => {
         if (cachedLocation && cachedTimestamp) {
           const timestamp = parseInt(cachedTimestamp);
           if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
-            setLocation(JSON.parse(cachedLocation));
-            return;
+            try {
+              const parsedLocation = JSON.parse(cachedLocation);
+              if (parsedLocation && parsedLocation.id && parsedLocation.name) {
+                setLocation(parsedLocation);
+                return;
+              }
+            } catch (e) {
+              console.error('Invalid cached location data:', e);
+              localStorage.removeItem('weather_location');
+              localStorage.removeItem('weather_location_timestamp');
+            }
           }
         }
 
-        // 使用 IP-API 获取用户位置信息
-        const ipResponse = await fetch('http://ip-api.com/json/?lang=zh-CN');
+        // 使用 ipapi.co 获取用户位置信息（免费版本每月30k次请求）
+        const ipResponse = await fetch('https://ipapi.co/json/');
         if (!ipResponse.ok) {
           throw new Error('无法获取位置信息，请检查网络连接');
         }
         
         const ipData = await ipResponse.json();
         
-        if (ipData.status === 'success') {
+        if (ipData.city) {
           // 使用和风天气 API 搜索城市
           const API_KEY = import.meta.env.VITE_QWEATHER_API_KEY;
           if (!API_KEY) {
             throw new Error('天气服务配置异常，请联系管理员');
           }
 
+          // 使用城市名称和省份进行更精确的定位
+          const cityQuery = `${ipData.city}${ipData.region ? ',' + ipData.region : ''}`;
           const cityResponse = await fetch(
-            `https://geoapi.qweather.com/v2/city/lookup?key=${API_KEY}&location=${ipData.city}`
+            `https://geoapi.qweather.com/v2/city/lookup?key=${API_KEY}&location=${encodeURIComponent(cityQuery)}`
           );
           
-          if (!cityResponse.ok) {
-            throw new Error('天气服务暂时不可用，请稍后再试');
-          }
-
           const cityData = await cityResponse.json();
 
           if (cityData.code === '200' && cityData.location?.[0]) {
@@ -77,10 +108,8 @@ export const useWeather = () => {
             localStorage.setItem('weather_location_timestamp', Date.now().toString());
             
             setLocation(locationData);
-          } else if (cityData.code === '404') {
-            throw new Error(`抱歉，暂不支持 ${ipData.city} 地区的天气服务`);
           } else {
-            throw new Error('无法获取城市信息，请稍后再试');
+            throw new Error(getQWeatherErrorMessage(cityData.code));
           }
         } else {
           throw new Error('无法确定您的位置信息');
@@ -93,8 +122,17 @@ export const useWeather = () => {
         // 如果发生错误，尝试使用缓存的位置信息
         const cachedLocation = localStorage.getItem('weather_location');
         if (cachedLocation) {
-          setLocation(JSON.parse(cachedLocation));
-          setError('使用缓存的位置信息');
+          try {
+            const parsedLocation = JSON.parse(cachedLocation);
+            if (parsedLocation && parsedLocation.id && parsedLocation.name) {
+              setLocation(parsedLocation);
+              setError('使用缓存的位置信息');
+            }
+          } catch (e) {
+            console.error('Invalid cached location data:', e);
+            localStorage.removeItem('weather_location');
+            localStorage.removeItem('weather_location_timestamp');
+          }
         }
       }
     };
@@ -115,13 +153,14 @@ export const useWeather = () => {
           `https://devapi.qweather.com/v7/weather/now?key=${API_KEY}&location=${location.id}`
         );
 
-        if (!response.ok) {
-          throw new Error('天气服务暂时不可用，请稍后再试');
-        }
-
         const data = await response.json();
 
-        if (data.code === '200') {
+        if (data.code === '200' && data.now) {
+          // 验证返回的数据是否完整
+          if (!validateWeatherData(data.now)) {
+            throw new Error('天气数据格式异常');
+          }
+
           const weatherData = {
             temp: data.now.temp,
             humidity: data.now.humidity,
@@ -137,10 +176,8 @@ export const useWeather = () => {
           // 缓存天气数据
           localStorage.setItem('weather_data', JSON.stringify(weatherData));
           localStorage.setItem('weather_timestamp', Date.now().toString());
-        } else if (data.code === '404') {
-          throw new Error('该地区暂不支持天气服务');
         } else {
-          throw new Error(data.message || '天气数据获取失败');
+          throw new Error(getQWeatherErrorMessage(data.code));
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '未知错误';
@@ -152,11 +189,22 @@ export const useWeather = () => {
         const cachedTimestamp = localStorage.getItem('weather_timestamp');
         
         if (cachedWeather && cachedTimestamp) {
-          const timestamp = parseInt(cachedTimestamp);
-          // 只使用1小时内的缓存数据
-          if (Date.now() - timestamp < 60 * 60 * 1000) {
-            setWeather(JSON.parse(cachedWeather));
-            setError('使用缓存的天气数据');
+          try {
+            const timestamp = parseInt(cachedTimestamp);
+            // 只使用1小时内的缓存数据
+            if (Date.now() - timestamp < 60 * 60 * 1000) {
+              const parsedWeather = JSON.parse(cachedWeather);
+              if (validateWeatherData(parsedWeather)) {
+                setWeather(parsedWeather);
+                setError('使用缓存的天气数据');
+              } else {
+                throw new Error('缓存的天气数据无效');
+              }
+            }
+          } catch (e) {
+            console.error('Invalid cached weather data:', e);
+            localStorage.removeItem('weather_data');
+            localStorage.removeItem('weather_timestamp');
           }
         }
       } finally {
