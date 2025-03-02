@@ -89,12 +89,7 @@ const StyledContent = styled(Content)`
     padding: 0;
   }
 `;
-styled(Footer)`
-  text-align: center;
-  background: #fff;
-  width: 100%;
-  padding: ${globalStyles.spacing.lg};
-`;
+
 const StyledMenu = styled(Menu)`
   flex: 1;
   border-bottom: none;
@@ -141,9 +136,10 @@ const FooterContent = styled.div`
   gap: ${globalStyles.spacing.xl};
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     padding: 0 ${globalStyles.spacing.lg};
-    gap: ${globalStyles.spacing.lg};
+    gap: ${globalStyles.spacing.xl};
   }
 `;
 
@@ -151,6 +147,20 @@ const FooterColumn = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${globalStyles.spacing.md};
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const FooterMiddleRow = styled.div`
+  display: contents;
+
+  @media (max-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: ${globalStyles.spacing.lg};
+  }
 `;
 
 const FooterTitle = styled.h3`
@@ -452,46 +462,48 @@ export const MainLayout: React.FC = () => {
             <FooterLink onClick={() => navigate(ROUTES.PROJECTS)}>项目展示</FooterLink>
             <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
           </FooterColumn>
-          <FooterColumn>
-            <FooterTitle>资源</FooterTitle>
-            <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
-            <ExternalLinkContainer>
-              <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
-                开源代码
-              </ExternalLink>
-              <LinkIcon className="link-icon" />
-            </ExternalLinkContainer>
-          </FooterColumn>
-          <FooterColumn>
-            <FooterTitle>我的</FooterTitle>
-            <ExternalLinkContainer>
-              <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
-                GitHub
-              </ExternalLink>
-              <LinkIcon className="link-icon" />
-            </ExternalLinkContainer>
-            <ExternalLinkContainer>
-              <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
-                联系我
-              </ExternalLink>
-              <LinkIcon className="link-icon" />
-            </ExternalLinkContainer>
-          </FooterColumn>
-          <FooterColumn>
-            <FooterTitle>友情链接</FooterTitle>
-            <ExternalLinkContainer>
-              <ExternalLink href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
-                LoliAPI
-              </ExternalLink>
-              <LinkIcon className="link-icon" />
-            </ExternalLinkContainer>
-            <ExternalLinkContainer>
-              <ExternalLink href="https://dev.qweather.com/" target="_blank" rel="noopener noreferrer">
-                和风天气
-              </ExternalLink>
-              <LinkIcon className="link-icon" />
-            </ExternalLinkContainer>
-          </FooterColumn>
+          <FooterMiddleRow>
+            <FooterColumn>
+              <FooterTitle>资源</FooterTitle>
+              <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
+              <ExternalLinkContainer>
+                <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
+                  开源代码
+                </ExternalLink>
+                <LinkIcon className="link-icon" />
+              </ExternalLinkContainer>
+            </FooterColumn>
+            <FooterColumn>
+              <FooterTitle>我的</FooterTitle>
+              <ExternalLinkContainer>
+                <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
+                  GitHub
+                </ExternalLink>
+                <LinkIcon className="link-icon" />
+              </ExternalLinkContainer>
+              <ExternalLinkContainer>
+                <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
+                  联系我
+                </ExternalLink>
+                <LinkIcon className="link-icon" />
+              </ExternalLinkContainer>
+            </FooterColumn>
+            <FooterColumn>
+              <FooterTitle>友情链接</FooterTitle>
+              <ExternalLinkContainer>
+                <ExternalLink href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
+                  LoliAPI
+                </ExternalLink>
+                <LinkIcon className="link-icon" />
+              </ExternalLinkContainer>
+              <ExternalLinkContainer>
+                <ExternalLink href="https://dev.qweather.com/" target="_blank" rel="noopener noreferrer">
+                  和风天气
+                </ExternalLink>
+                <LinkIcon className="link-icon" />
+              </ExternalLinkContainer>
+            </FooterColumn>
+          </FooterMiddleRow>
           <FooterColumn>
             <FooterTitle>更多</FooterTitle>
             <BuildInfo>
