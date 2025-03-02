@@ -23,7 +23,7 @@ import FloatSidebar from '../FloatSidebar';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content} = Layout;
 
 const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null }>`
   min-height: 100vh;
