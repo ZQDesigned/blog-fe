@@ -104,6 +104,16 @@ const DirectionButton = styled(Button)`
   padding: 0;
 `;
 
+const DropButton = styled(DirectionButton)`
+  background: ${globalStyles.colors.primary}40;
+  color: ${globalStyles.colors.primary};
+  
+  &:hover {
+    background: ${globalStyles.colors.primary}60;
+    border-color: ${globalStyles.colors.primary};
+  }
+`;
+
 // 俄罗斯方块的形状定义
 const TETROMINOES = {
   I: { shape: [[1, 1, 1, 1]], color: '#00f0f0' },
@@ -288,6 +298,20 @@ const GameTetris: React.FC = () => {
     }
   }, [currentPiece, gameOver, isCollision, rotatePiece]);
 
+  const hardDrop = useCallback(() => {
+    if (!currentPiece || gameOver || isPaused) return;
+
+    let dropDistance = 0;
+    while (!isCollision(currentPiece.shape, currentPiece.x, currentPiece.y + dropDistance + 1)) {
+      dropDistance++;
+    }
+
+    setCurrentPiece(prev => prev && {
+      ...prev,
+      y: prev.y + dropDistance
+    });
+  }, [currentPiece, gameOver, isPaused, isCollision]);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (gameOver) return;
 
@@ -310,10 +334,14 @@ const GameTetris: React.FC = () => {
         break;
       case ' ':
         e.preventDefault();
+        hardDrop();
+        break;
+      case 'p':
+        e.preventDefault();
         setIsPaused(prev => !prev);
         break;
     }
-  }, [gameOver, moveHorizontal, moveDown, rotate]);
+  }, [gameOver, moveHorizontal, moveDown, rotate, hardDrop]);
 
   useEffect(() => {
     resetGame();
@@ -419,7 +447,7 @@ const GameTetris: React.FC = () => {
         <DirectionButton onClick={() => moveHorizontal(1)}>→</DirectionButton>
         <div />
         <DirectionButton onClick={moveDown}>↓</DirectionButton>
-        <div />
+        <DropButton onClick={hardDrop}>⚡</DropButton>
       </TouchControls>
 
       <Modal
