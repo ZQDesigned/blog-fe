@@ -6,6 +6,7 @@ import PageLoading from '../PageLoading';
 
 const Game2048 = React.lazy(() => import('../Game2048'));
 const GameSnake = React.lazy(() => import('../GameSnake'));
+const GameTetris = React.lazy(() => import('../GameTetris'));
 
 const StyledModal = styled(Modal)`
   .ant-modal-content {
@@ -27,7 +28,8 @@ interface GameModalProps {
 
 const GAMES = [
   { component: Game2048, title: '2048' },
-  { component: GameSnake, title: '贪吃蛇' }
+  { component: GameSnake, title: '贪吃蛇' },
+  { component: GameTetris, title: '俄罗斯方块' }
 ];
 
 const GameModal: React.FC<GameModalProps> = ({ open, onClose }) => {

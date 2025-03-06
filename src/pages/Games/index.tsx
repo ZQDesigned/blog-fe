@@ -6,6 +6,7 @@ import { useMediaQuery } from 'react-responsive';
 import { globalStyles } from '../../styles/theme';
 import Game2048 from '../../components/Game2048';
 import GameSnake from '../../components/GameSnake';
+import GameTetris from '../../components/GameTetris';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -80,6 +81,13 @@ const GAMES = [
     description: '控制蛇吃掉食物不断成长，注意不要撞到自己或墙壁。使用方向键或屏幕按钮控制方向。',
     image: '/images/snake.png',
     component: GameSnake,
+  },
+  {
+    id: 'tetris',
+    title: '俄罗斯方块',
+    description: '经典的俄罗斯方块游戏，使用方向键控制方块移动和旋转，尽可能多地消除行数获得高分！',
+    image: '/images/tetris.png',
+    component: GameTetris,
   },
 ];
 
