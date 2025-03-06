@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Card, Modal } from 'antd';
+import { Card, Modal, Typography } from 'antd';
 import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
 import { globalStyles } from '../../styles/theme';
@@ -9,6 +9,8 @@ import GameSnake from '../../components/GameSnake';
 import GameTetris from '../../components/GameTetris';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
+
+const { Title } = Typography;
 
 const GamesContainer = styled.div`
   max-width: 1200px;
@@ -67,7 +69,31 @@ const GameTitle = styled.div`
   }
 `;
 
-const GAMES = [
+const CategoryTitle = styled(Title)`
+  margin-top: ${globalStyles.spacing.xl} !important;
+  margin-bottom: ${globalStyles.spacing.lg} !important;
+  color: ${globalStyles.colors.text};
+  
+  &:first-of-type {
+    margin-top: 0 !important;
+  }
+`;
+
+const WebGameCard = styled(motion(Card))`
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  background: ${globalStyles.colors.secondary};
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .ant-card-body {
+    padding: ${globalStyles.spacing.lg};
+  }
+`;
+
+const MINI_GAMES = [
   {
     id: '2048',
     title: '2048',
@@ -89,6 +115,15 @@ const GAMES = [
     image: '/images/tetris.png',
     component: GameTetris,
   },
+];
+
+const WEB_GAMES = [
+  {
+    id: 'minecraft',
+    title: 'Minecraft 1.8',
+    description: '在浏览器中体验经典的 Minecraft 1.8 版本，支持完整的游戏功能。使用 WASD 移动，空格跳跃，鼠标控制视角。',
+    url: '/minecraft/index.html'
+  }
 ];
 
 const cardVariants = {
@@ -134,6 +169,10 @@ const GamesPage: React.FC = () => {
     setSelectedGame(gameId);
   };
 
+  const handleWebGameClick = (url: string) => {
+    window.open(url, '_blank');
+  };
+
   const handleCloseGame = () => {
     setSelectedGame(null);
   };
@@ -142,13 +181,15 @@ const GamesPage: React.FC = () => {
     setImageLoadError(prev => ({ ...prev, [gameId]: true }));
   };
 
-  const selectedGameData = GAMES.find(game => game.id === selectedGame);
+  const selectedGameData = MINI_GAMES.find(game => game.id === selectedGame);
 
   return (
     <GamesContainer>
       <PageTitle>休闲游戏</PageTitle>
+
+      <CategoryTitle level={3}>小游戏</CategoryTitle>
       <GamesGrid>
-        {GAMES.map((game, index) => (
+        {MINI_GAMES.map((game, index) => (
           <GameCard
             key={game.id}
             hoverable
@@ -183,13 +224,38 @@ const GamesPage: React.FC = () => {
         ))}
       </GamesGrid>
 
+      <CategoryTitle level={3}>网页游戏</CategoryTitle>
+      <GamesGrid>
+        {WEB_GAMES.map((game, index) => (
+          <WebGameCard
+            key={game.id}
+            hoverable
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            onClick={() => handleWebGameClick(game.url)}
+          >
+            <Card.Meta
+              title={
+                <GameTitle>
+                  <span className="game-emoji">⛏️</span>
+                  {game.title}
+                </GameTitle>
+              }
+              description={game.description}
+            />
+          </WebGameCard>
+        ))}
+      </GamesGrid>
+
       <StyledModal
         open={!!selectedGame}
         onCancel={handleCloseGame}
         footer={null}
         width={isMobile ? '100%' : '90%'}
-        style={isMobile ? 
-          { top: 0, margin: 0, maxWidth: '100%', padding: 0 } : 
+        style={isMobile ?
+          { top: 0, margin: 0, maxWidth: '100%', padding: 0 } :
           { maxWidth: '800px' }
         }
         title={
@@ -209,4 +275,4 @@ const GamesPage: React.FC = () => {
   );
 };
 
-export default GamesPage; 
+export default GamesPage;
