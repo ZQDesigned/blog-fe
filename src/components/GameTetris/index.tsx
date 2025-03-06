@@ -141,7 +141,7 @@ const GameTetris: React.FC = () => {
 
   const createNewPiece = useCallback(() => {
     const shapes = Object.entries(TETROMINOES);
-    const [type, { shape, color }] = shapes[Math.floor(Math.random() * shapes.length)];
+    const [, { shape, color }] = shapes[Math.floor(Math.random() * shapes.length)];
     return { shape, color };
   }, []);
 
@@ -185,7 +185,7 @@ const GameTetris: React.FC = () => {
   const rotatePiece = useCallback((shape: number[][]) => {
     const newShape = Array(shape[0].length).fill(0)
       .map(() => Array(shape.length).fill(0));
-    
+
     for (let row = 0; row < shape.length; row++) {
       for (let col = 0; col < shape[row].length; col++) {
         newShape[col][shape.length - 1 - row] = shape[row][col];
@@ -438,4 +438,4 @@ const GameTetris: React.FC = () => {
   );
 };
 
-export default GameTetris; 
+export default GameTetris;
