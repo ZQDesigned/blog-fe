@@ -1,5 +1,5 @@
 import React, { Suspense, useState, useEffect } from 'react';
-import { Layout, Menu, Avatar, Spin } from 'antd';
+import { Layout, Menu, Avatar, Spin, Typography } from 'antd';
 import {
   HomeOutlined,
   GithubOutlined,
@@ -24,6 +24,7 @@ import FloatSidebar from '../FloatSidebar';
 const GameModal = React.lazy(() => import('../GameModal'));
 
 const { Header, Content} = Layout;
+const { Paragraph } = Typography;
 
 const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null }>`
   min-height: 100vh;
@@ -457,14 +458,25 @@ export const MainLayout: React.FC = () => {
         <FooterContent>
           <FooterColumn>
             <FooterTitle>关于</FooterTitle>
-            <FooterLink onClick={() => navigate('/')}>ZQDesigned's Blog</FooterLink>
-            <FooterLink onClick={() => navigate(ROUTES.ABOUT)}>关于我</FooterLink>
-            <FooterLink onClick={() => navigate(ROUTES.PROJECTS)}>项目展示</FooterLink>
-            <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
+            <FooterLink style={{ 
+              fontSize: '16px', 
+              fontWeight: 600,
+              marginBottom: globalStyles.spacing.xs 
+            }}>
+              LumiCMS
+            </FooterLink>
+            <Paragraph style={{ 
+              color: globalStyles.colors.lightText, 
+              fontSize: '14px', 
+              margin: 0,
+              lineHeight: '1.6'
+            }}>
+              轻量、自由、优雅——一款专为极简内容管理打造的 CMS。
+            </Paragraph>
           </FooterColumn>
           <FooterMiddleRow>
             <FooterColumn>
-              <FooterTitle>资源</FooterTitle>
+              <FooterTitle>🚃逛逛</FooterTitle>
               <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
               <ExternalLinkContainer>
                 <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
@@ -472,6 +484,7 @@ export const MainLayout: React.FC = () => {
                 </ExternalLink>
                 <LinkIcon className="link-icon" />
               </ExternalLinkContainer>
+              <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
             </FooterColumn>
             <FooterColumn>
               <FooterTitle>我的</FooterTitle>
