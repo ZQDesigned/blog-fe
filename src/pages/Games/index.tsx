@@ -7,6 +7,7 @@ import { globalStyles } from '../../styles/theme';
 import Game2048 from '../../components/Game2048';
 import GameSnake from '../../components/GameSnake';
 import GameTetris from '../../components/GameTetris';
+import GameMinesweeper from '../../components/GameMinesweeper';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -114,6 +115,13 @@ const MINI_GAMES = [
     description: '经典的俄罗斯方块游戏，使用方向键控制方块移动和旋转，尽可能多地消除行数获得高分！',
     image: '/images/tetris.png',
     component: GameTetris,
+  },
+  {
+    id: 'minesweeper',
+    title: '扫雷',
+    description: '经典的扫雷游戏，左键点击揭开方块，按F键或使用按钮切换插旗模式。小心不要踩到地雷！',
+    image: '/images/minesweeper.png',
+    component: GameMinesweeper,
   },
 ];
 
