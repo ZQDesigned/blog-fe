@@ -8,6 +8,7 @@ import Game2048 from '../../components/Game2048';
 import GameSnake from '../../components/GameSnake';
 import GameTetris from '../../components/GameTetris';
 import GameMinesweeper from '../../components/GameMinesweeper';
+import GameSudoku from '../../components/GameSudoku';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -122,6 +123,13 @@ const MINI_GAMES = [
     description: '经典的扫雷游戏，左键点击揭开方块，按F键或使用按钮切换插旗模式。小心不要踩到地雷！',
     image: '/images/minesweeper.png',
     component: GameMinesweeper,
+  },
+  {
+    id: 'sudoku',
+    title: '数独',
+    description: '经典的数独游戏，每行、每列和每个3x3宫格都需要填入1-9的数字，考验你的逻辑思维能力！',
+    image: '/images/sudoku.png',
+    component: GameSudoku,
   },
 ];
 
