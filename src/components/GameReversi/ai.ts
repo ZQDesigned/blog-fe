@@ -1,5 +1,6 @@
 import { Board, Player, Position, IReversiAI, AIDifficulty, POSITION_WEIGHTS } from './types';
 import { getValidMoves, makeMove, getFlippableDiscs } from './utils';
+import { MCTSAI } from './mcts';
 
 // 贪心策略 AI（简单模式）
 export class GreedyAI implements IReversiAI {
@@ -184,16 +185,36 @@ export class MinimaxAI implements IReversiAI {
 
 // AI 工厂
 export class ReversiAIFactory {
+  private static instances: Map<AIDifficulty, IReversiAI> = new Map();
+
   static createAI(difficulty: AIDifficulty): IReversiAI {
+    // 检查是否已有实例
+    const existingInstance = this.instances.get(difficulty);
+    if (existingInstance) {
+      return existingInstance;
+    }
+
+    // 创建新实例
+    let instance: IReversiAI;
     switch (difficulty) {
       case 'easy':
-        return new GreedyAI();
+        instance = new GreedyAI();
+        break;
       case 'medium':
-        return new HeuristicAI();
+        instance = new HeuristicAI();
+        break;
       case 'hard':
-        return new MinimaxAI();
+        instance = new MinimaxAI();
+        break;
+      case 'hell':
+        instance = new MCTSAI();
+        break;
       default:
-        return new HeuristicAI();
+        instance = new HeuristicAI();
     }
+
+    // 缓存实例
+    this.instances.set(difficulty, instance);
+    return instance;
   }
 }

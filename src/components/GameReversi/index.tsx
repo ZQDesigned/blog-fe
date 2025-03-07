@@ -5,6 +5,7 @@ import { globalStyles } from '../../styles/theme';
 import { Board, Player, Position, AIDifficulty } from './types';
 import { BOARD_SIZE, getValidMoves, makeMove, calculateScores } from './utils';
 import { ReversiAIFactory } from './ai';
+import { Global, css } from '@emotion/react';
 
 const GameContainer = styled.div`
   display: flex;
@@ -78,6 +79,17 @@ const Disc = styled.div<{ $color: 'black' | 'white' }>`
   }
 `;
 
+const GlobalStyles = () => (
+  <Global
+    styles={css`
+      .hell-mode-option {
+        color: ${globalStyles.colors.error} !important;
+        font-weight: 500;
+      }
+    `}
+  />
+);
+
 const GameReversi: React.FC = () => {
   const [board, setBoard] = useState<Board>(() => {
     const newBoard: Board = Array(BOARD_SIZE).fill(null)
@@ -97,7 +109,9 @@ const GameReversi: React.FC = () => {
   const [validMoves, setValidMoves] = useState<Position[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
-  const [ai] = useState(() => ReversiAIFactory.createAI('medium'));
+  const [ai, setAi] = useState(() => ReversiAIFactory.createAI('medium'));
+  const [showHellModeDialog, setShowHellModeDialog] = useState(false);
+  const [pendingDifficulty, setPendingDifficulty] = useState<AIDifficulty | null>(null);
 
   // 初始化游戏
   const initGame = () => {
@@ -135,7 +149,7 @@ const GameReversi: React.FC = () => {
     if (opponentMoves.length > 0) {
       setCurrentPlayer(opponent);
       setIsThinking(true);
-      const aiMove = await ReversiAIFactory.createAI(difficulty).getMove(newBoard, opponent);
+      const aiMove = await ai.getMove(newBoard, opponent);
       setIsThinking(false);
 
       if (aiMove) {
@@ -143,7 +157,7 @@ const GameReversi: React.FC = () => {
         const aiScores = calculateScores(aiBoard);
         setBoard(aiBoard);
         setScores(aiScores);
-
+        
         const playerMoves = getValidMoves('black', aiBoard);
         if (playerMoves.length > 0) {
           setCurrentPlayer('black');
@@ -170,25 +184,47 @@ const GameReversi: React.FC = () => {
   }, [board, currentPlayer, isThinking]);
 
   // 处理难度变更
-  useEffect(() => {
-    if (difficulty !== ai.getDifficulty()) {
+  const handleDifficultyChange = (newDifficulty: AIDifficulty) => {
+    if (newDifficulty === 'hell' && difficulty !== 'hell') {
+      setPendingDifficulty(newDifficulty);
+      setShowHellModeDialog(true);
+    } else {
+      setDifficulty(newDifficulty);
+      setAi(ReversiAIFactory.createAI(newDifficulty));
       initGame();
     }
-  }, [difficulty, ai]);
+  };
+
+  const handleHellModeConfirm = () => {
+    if (pendingDifficulty) {
+      setDifficulty(pendingDifficulty);
+      setAi(ReversiAIFactory.createAI(pendingDifficulty));
+      initGame();
+    }
+    setShowHellModeDialog(false);
+    setPendingDifficulty(null);
+  };
+
+  const handleHellModeCancel = () => {
+    setShowHellModeDialog(false);
+    setPendingDifficulty(null);
+  };
 
   return (
     <GameContainer>
+      <GlobalStyles />
       <GameInfo>
         <InfoItem>黑棋: {scores.black}</InfoItem>
         <InfoItem>白棋: {scores.white}</InfoItem>
         <Select
           value={difficulty}
-          onChange={(value: AIDifficulty) => setDifficulty(value)}
+          onChange={handleDifficultyChange}
           style={{ width: 100 }}
           options={[
             { label: '简单', value: 'easy' },
             { label: '中等', value: 'medium' },
             { label: '困难', value: 'hard' },
+            { label: '地狱', value: 'hell', className: 'hell-mode-option' }
           ]}
         />
         <Button onClick={initGame}>重新开始</Button>
@@ -224,6 +260,18 @@ const GameReversi: React.FC = () => {
             : '平局！'}
         </p>
         <p>最终比分 - 黑棋: {scores.black} vs 白棋: {scores.white}</p>
+      </Modal>
+
+      <Modal
+        title="地狱模式提示"
+        open={showHellModeDialog}
+        onOk={handleHellModeConfirm}
+        onCancel={handleHellModeCancel}
+        okText="确认"
+        cancelText="取消"
+      >
+        <p>您选择了地狱难度。在该难度下，AI 每次落子需要进行深度计算，可能会出现约 1.5 秒的短暂卡顿，这是正常现象。</p>
+        <p>请耐心等待 AI 完成计算。是否确认选择地狱难度？</p>
       </Modal>
     </GameContainer>
   );
