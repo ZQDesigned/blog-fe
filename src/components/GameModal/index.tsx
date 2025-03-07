@@ -9,6 +9,7 @@ const GameSnake = React.lazy(() => import('../GameSnake'));
 const GameTetris = React.lazy(() => import('../GameTetris'));
 const GameMinesweeper = React.lazy(() => import('../GameMinesweeper'));
 const GameSudoku = React.lazy(() => import('../GameSudoku'));
+const GameReversi = React.lazy(() => import('../GameReversi'));
 
 const StyledModal = styled(Modal)`
   .ant-modal-content {
@@ -48,6 +49,10 @@ const GAMES = [
   {
     title: '数独',
     component: GameSudoku,
+  },
+  {
+    title: '黑白棋',
+    component: GameReversi,
   },
 ];
 

@@ -9,6 +9,7 @@ import GameSnake from '../../components/GameSnake';
 import GameTetris from '../../components/GameTetris';
 import GameMinesweeper from '../../components/GameMinesweeper';
 import GameSudoku from '../../components/GameSudoku';
+import GameReversi from '../../components/GameReversi';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -130,6 +131,13 @@ const MINI_GAMES = [
     description: '经典的数独游戏，每行、每列和每个3x3宫格都需要填入1-9的数字，考验你的逻辑思维能力！',
     image: '/images/sudoku.png',
     component: GameSudoku,
+  },
+  {
+    id: 'reversi',
+    title: '黑白棋',
+    description: '经典的黑白棋游戏，与智能AI对战。占领棋盘上更多的格子来获得胜利！',
+    image: '/images/reversi.png',
+    component: GameReversi,
   },
 ];
 
