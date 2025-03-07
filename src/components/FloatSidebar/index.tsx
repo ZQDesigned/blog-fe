@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Card, Typography, Space, Tag, Spin, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import { motion, AnimatePresence } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import LazyImage from '../LazyImage';
 import { useWeather } from '../../hooks/useWeather';
@@ -9,15 +10,62 @@ import { formatDate } from '../../utils/dateUtils';
 
 const { Title, Paragraph } = Typography;
 
-const SidebarContainer = styled.div`
+const SidebarContainer = styled(motion.div)`
   position: fixed;
-  right: ${globalStyles.spacing.xl};
+  right: 0;
   top: calc(64px + ${globalStyles.spacing.xl});
   width: 300px;
   display: flex;
   flex-direction: column;
   gap: ${globalStyles.spacing.lg};
   z-index: 1;
+  padding-right: ${globalStyles.spacing.xl};
+
+  @media (max-width: 1500px) {
+    display: none;
+  }
+`;
+
+const SidebarTrigger = styled(motion.div)`
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 8px;
+  background: ${globalStyles.colors.primary}20;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  z-index: 1;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      ${globalStyles.colors.primary}40,
+      transparent
+    );
+    animation: wave 3s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes wave {
+    0% {
+      transform: translateX(-100%) scaleY(1);
+    }
+    50% {
+      transform: translateX(0%) scaleY(1.2);
+    }
+    100% {
+      transform: translateX(100%) scaleY(1);
+    }
+  }
 
   @media (max-width: 1500px) {
     display: none;
@@ -124,6 +172,8 @@ const WeatherTitle = styled.div`
 
 const FloatSidebar: React.FC = () => {
   const { weather, loading, error } = useWeather();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   // 检测操作系统
   const isMacOS = useMemo(() => {
@@ -145,6 +195,21 @@ const FloatSidebar: React.FC = () => {
       </KeyboardShortcut>
     );
   }, [isMacOS]);
+
+  // 处理鼠标进入触发区域
+  useEffect(() => {
+    let timeoutId: number;
+    if (isHovering) {
+      timeoutId = window.setTimeout(() => {
+        setIsExpanded(true);
+      }, 200);
+    } else {
+      timeoutId = window.setTimeout(() => {
+        setIsExpanded(false);
+      }, 300);
+    }
+    return () => window.clearTimeout(timeoutId);
+  }, [isHovering]);
 
   const renderWeatherContent = () => {
     if (loading) {
@@ -181,62 +246,79 @@ const FloatSidebar: React.FC = () => {
   };
 
   return (
-    <SidebarContainer>
-      <ProfileCard>
-        <ProfileHeader>
-          <LazyImage
-            src="/avatar.jpg"
-            alt="头像"
-            style={{
-              width: '120px',
-              height: '120px',
-              borderRadius: '50%',
-              margin: '0 auto',
-            }}
-          />
-          <Title level={4} style={{ marginTop: globalStyles.spacing.sm, marginBottom: 0 }}>
-            ZQDesigned
-          </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            分享开发历程、科技生活～
-          </Paragraph>
-          <OnlineStatus>
-            <StatusDot />
-            <span>一日之计在于晨</span>
-          </OnlineStatus>
-        </ProfileHeader>
-        <ProfileContent>
-          <Space direction="vertical" size="small">
-            <Tag color="blue">公告</Tag>
-            <Paragraph>
-              👋 Hi, 我是 ZQDesigned！欢迎你！
-            </Paragraph>
-            <Paragraph>
-              ❓ 有任何问题欢迎评论区交流！
-            </Paragraph>
-            <Paragraph>
-              🖱️ 页面异常？ 尝试 {refreshShortcut}
-            </Paragraph>
-            <Paragraph>
-              📧 如需联系：<a href="mailto:zqdesigned@mail.lnyynet.com">发送邮件📨</a>
-            </Paragraph>
-          </Space>
-        </ProfileContent>
-      </ProfileCard>
+    <>
+      <SidebarTrigger
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      />
+      <AnimatePresence>
+        {(isExpanded || isHovering) && (
+          <SidebarContainer
+            initial={{ x: 300 }}
+            animate={{ x: 0 }}
+            exit={{ x: 300 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <ProfileCard>
+              <ProfileHeader>
+                <LazyImage
+                  src="/avatar.jpg"
+                  alt="头像"
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    margin: '0 auto',
+                  }}
+                />
+                <Title level={4} style={{ marginTop: globalStyles.spacing.sm, marginBottom: 0 }}>
+                  ZQDesigned
+                </Title>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  分享开发历程、科技生活～
+                </Paragraph>
+                <OnlineStatus>
+                  <StatusDot />
+                  <span>一日之计在于晨</span>
+                </OnlineStatus>
+              </ProfileHeader>
+              <ProfileContent>
+                <Space direction="vertical" size="small">
+                  <Tag color="blue">公告</Tag>
+                  <Paragraph>
+                    👋 Hi, 我是 ZQDesigned！欢迎你！
+                  </Paragraph>
+                  <Paragraph>
+                    ❓ 有任何问题欢迎评论区交流！
+                  </Paragraph>
+                  <Paragraph>
+                    🖱️ 页面异常？ 尝试 {refreshShortcut}
+                  </Paragraph>
+                  <Paragraph>
+                    📧 如需联系：<a href="mailto:zqdesigned@mail.lnyynet.com">发送邮件📨</a>
+                  </Paragraph>
+                </Space>
+              </ProfileContent>
+            </ProfileCard>
 
-      <WeatherCard 
-        title={
-          <WeatherTitle>
-            天气
-            <Tooltip title="此位置基于您的 IP，可能存在错误">
-              <QuestionCircleOutlined className="weather-tip" />
-            </Tooltip>
-          </WeatherTitle>
-        }
-      >
-        {renderWeatherContent()}
-      </WeatherCard>
-    </SidebarContainer>
+            <WeatherCard 
+              title={
+                <WeatherTitle>
+                  天气
+                  <Tooltip title="此位置基于您的 IP，可能存在错误">
+                    <QuestionCircleOutlined className="weather-tip" />
+                  </Tooltip>
+                </WeatherTitle>
+              }
+            >
+              {renderWeatherContent()}
+            </WeatherCard>
+          </SidebarContainer>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
