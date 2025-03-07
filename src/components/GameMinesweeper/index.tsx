@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { globalStyles } from '../../styles/theme';
 
 const GameContainer = styled.div`
@@ -112,6 +113,31 @@ const ModeButton = styled(Button)<{ $active: boolean }>`
   &:hover {
     background-color: ${props => props.$active ? globalStyles.colors.primary + 'dd' : undefined};
     color: ${props => props.$active ? '#fff' : undefined};
+  }
+`;
+
+const ModeIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${globalStyles.spacing.xs};
+  background: ${globalStyles.colors.border};
+  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  border-radius: 4px;
+  color: ${globalStyles.colors.text};
+  font-weight: bold;
+
+  .tip-icon {
+    color: ${globalStyles.colors.lightText};
+    cursor: help;
+    transition: color ${globalStyles.transitions.fast};
+
+    &:hover {
+      color: ${globalStyles.colors.primary};
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -326,6 +352,12 @@ const GameMinesweeper: React.FC = () => {
         <GameInfo>
           <InfoItem>💣 {MINES_COUNT - flagsCount}</InfoItem>
           <InfoItem>⏱️ {timeElapsed}s</InfoItem>
+          <ModeIndicator>
+            {flagMode ? '插旗 🚩' : '揭开 🔍'}
+            <Tooltip title="按 F 键切换操作模式">
+              <QuestionCircleOutlined className="tip-icon" />
+            </Tooltip>
+          </ModeIndicator>
         </GameInfo>
         <Button onClick={resetGame}>重新开始</Button>
       </GameControls>
