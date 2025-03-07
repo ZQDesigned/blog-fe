@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Select } from 'antd';
 import { globalStyles } from '../../styles/theme';
+import { Board, Player, Position, AIDifficulty } from './types';
+import { BOARD_SIZE, getValidMoves, makeMove, calculateScores } from './utils';
+import { ReversiAIFactory } from './ai';
 
 const GameContainer = styled.div`
   display: flex;
@@ -75,42 +78,17 @@ const Disc = styled.div<{ $color: 'black' | 'white' }>`
   }
 `;
 
-type Player = 'black' | 'white';
-type Board = (Player | null)[][];
-type Position = [number, number];
-
-const BOARD_SIZE = 8;
-const DIRECTIONS = [
-  [-1, -1], [-1, 0], [-1, 1],
-  [0, -1],           [0, 1],
-  [1, -1],  [1, 0],  [1, 1]
-] as const;
-
-// 评估函数权重
-const WEIGHTS = [
-  [100, -20, 10, 5, 5, 10, -20, 100],
-  [-20, -50, -2, -2, -2, -2, -50, -20],
-  [10, -2, 1, 1, 1, 1, -2, 10],
-  [5, -2, 1, 1, 1, 1, -2, 5],
-  [5, -2, 1, 1, 1, 1, -2, 5],
-  [10, -2, 1, 1, 1, 1, -2, 10],
-  [-20, -50, -2, -2, -2, -2, -50, -20],
-  [100, -20, 10, 5, 5, 10, -20, 100]
-];
-
 const GameReversi: React.FC = () => {
   const [board, setBoard] = useState<Board>(() => {
-    // 初始化棋盘
     const newBoard: Board = Array(BOARD_SIZE).fill(null)
       .map(() => Array(BOARD_SIZE).fill(null));
-    
-    // 放置初始棋子
+
     const center = BOARD_SIZE / 2;
     newBoard[center-1][center-1] = 'white';
     newBoard[center-1][center] = 'black';
     newBoard[center][center-1] = 'black';
     newBoard[center][center] = 'white';
-    
+
     return newBoard;
   });
   const [currentPlayer, setCurrentPlayer] = useState<Player>('black');
@@ -118,13 +96,14 @@ const GameReversi: React.FC = () => {
   const [scores, setScores] = useState({ black: 2, white: 2 });
   const [validMoves, setValidMoves] = useState<Position[]>([]);
   const [isThinking, setIsThinking] = useState(false);
+  const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
+  const [ai] = useState(() => ReversiAIFactory.createAI('medium'));
 
   // 初始化游戏
-  const initGame = useCallback(() => {
+  const initGame = () => {
     const newBoard: Board = Array(BOARD_SIZE).fill(null)
       .map(() => Array(BOARD_SIZE).fill(null));
-    
-    // 放置初始棋子
+
     const center = BOARD_SIZE / 2;
     newBoard[center-1][center-1] = 'white';
     newBoard[center-1][center] = 'black';
@@ -135,172 +114,7 @@ const GameReversi: React.FC = () => {
     setCurrentPlayer('black');
     setGameOver(false);
     setScores({ black: 2, white: 2 });
-    setValidMoves([]); // 清空有效移动，等待下一次 useEffect 更新
-  }, []);
-
-  // 检查位置是否在棋盘内
-  const isValidPosition = ([row, col]: Position): boolean => {
-    return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
-  };
-
-  // 获取可以翻转的棋子
-  const getFlippableDiscs = (pos: Position, player: Player, boardState: Board): Position[] => {
-    if (!boardState || !Array.isArray(boardState)) return [];
-    
-    const [row, col] = pos;
-    if (!isValidPosition([row, col]) || boardState[row][col] !== null) return [];
-
-    const flippable: Position[] = [];
-    const opponent = player === 'black' ? 'white' : 'black';
-
-    for (const [dx, dy] of DIRECTIONS) {
-      let currentRow = row + dx;
-      let currentCol = col + dy;
-      const temp: Position[] = [];
-
-      while (isValidPosition([currentRow, currentCol])) {
-        const current = boardState[currentRow][currentCol];
-        if (current === opponent) {
-          temp.push([currentRow, currentCol]);
-        } else if (current === player && temp.length > 0) {
-          flippable.push(...temp);
-          break;
-        } else {
-          break;
-        }
-        currentRow += dx;
-        currentCol += dy;
-      }
-    }
-
-    return flippable;
-  };
-
-  // 获取有效移动位置
-  const getValidMoves = (player: Player, boardState: Board): Position[] => {
-    const moves: Position[] = [];
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      for (let j = 0; j < BOARD_SIZE; j++) {
-        if (getFlippableDiscs([i, j], player, boardState).length > 0) {
-          moves.push([i, j]);
-        }
-      }
-    }
-    return moves;
-  };
-
-  // 评估局面分数
-  const evaluateBoard = (boardState: Board, player: Player): number => {
-    let score = 0;
-    const opponent = player === 'black' ? 'white' : 'black';
-
-    // 位置权重评分
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      for (let j = 0; j < BOARD_SIZE; j++) {
-        if (boardState[i][j] === player) {
-          score += WEIGHTS[i][j];
-        } else if (boardState[i][j] === opponent) {
-          score -= WEIGHTS[i][j];
-        }
-      }
-    }
-
-    // 行动力评分（可下位置数量）
-    const playerMoves = getValidMoves(player, boardState).length;
-    const opponentMoves = getValidMoves(opponent, boardState).length;
-    score += (playerMoves - opponentMoves) * 5;
-
-    return score;
-  };
-
-  // AI移动（极小化极大算法）
-  const minimax = (
-    boardState: Board,
-    depth: number,
-    alpha: number,
-    beta: number,
-    maximizingPlayer: boolean,
-    player: Player
-  ): [number, Position | null] => {
-    if (depth === 0) {
-      return [evaluateBoard(boardState, player), null];
-    }
-
-    const moves = getValidMoves(player, boardState);
-    if (moves.length === 0) {
-      return [evaluateBoard(boardState, player), null];
-    }
-
-    let bestMove: Position | null = null;
-    const opponent = player === 'black' ? 'white' : 'black';
-
-    if (maximizingPlayer) {
-      let maxEval = -Infinity;
-      for (const move of moves) {
-        const newBoard = makeMove(move, player, JSON.parse(JSON.stringify(boardState)));
-        const [evaluation] = minimax(newBoard, depth - 1, alpha, beta, false, opponent);
-        if (evaluation > maxEval) {
-          maxEval = evaluation;
-          bestMove = move;
-        }
-        alpha = Math.max(alpha, evaluation);
-        if (beta <= alpha) break;
-      }
-      return [maxEval, bestMove];
-    } else {
-      let minEval = Infinity;
-      for (const move of moves) {
-        const newBoard = makeMove(move, player, JSON.parse(JSON.stringify(boardState)));
-        const [evaluation] = minimax(newBoard, depth - 1, alpha, beta, true, opponent);
-        if (evaluation < minEval) {
-          minEval = evaluation;
-          bestMove = move;
-        }
-        beta = Math.min(beta, evaluation);
-        if (beta <= alpha) break;
-      }
-      return [minEval, bestMove];
-    }
-  };
-
-  // AI决策
-  const getAIMove = async (boardState: Board, player: Player): Promise<Position | null> => {
-    setIsThinking(true);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const [, move] = minimax(boardState, 5, -Infinity, Infinity, true, player);
-        setIsThinking(false);
-        resolve(move);
-      }, 500);
-    });
-  };
-
-  // 执行移动
-  const makeMove = (pos: Position, player: Player, boardState: Board): Board => {
-    const [row, col] = pos;
-    const newBoard = JSON.parse(JSON.stringify(boardState));
-    const flippable = getFlippableDiscs(pos, player, boardState);
-
-    if (flippable.length === 0) return boardState;
-
-    newBoard[row][col] = player;
-    for (const [r, c] of flippable) {
-      newBoard[r][c] = player;
-    }
-
-    return newBoard;
-  };
-
-  // 计算分数
-  const calculateScores = (boardState: Board) => {
-    let black = 0, white = 0;
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      for (let j = 0; j < BOARD_SIZE; j++) {
-        if (boardState[i][j] === 'black') black++;
-        else if (boardState[i][j] === 'white') white++;
-      }
-    }
-    return { black, white };
+    setValidMoves([]);
   };
 
   // 处理玩家移动
@@ -320,13 +134,16 @@ const GameReversi: React.FC = () => {
 
     if (opponentMoves.length > 0) {
       setCurrentPlayer(opponent);
-      const aiMove = await getAIMove(newBoard, opponent);
+      setIsThinking(true);
+      const aiMove = await ReversiAIFactory.createAI(difficulty).getMove(newBoard, opponent);
+      setIsThinking(false);
+
       if (aiMove) {
         const aiBoard = makeMove(aiMove, opponent, newBoard);
         const aiScores = calculateScores(aiBoard);
         setBoard(aiBoard);
         setScores(aiScores);
-        
+
         const playerMoves = getValidMoves('black', aiBoard);
         if (playerMoves.length > 0) {
           setCurrentPlayer('black');
@@ -344,7 +161,7 @@ const GameReversi: React.FC = () => {
 
   // 更新有效移动
   useEffect(() => {
-    if (!isThinking && currentPlayer === 'black' && board && Array.isArray(board)) {
+    if (!isThinking && currentPlayer === 'black' && board) {
       const moves = getValidMoves('black', board);
       setValidMoves(moves);
     } else {
@@ -352,12 +169,29 @@ const GameReversi: React.FC = () => {
     }
   }, [board, currentPlayer, isThinking]);
 
+  // 处理难度变更
+  useEffect(() => {
+    if (difficulty !== ai.getDifficulty()) {
+      initGame();
+    }
+  }, [difficulty, ai]);
+
   return (
     <GameContainer>
       <GameInfo>
         <InfoItem>黑棋: {scores.black}</InfoItem>
-        <Button onClick={initGame}>重新开始</Button>
         <InfoItem>白棋: {scores.white}</InfoItem>
+        <Select
+          value={difficulty}
+          onChange={(value: AIDifficulty) => setDifficulty(value)}
+          style={{ width: 100 }}
+          options={[
+            { label: '简单', value: 'easy' },
+            { label: '中等', value: 'medium' },
+            { label: '困难', value: 'hard' },
+          ]}
+        />
+        <Button onClick={initGame}>重新开始</Button>
       </GameInfo>
 
       <GameBoard>
@@ -395,4 +229,4 @@ const GameReversi: React.FC = () => {
   );
 };
 
-export default GameReversi; 
+export default GameReversi;
