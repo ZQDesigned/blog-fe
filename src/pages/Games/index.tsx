@@ -10,6 +10,7 @@ import GameTetris from '../../components/GameTetris';
 import GameMinesweeper from '../../components/GameMinesweeper';
 import GameSudoku from '../../components/GameSudoku';
 import GameReversi from '../../components/GameReversi';
+import GameHanoi from '../../components/GameHanoi';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -138,6 +139,13 @@ const MINI_GAMES = [
     description: '经典的黑白棋游戏，与智能AI对战。占领棋盘上更多的格子来获得胜利！',
     image: '/images/reversi.png',
     component: GameReversi,
+  },
+  {
+    id: 'hanoi',
+    title: '汉诺塔',
+    description: '经典的汉诺塔益智游戏，目标是将所有圆盘从第一根柱子移动到最后一根柱子，每次只能移动一个圆盘，且不能将大圆盘放在小圆盘上。',
+    image: '/images/hanoi.png',
+    component: GameHanoi,
   },
 ];
 

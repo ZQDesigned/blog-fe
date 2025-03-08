@@ -10,6 +10,7 @@ const GameTetris = React.lazy(() => import('../GameTetris'));
 const GameMinesweeper = React.lazy(() => import('../GameMinesweeper'));
 const GameSudoku = React.lazy(() => import('../GameSudoku'));
 const GameReversi = React.lazy(() => import('../GameReversi'));
+const GameHanoi = React.lazy(() => import('../GameHanoi'));
 
 const StyledModal = styled(Modal)`
   .ant-modal-content {
@@ -54,6 +55,10 @@ const GAMES = [
     title: '黑白棋',
     component: GameReversi,
   },
+  {
+    title: '汉诺塔',
+    component: GameHanoi,
+  },
 ];
 
 const GameModal: React.FC<GameModalProps> = ({ open, onClose }) => {
@@ -89,4 +94,4 @@ const GameModal: React.FC<GameModalProps> = ({ open, onClose }) => {
   );
 };
 
-export default GameModal; 
+export default GameModal;
