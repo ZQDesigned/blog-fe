@@ -11,6 +11,7 @@ import GameMinesweeper from '../../components/GameMinesweeper';
 import GameSudoku from '../../components/GameSudoku';
 import GameReversi from '../../components/GameReversi';
 import GameHanoi from '../../components/GameHanoi';
+import GameGo from '../../components/GameGo';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 
@@ -134,6 +135,16 @@ const MINI_GAMES = [
     component: GameSudoku,
   },
   {
+    id: 'hanoi',
+    title: '汉诺塔',
+    description: '经典的汉诺塔益智游戏，目标是将所有圆盘从第一根柱子移动到最后一根柱子，每次只能移动一个圆盘，且不能将大圆盘放在小圆盘上。',
+    image: '/images/hanoi.png',
+    component: GameHanoi,
+  },
+];
+
+const BOARD_GAMES = [
+  {
     id: 'reversi',
     title: '黑白棋',
     description: '经典的黑白棋游戏，与智能AI对战。占领棋盘上更多的格子来获得胜利！',
@@ -141,11 +152,11 @@ const MINI_GAMES = [
     component: GameReversi,
   },
   {
-    id: 'hanoi',
-    title: '汉诺塔',
-    description: '经典的汉诺塔益智游戏，目标是将所有圆盘从第一根柱子移动到最后一根柱子，每次只能移动一个圆盘，且不能将大圆盘放在小圆盘上。',
-    image: '/images/hanoi.png',
-    component: GameHanoi,
+    id: 'go',
+    title: '围棋',
+    description: '古老的东方棋类游戏，通过落子围地和吃子获取领地。与AI对弈，体验围棋的深邃魅力！',
+    image: '/images/go.png',
+    component: GameGo,
   },
 ];
 
@@ -213,7 +224,7 @@ const GamesPage: React.FC = () => {
     setImageLoadError(prev => ({ ...prev, [gameId]: true }));
   };
 
-  const selectedGameData = MINI_GAMES.find(game => game.id === selectedGame);
+  const selectedGameData = [...MINI_GAMES, ...BOARD_GAMES].find(game => game.id === selectedGame);
 
   return (
     <GamesContainer>
@@ -247,6 +258,43 @@ const GamesPage: React.FC = () => {
               title={
                 <GameTitle>
                   <span className="game-emoji">🎮</span>
+                  {game.title}
+                </GameTitle>
+              }
+              description={game.description}
+            />
+          </GameCard>
+        ))}
+      </GamesGrid>
+
+      <CategoryTitle level={3}>经典棋类游戏</CategoryTitle>
+      <GamesGrid>
+        {BOARD_GAMES.map((game, index) => (
+          <GameCard
+            key={game.id}
+            hoverable
+            className={imageLoadError[game.id] ? 'image-error' : ''}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            cover={
+              !imageLoadError[game.id] && (
+                <LazyImage
+                  src={game.image}
+                  alt={game.title}
+                  onError={() => handleImageError(game.id)}
+                  loadingSize={40}
+                  className="preview-image"
+                />
+              )
+            }
+            onClick={() => handleGameSelect(game.id)}
+          >
+            <Card.Meta
+              title={
+                <GameTitle>
+                  <span className="game-emoji">♟️</span>
                   {game.title}
                 </GameTitle>
               }
