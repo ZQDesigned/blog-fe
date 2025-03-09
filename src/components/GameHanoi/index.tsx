@@ -52,7 +52,7 @@ const TowersContainer = styled.div`
   }
 `;
 
-const Tower = styled.div`
+const Tower = styled.div<{ $disksCount: number }>`
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -60,16 +60,17 @@ const Tower = styled.div`
   position: relative;
   cursor: pointer;
   padding-top: ${globalStyles.spacing.lg};
+  padding-bottom: 8px;
   
   &::before {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: 8px;
     width: 8px;
     background-color: #8c8c8c;
     border-radius: 4px;
     z-index: 1;
-    height: calc(100% - 20px);
+    height: calc(max(140px, ${props => (props.$disksCount * 20 + 40)}px));
   }
 
   &::after {
@@ -80,6 +81,7 @@ const Tower = styled.div`
     width: 80%;
     background-color: #8c8c8c;
     border-radius: 4px;
+    z-index: 3;
   }
 `;
 
@@ -88,7 +90,7 @@ const Disk = styled.div<{ $size: number; $color: string; $total: number }>`
   width: ${props => 40 + (props.$size * 20)}px;
   background-color: ${props => props.$color};
   border-radius: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 0;
   z-index: 2;
   transition: all 0.3s ease;
   
@@ -96,7 +98,7 @@ const Disk = styled.div<{ $size: number; $color: string; $total: number }>`
     height: 16px;
     width: ${props => 30 + (props.$size * 15)}px;
     border-radius: 8px;
-    margin-bottom: 3px;
+    margin-bottom: 0;
   }
 `;
 
@@ -245,6 +247,7 @@ const GameHanoi: React.FC = () => {
             <Tower
               key={index}
               onClick={() => handleTowerClick(index)}
+              $disksCount={state.disksCount}
               style={{
                 border: state.selectedTower === index ? `2px solid ${globalStyles.colors.primary}` : 'none',
                 borderRadius: '8px',
