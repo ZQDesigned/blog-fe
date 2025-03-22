@@ -1,13 +1,16 @@
 import { Global, css } from '@emotion/react';
 import { globalStyles } from './theme';
+import { useStandaloneMode } from '../hooks/useStandaloneMode';
 
 const GlobalStyles = () => {
+  const isStandalone = useStandaloneMode();
+
   const globalCss = css`
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none;
+      user-select: ${isStandalone ? 'auto' : 'none'};
     }
 
     html, body {
@@ -20,7 +23,7 @@ const GlobalStyles = () => {
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: ${globalStyles.colors.text};
-      background-color: ${globalStyles.colors.secondary};
+      background-color: ${isStandalone ? '#ffffff' : globalStyles.colors.secondary};
       line-height: 1.5;
       overflow-x: hidden;
       transition: all 0.3s;
@@ -61,17 +64,17 @@ const GlobalStyles = () => {
     /* PC 端隐藏滚动条 */
     @media (min-width: 769px) {
       ::-webkit-scrollbar {
-        width: 0;
-        height: 0;
+        width: ${isStandalone ? '10px' : 0};
+        height: ${isStandalone ? '10px' : 0};
       }
 
       /* Firefox */
       * {
-        scrollbar-width: none;
+        scrollbar-width: ${isStandalone ? 'auto' : 'none'};
       }
 
       /* IE */
-      -ms-overflow-style: none;
+      -ms-overflow-style: ${isStandalone ? 'auto' : 'none'};
     }
 
     #root {
@@ -92,27 +95,27 @@ const GlobalStyles = () => {
     }
 
     .page-transition-enter {
-      opacity: 0;
-      transform: translateY(20px);
+      opacity: ${isStandalone ? 1 : 0};
+      transform: ${isStandalone ? 'none' : 'translateY(20px)'};
     }
 
     .page-transition-enter-active {
       opacity: 1;
       transform: translateY(0);
-      transition: opacity ${globalStyles.transitions.default},
-                  transform ${globalStyles.transitions.default};
+      transition: ${isStandalone ? 'none' : `opacity ${globalStyles.transitions.default},
+                  transform ${globalStyles.transitions.default}`};
     }
 
     .page-transition-exit {
-      opacity: 1;
-      transform: translateY(0);
+      opacity: ${isStandalone ? 1 : 0};
+      transform: ${isStandalone ? 'none' : 'translateY(0)'};
     }
 
     .page-transition-exit-active {
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: opacity ${globalStyles.transitions.default},
-                  transform ${globalStyles.transitions.default};
+      opacity: ${isStandalone ? 1 : 0};
+      transform: ${isStandalone ? 'none' : 'translateY(-20px)'};
+      transition: ${isStandalone ? 'none' : `opacity ${globalStyles.transitions.default},
+                  transform ${globalStyles.transitions.default}`};
     }
 
     pre, code {

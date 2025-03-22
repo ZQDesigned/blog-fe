@@ -20,10 +20,10 @@ const GamesPage = lazy(() => import('./pages/Games'));
 function App() {
   return (
     <ConfigProvider theme={customTheme}>
-      <GlobalStyles />
       <AnimatedCursor />
       <ToastProvider>
         <BrowserRouter>
+          <GlobalStyles />
           <React.Suspense fallback={<PageLoading tip="页面加载中" />}>
             <Routes>
               <Route element={<MainLayout />}>

@@ -20,13 +20,14 @@ import { useToast } from '../../hooks/useToast.ts';
 import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
 import SettingsDrawer from '../SettingsDrawer';
 import FloatSidebar from '../FloatSidebar';
+import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
 const { Header, Content} = Layout;
 const { Paragraph } = Typography;
 
-const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null }>`
+const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandalone?: boolean }>`
   min-height: 100vh;
   width: 100%;
   position: relative;
@@ -38,7 +39,7 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: ${props => props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
+    background-image: ${props => !props.$isStandalone && props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -79,11 +80,11 @@ const StyledAvatar = styled(Avatar)`
   }
 `;
 
-const StyledContent = styled(Content)`
-  padding: ${globalStyles.spacing.xl};
-  margin-top: 64px;
+const StyledContent = styled(Content)<{ $isStandalone?: boolean }>`
+  padding: ${props => props.$isStandalone ? 0 : globalStyles.spacing.xl};
+  margin-top: ${props => props.$isStandalone ? 0 : '64px'};
   background: ${globalStyles.colors.secondary};
-  min-height: calc(100vh - 64px - 70px);
+  min-height: ${props => props.$isStandalone ? '100vh' : 'calc(100vh - 64px - 70px)'};
   width: 100%;
 
   @media (max-width: 768px) {
@@ -271,6 +272,7 @@ export const MainLayout: React.FC = () => {
     setBackgroundType,
     refreshBackground
   } = useBackgroundSettings();
+  const isStandalone = useStandaloneMode();
 
   // 监听路由变化，自动滚动到顶部
   useEffect(() => {
@@ -431,120 +433,133 @@ export const MainLayout: React.FC = () => {
   const buildTime = import.meta.env.VITE_BUILD_TIME || Date.now();
 
   return (
-    <StyledLayout $backgroundUrl={backgroundType === 'anime' ? backgroundUrl : null}>
-      <StyledHeader>
-        <HeaderLeft>
-          <StyledAvatar
-            size={40}
-            src="https://www.loliapi.com/acg/pp/"
-            onClick={() => setSettingsOpen(true)}
+    <StyledLayout $backgroundUrl={backgroundType === 'anime' ? backgroundUrl : null} $isStandalone={isStandalone}>
+      {!isStandalone && (
+        <StyledHeader>
+          <HeaderLeft>
+            <StyledAvatar
+              size={40}
+              src="https://www.loliapi.com/acg/pp/"
+              onClick={() => setSettingsOpen(true)}
+            />
+          </HeaderLeft>
+          <StyledMenu
+            mode="horizontal"
+            selectedKeys={[location.pathname]}
+            items={NAV_ITEMS.map((item) => ({
+              key: item.path,
+              label: item.label,
+              onClick: () => handleMenuClick(item.path),
+            }))}
           />
-        </HeaderLeft>
-        <StyledMenu
-          mode="horizontal"
-          selectedKeys={[location.pathname]}
-          items={NAV_ITEMS.map((item) => ({
-            key: item.path,
-            label: item.label,
-            onClick: () => handleMenuClick(item.path),
-          }))}
-        />
-      </StyledHeader>
-      <StyledContent>
+        </StyledHeader>
+      )}
+      <StyledContent $isStandalone={isStandalone}>
         <Outlet />
-        <FloatSidebar />
+        {!isStandalone && <FloatSidebar />}
       </StyledContent>
-      <FooterContainer>
-        <FooterContent>
-          <FooterColumn>
-            <FooterTitle>关于</FooterTitle>
-            <FooterLink style={{ 
-              fontSize: '16px', 
-              fontWeight: 600,
-              marginBottom: globalStyles.spacing.xs 
-            }}>
-              LumiCMS
-            </FooterLink>
-            <Paragraph style={{ 
-              color: globalStyles.colors.lightText, 
-              fontSize: '14px', 
-              margin: 0,
-              lineHeight: '1.6'
-            }}>
-              轻量、自由、优雅——一款专为极简内容管理打造的 CMS。
-            </Paragraph>
-          </FooterColumn>
-          <FooterMiddleRow>
+      {!isStandalone && (
+        <FooterContainer>
+          <FooterContent>
             <FooterColumn>
-              <FooterTitle>🚃逛逛</FooterTitle>
-              <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
-              <ExternalLinkContainer>
-                <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
-                  开源代码
-                </ExternalLink>
-                <LinkIcon className="link-icon" />
-              </ExternalLinkContainer>
-              <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
+              <FooterTitle>关于</FooterTitle>
+              <FooterLink style={{
+                fontSize: '16px',
+                fontWeight: 600,
+                marginBottom: globalStyles.spacing.xs
+              }}>
+                LumiCMS
+              </FooterLink>
+              <Paragraph style={{
+                color: globalStyles.colors.lightText,
+                fontSize: '14px',
+                margin: 0,
+                lineHeight: '1.6'
+              }}>
+                轻量、自由、优雅——一款专为极简内容管理打造的 CMS。
+              </Paragraph>
             </FooterColumn>
+            <FooterMiddleRow>
+              <FooterColumn>
+                <FooterTitle>🚃逛逛</FooterTitle>
+                <FooterLink onClick={() => navigate(ROUTES.BLOG)}>技术博客</FooterLink>
+                <ExternalLinkContainer>
+                  <ExternalLink href="https://github.com/ZQDesigned/blog-fe" target="_blank">
+                    开源代码
+                  </ExternalLink>
+                  <LinkIcon className="link-icon" />
+                </ExternalLinkContainer>
+                <FooterLink onClick={() => navigate(ROUTES.GAMES)}>休闲游戏</FooterLink>
+              </FooterColumn>
+              <FooterColumn>
+                <FooterTitle>我的</FooterTitle>
+                <ExternalLinkContainer>
+                  <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
+                    GitHub
+                  </ExternalLink>
+                  <LinkIcon className="link-icon" />
+                </ExternalLinkContainer>
+                <ExternalLinkContainer>
+                  <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
+                    联系我
+                  </ExternalLink>
+                  <LinkIcon className="link-icon" />
+                </ExternalLinkContainer>
+              </FooterColumn>
+              <FooterColumn>
+                <FooterTitle>友情链接</FooterTitle>
+                <ExternalLinkContainer>
+                  <ExternalLink href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
+                    LoliAPI
+                  </ExternalLink>
+                  <LinkIcon className="link-icon" />
+                </ExternalLinkContainer>
+                <ExternalLinkContainer>
+                  <ExternalLink href="https://dev.qweather.com/" target="_blank" rel="noopener noreferrer">
+                    和风天气
+                  </ExternalLink>
+                  <LinkIcon className="link-icon" />
+                </ExternalLinkContainer>
+              </FooterColumn>
+            </FooterMiddleRow>
             <FooterColumn>
-              <FooterTitle>我的</FooterTitle>
-              <ExternalLinkContainer>
-                <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
-                  GitHub
-                </ExternalLink>
-                <LinkIcon className="link-icon" />
-              </ExternalLinkContainer>
-              <ExternalLinkContainer>
-                <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
-                  联系我
-                </ExternalLink>
-                <LinkIcon className="link-icon" />
-              </ExternalLinkContainer>
+              <FooterTitle>更多</FooterTitle>
+              <BuildInfo>
+                <span>构建于：{formatDate(Number(buildTime))}</span>
+                <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
+              </BuildInfo>
             </FooterColumn>
-            <FooterColumn>
-              <FooterTitle>友情链接</FooterTitle>
-              <ExternalLinkContainer>
-                <ExternalLink href="https://www.loliapi.com/" target="_blank" rel="noopener noreferrer">
-                  LoliAPI
-                </ExternalLink>
-                <LinkIcon className="link-icon" />
-              </ExternalLinkContainer>
-              <ExternalLinkContainer>
-                <ExternalLink href="https://dev.qweather.com/" target="_blank" rel="noopener noreferrer">
-                  和风天气
-                </ExternalLink>
-                <LinkIcon className="link-icon" />
-              </ExternalLinkContainer>
-            </FooterColumn>
-          </FooterMiddleRow>
-          <FooterColumn>
-            <FooterTitle>更多</FooterTitle>
-            <BuildInfo>
-              <span>构建于：{formatDate(Number(buildTime))}</span>
-              <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
-            </BuildInfo>
-          </FooterColumn>
-        </FooterContent>
-        <FooterBottom>
-          <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
-          <IcpContainer>
-            <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
-              {icpNumber}
-            </IcpLink>
-            <BadgesGroup>
-              <a href="https://ipw.cn/ssl/?site=blog.zqdesigned.city" title="本站支持SSL安全访问" target='_blank'>
-                <img alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s4.svg" />
-              </a>
-              <a href="https://ipw.cn/ipv6webcheck/?site=blog.zqdesigned.city" title="本站支持IPv6访问" target='_blank'>
-                <img alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s4.svg" />
-              </a>
-            </BadgesGroup>
-          </IcpContainer>
-        </FooterBottom>
-      </FooterContainer>
-
-      <ContextMenu items={contextMenuItems} />
-
+          </FooterContent>
+          <FooterBottom>
+            <div>©{new Date().getFullYear()} ZQDesigned | 记录技术 & 创新</div>
+            <IcpContainer>
+              <IcpLink href={icpLink} target="_blank" rel="noopener noreferrer">
+                {icpNumber}
+              </IcpLink>
+              <BadgesGroup>
+                <a href="https://ipw.cn/ssl/?site=blog.zqdesigned.city" title="本站支持SSL安全访问" target='_blank'>
+                  <img alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s4.svg" />
+                </a>
+                <a href="https://ipw.cn/ipv6webcheck/?site=blog.zqdesigned.city" title="本站支持IPv6访问" target='_blank'>
+                  <img alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s4.svg" />
+                </a>
+              </BadgesGroup>
+            </IcpContainer>
+          </FooterBottom>
+        </FooterContainer>
+      )}
+      {!isStandalone && <ContextMenu items={contextMenuItems} />}
+      {!isStandalone && (
+        <SettingsDrawer
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          backgroundType={backgroundType}
+          backgroundUrl={backgroundUrl}
+          isLoading={isLoading}
+          onBackgroundTypeChange={setBackgroundType}
+          onRefreshBackground={refreshBackground}
+        />
+      )}
       <Suspense fallback={
         <LoadingContainer>
           <Spin size="large" tip="游戏加载中..." />
@@ -552,16 +567,6 @@ export const MainLayout: React.FC = () => {
       }>
         {showGameModal && <GameModal open={showGameModal} onClose={handleCloseGameModal} />}
       </Suspense>
-
-      <SettingsDrawer
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        backgroundType={backgroundType}
-        backgroundUrl={backgroundUrl}
-        isLoading={isLoading}
-        onBackgroundTypeChange={setBackgroundType}
-        onRefreshBackground={refreshBackground}
-      />
     </StyledLayout>
   );
 };
