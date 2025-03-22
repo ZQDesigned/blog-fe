@@ -14,6 +14,7 @@ import GameHanoi from '../../components/GameHanoi';
 import GameGo from '../../components/GameGo';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
+import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 
 const { Title } = Typography;
 
@@ -204,6 +205,7 @@ const StyledModal = styled(Modal)`
 
 const GamesPage: React.FC = () => {
   useTitle('休闲游戏', { restoreOnUnmount: true });
+  const isStandalone = useStandaloneMode();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [imageLoadError, setImageLoadError] = useState<{ [key: string]: boolean }>({});
   const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -228,7 +230,7 @@ const GamesPage: React.FC = () => {
 
   return (
     <GamesContainer>
-      <PageTitle>休闲游戏</PageTitle>
+      {!isStandalone && <PageTitle>休闲游戏</PageTitle>}
 
       <CategoryTitle level={3}>小游戏</CategoryTitle>
       <GamesGrid>

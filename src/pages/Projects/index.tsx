@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
+import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import LazyImage from '../../components/LazyImage';
 
 const { Title, Paragraph } = Typography;
@@ -271,7 +272,7 @@ const cardVariants = {
 
 const Projects: React.FC = () => {
   useTitle('项目', { restoreOnUnmount: true });
-
+  const isStandalone = useStandaloneMode();
   const [selectedProject, setSelectedProject] = useState<typeof PROJECTS[0] | null>(null);
   const [imageLoadError, setImageLoadError] = useState<{ [key: number]: boolean }>({});
 
@@ -292,9 +293,11 @@ const Projects: React.FC = () => {
   return (
     <Container>
       <ContentWrapper>
-        <Title level={2} style={{ marginBottom: globalStyles.spacing.xl }}>
-          个人项目展示
-        </Title>
+        {!isStandalone && (
+          <Title level={2} style={{ marginBottom: globalStyles.spacing.xl }}>
+            个人项目展示
+          </Title>
+        )}
 
         <ProjectGrid>
           {PROJECTS.map((project) => (
