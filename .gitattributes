@@ -1,0 +1,2 @@
+public/minecraft/index.html linguist-vendored
+# 标记为 vendored 的文件会被 GitHub 语言统计忽略，但仍然会被 Git 追踪
