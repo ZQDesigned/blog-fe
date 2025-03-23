@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Space, Tag, Button, Skeleton } from 'antd';
 import { ArrowLeftOutlined, CalendarOutlined, EyeOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { MOCK_BLOGS } from './mockData';
@@ -63,6 +63,7 @@ const StyledMarkdownRenderer = styled(MarkdownRenderer)`
 const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 查找博客数据
   const blog = MOCK_BLOGS.find(blog => blog.id === Number(id));
@@ -71,7 +72,10 @@ const BlogDetail: React.FC = () => {
   useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
 
   const handleBack = () => {
-    navigate('/blog');
+    // 保持当前 URL 的查询参数
+    const searchParams = new URLSearchParams(location.search);
+    const blogPath = `/blog${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    navigate(blogPath);
   };
 
   if (!blog) {

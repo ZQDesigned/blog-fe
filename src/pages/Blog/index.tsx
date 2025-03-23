@@ -3,7 +3,7 @@ import { Card, Typography, Space, Tag, Radio, Modal, Button, Select, Pagination 
 import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, FolderOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { globalStyles } from '../../styles/theme';
 import { MOCK_BLOGS } from './mockData';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
@@ -211,8 +211,9 @@ interface BlogData {
 }
 
 const Blog: React.FC = () => {
-  // 使用 useTitle hook，设置博客列表页面标题
   useTitle('博客', { restoreOnUnmount: true });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [isGrid, setIsGrid] = useState(() => {
     const savedViewMode = localStorage.getItem('blogViewMode');
@@ -223,7 +224,6 @@ const Blog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const navigate = useNavigate();
 
   // 获取所有唯一的标签和分类
   const { allTags, allCategories } = useMemo(() => {
@@ -255,12 +255,15 @@ const Blog: React.FC = () => {
   }, [filteredBlogs, currentPage]);
 
   const handleBlogClick = (blog: BlogData) => {
-    setSelectedBlog(blog);
+    // 保持当前 URL 的查询参数
+    const searchParams = new URLSearchParams(location.search);
+    const blogPath = `/blog/${blog.id}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    navigate(blogPath);
   };
 
   const handleReadMore = (e: React.MouseEvent, blog: BlogData) => {
     e.stopPropagation();
-    navigate(`/blog/${blog.id}`);
+    handleBlogClick(blog);
   };
 
   const handlePageChange = (page: number) => {
