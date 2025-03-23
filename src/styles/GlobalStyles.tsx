@@ -61,20 +61,20 @@ const GlobalStyles = () => {
       }
     }
 
-    /* PC 端隐藏滚动条 */
+    /* PC 端滚动条样式 */
     @media (min-width: 769px) {
       ::-webkit-scrollbar {
-        width: ${isStandalone ? '10px' : 0};
-        height: ${isStandalone ? '10px' : 0};
+        width: 0;
+        height: 0;
       }
 
       /* Firefox */
       * {
-        scrollbar-width: ${isStandalone ? 'auto' : 'none'};
+        scrollbar-width: none;
       }
 
       /* IE */
-      -ms-overflow-style: ${isStandalone ? 'auto' : 'none'};
+      -ms-overflow-style: none;
     }
 
     #root {
