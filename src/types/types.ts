@@ -1,10 +1,13 @@
 export interface BlogData {
   id: number;
   title: string;
-  summary: string;
   content: string;
-  tags: string[];
-  category: string;
-  date: string;
+  summary: string;
+  categoryId: number;
+  categoryName: string;
+  tagIds: number[];
+  tagNames: string[];
   viewCount: number;
+  createTime: string;
+  updateTime: string;
 } 

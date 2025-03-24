@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Space, Tag, Button, Skeleton } from 'antd';
-import { ArrowLeftOutlined, CalendarOutlined, EyeOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CalendarOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
-import { MOCK_BLOGS } from './mockData';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
+import { blogApi } from '../../services/api';
+import { BlogData } from '../../types/types';
+import GameModal from '../../components/GameModal';
+import { useGameEasterEgg } from '../../hooks/useGameEasterEgg';
 
 const { Title } = Typography;
 
@@ -54,6 +57,12 @@ const BlogMeta = styled.div`
   gap: ${globalStyles.spacing.sm};
   color: ${globalStyles.colors.lightText};
   margin: ${globalStyles.spacing.md} 0;
+  flex-wrap: wrap;
+`;
+
+const MetaDivider = styled.span`
+  margin: 0 ${globalStyles.spacing.xs};
+  color: ${globalStyles.colors.border};
 `;
 
 const StyledMarkdownRenderer = styled(MarkdownRenderer)`
@@ -64,19 +73,51 @@ const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
 
-  // 查找博客数据
-  const blog = MOCK_BLOGS.find(blog => blog.id === Number(id));
+  const [blog, setBlog] = useState<BlogData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 使用 useTitle hook，设置当前页面标题为博客标题
+  // 使用 useTitle hook
   useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
 
+  useEffect(() => {
+    const loadBlog = async () => {
+      if (!id) return;
+
+      try {
+        setLoading(true);
+        const data = await blogApi.getDetail(Number(id));
+        setBlog(data);
+
+        // 增加阅读量
+        await blogApi.increaseViewCount(Number(id));
+      } catch (error) {
+        console.error('Failed to load blog:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBlog();
+  }, [id]);
+
   const handleBack = () => {
-    // 保持当前 URL 的查询参数
     const searchParams = new URLSearchParams(location.search);
     const blogPath = `/blog${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
     navigate(blogPath);
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <BackButton type="link" icon={<ArrowLeftOutlined />} onClick={handleBack}>
+          返回博客列表
+        </BackButton>
+        <Skeleton active />
+      </Container>
+    );
+  }
 
   if (!blog) {
     return (
@@ -84,7 +125,7 @@ const BlogDetail: React.FC = () => {
         <BackButton type="link" icon={<ArrowLeftOutlined />} onClick={handleBack}>
           返回博客列表
         </BackButton>
-        <Skeleton active />
+        <div>博客不存在或已被删除</div>
       </Container>
     );
   }
@@ -104,19 +145,29 @@ const BlogDetail: React.FC = () => {
         <Title level={2}>{blog.title}</Title>
 
         <BlogMeta>
-          <CalendarOutlined /> {blog.date}
-          <span style={{ margin: `0 ${globalStyles.spacing.sm}` }}>•</span>
-          <EyeOutlined /> {blog.viewCount} 次浏览
+          <Space>
+            <ClockCircleOutlined /> 发布于 {blog.createTime}
+          </Space>
+          <MetaDivider>•</MetaDivider>
+          <Space>
+            <EditOutlined /> 更新于 {blog.updateTime}
+          </Space>
+          <MetaDivider>•</MetaDivider>
+          <Space>
+            <EyeOutlined /> {blog.viewCount} 次浏览
+          </Space>
         </BlogMeta>
 
         <Space wrap>
-          {blog.tags.map((tag) => (
+          {blog.tagNames.map((tag) => (
             <BlogTag key={tag} color="blue">{tag}</BlogTag>
           ))}
         </Space>
 
         <StyledMarkdownRenderer content={blog.content} />
       </ContentWrapper>
+
+      <GameModal open={showGameModal} onClose={handleCloseGameModal} />
     </Container>
   );
 };
