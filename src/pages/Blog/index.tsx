@@ -8,6 +8,7 @@ import { globalStyles } from '../../styles/theme';
 import { MOCK_BLOGS } from './mockData';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
+import {useStandaloneMode} from "../../hooks/useStandaloneMode.ts";
 
 const { Title } = Typography;
 
@@ -214,6 +215,7 @@ const Blog: React.FC = () => {
   useTitle('博客', { restoreOnUnmount: true });
   const navigate = useNavigate();
   const location = useLocation();
+  const isStandaloneMode = useStandaloneMode();
 
   const [isGrid, setIsGrid] = useState(() => {
     const savedViewMode = localStorage.getItem('blogViewMode');
@@ -255,16 +257,24 @@ const Blog: React.FC = () => {
   }, [filteredBlogs, currentPage]);
 
   const handleBlogClick = (blog: BlogData) => {
-    // 保持当前 URL 的查询参数
-    const searchParams = new URLSearchParams(location.search);
-    const blogPath = `/blog/${blog.id}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-    navigate(blogPath);
+    if (isStandaloneMode) {
+      handleNavigateToBlog(blog);
+    } else {
+      setSelectedBlog(blog);
+    }
   };
 
   const handleReadMore = (e: React.MouseEvent, blog: BlogData) => {
     e.stopPropagation();
-    handleBlogClick(blog);
+    handleNavigateToBlog(blog);
   };
+
+  const handleNavigateToBlog = (blog: BlogData) => {
+    // 保持当前 URL 的查询参数
+    const searchParams = new URLSearchParams(location.search);
+    const blogPath = `/blog/${blog.id}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    navigate(blogPath);
+  }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
