@@ -61,6 +61,7 @@ export interface TagData {
 export const blogApi = {
   // 获取博客列表
   getList: async (params: BlogQuery) => {
+    // @ts-ignore
     const response = await http.get<BlogListResponse>('/api/blog/list', params);
     console.log(response);
     return {

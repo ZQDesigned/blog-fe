@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Space, Tag, Button, Skeleton } from 'antd';
-import { ArrowLeftOutlined, CalendarOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Typography, Space, Tag, Radio, Modal, Button, Select, Pagination, Spin } from 'antd';
-import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, FolderOutlined, SearchOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, FolderOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -294,10 +294,6 @@ const Blog: React.FC = () => {
     });
     navigate({ search: params.toString() }, { replace: true });
   }, [query, loadBlogs, navigate]);
-
-  const handleSearch = (value: string) => {
-    setQuery(prev => ({ ...prev, keyword: value, page: 1 }));
-  };
 
   const handleCategoryChange = (value: string | null) => {
     setQuery(prev => ({ ...prev, category: value || undefined, page: '1' }));

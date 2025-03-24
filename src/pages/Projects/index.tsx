@@ -54,20 +54,6 @@ const ProjectTag = styled(Tag)`
   margin: ${globalStyles.spacing.xs};
 `;
 
-const ProjectLinks = styled.div`
-  display: flex;
-  gap: ${globalStyles.spacing.md};
-  margin-top: ${globalStyles.spacing.md};
-`;
-
-const ProjectLink = styled(Button)<{ $disabled?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${globalStyles.spacing.xs};
-  opacity: ${props => props.$disabled ? 0.5 : 1};
-  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
-`;
-
 const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused' }>`
   position: absolute;
   top: 12px;
