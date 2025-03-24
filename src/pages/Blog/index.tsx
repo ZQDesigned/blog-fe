@@ -313,9 +313,9 @@ const Blog: React.FC = () => {
 
   const handleBlogClick = (blog: BlogData) => {
     if (isStandaloneMode) {
-      setSelectedBlog(blog);
+      handleNavigateToBlog(blog);
     } else {
-      navigate(`/blog/${blog.id}${location.search}`);
+      setSelectedBlog(blog);
     }
   };
 
