@@ -77,11 +77,13 @@ Authorization: Bearer <token>
         "id": 1,
         "title": "文章标题",
         "summary": "文章摘要",
-        "category": "技术",
-        "tags": ["React", "TypeScript"],
+        "categoryId": 1,
+        "categoryName": "技术",
+        "tagIds": [1, 2],
+        "tagNames": ["React", "TypeScript"],
+        "viewCount": 100,
         "createTime": "2024-03-15T12:00:00",
-        "updateTime": "2024-03-15T12:00:00",
-        "viewCount": 100
+        "updateTime": "2024-03-15T12:00:00"
       }
     ]
   }
@@ -111,11 +113,14 @@ Authorization: Bearer <token>
     "id": 1,
     "title": "文章标题",
     "content": "文章内容（Markdown格式）",
-    "category": "技术",
-    "tags": ["React", "TypeScript"],
+    "summary": "文章摘要",
+    "categoryId": 1,
+    "categoryName": "技术",
+    "tagIds": [1, 2],
+    "tagNames": ["React", "TypeScript"],
+    "viewCount": 100,
     "createTime": "2024-03-15T12:00:00",
-    "updateTime": "2024-03-15T12:00:00",
-    "viewCount": 100
+    "updateTime": "2024-03-15T12:00:00"
   }
 }
 ```
@@ -247,9 +252,7 @@ Authorization: Bearer <token>
 {
   "code": 200,
   "msg": "success",
-  "data": {
-    "viewCount": 101
-  }
+  "data": 101
 }
 ```
 
@@ -274,6 +277,7 @@ Authorization: Bearer <token>
         "id": 1,
         "title": "项目标题",
         "description": "项目描述",
+        "imageUrl": "/uploads/xxx.jpg",
         "tags": ["React", "TypeScript"],
         "github": "https://github.com/...",
         "demo": "https://demo.com",
@@ -306,6 +310,7 @@ Authorization: Bearer <token>
 | title | string | 项目标题 |
 | description | string | 项目描述 |
 | content | string | 项目详细介绍 |
+| imageUrl | string | 项目图片URL |
 | tags | array | 项目标签 |
 | github | object | GitHub 仓库信息 |
 | github.url | string | GitHub 仓库地址 |
@@ -332,6 +337,7 @@ Authorization: Bearer <token>
     "title": "项目标题",
     "description": "项目描述",
     "content": "项目详细介绍",
+    "imageUrl": "/uploads/xxx.jpg",
     "tags": ["React", "TypeScript"],
     "github": {
       "url": "https://github.com/...",
@@ -364,36 +370,26 @@ Authorization: Bearer <token>
 
 - 路径：`POST /api/project`
 - 认证：需要 JWT
+- Content-Type: multipart/form-data
 
-#### 请求体
+#### 请求参数
 
-```json
-{
-  "title": "项目标题",
-  "description": "项目描述",
-  "content": "项目详细介绍",
-  "tags": ["React", "TypeScript"],
-  "github": {
-    "url": "https://github.com/...",
-    "disabled": false,
-    "disabledReason": null
-  },
-  "demo": {
-    "url": "https://demo.com",
-    "disabled": false,
-    "disabledReason": null
-  },
-  "status": "maintaining",
-  "features": [
-    "特性1",
-    "特性2"
-  ],
-  "techStack": [
-    "技术栈1",
-    "技术栈2"
-  ]
-}
-```
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| title | string | 是 | 项目标题 |
+| description | string | 是 | 项目描述 |
+| image | file | 是 | 项目图片（仅支持图片文件：jpg、jpeg、png、gif） |
+| github | object | 否 | GitHub 仓库信息 |
+| github.url | string | 否 | GitHub 仓库地址 |
+| github.disabled | boolean | 否 | 是否禁用源码按钮 |
+| github.disabledReason | string | 否 | 源码按钮禁用原因 |
+| demo | object | 否 | 演示信息 |
+| demo.url | string | 否 | 演示地址 |
+| demo.disabled | boolean | 否 | 是否禁用演示按钮 |
+| demo.disabledReason | string | 否 | 演示按钮禁用原因 |
+| status | string | 是 | 项目状态（developing-开发中, maintaining-维护中, paused-暂停维护） |
+| features | array | 否 | 项目特性列表，格式：["特性1", "特性2"] |
+| techStack | array | 否 | 技术栈列表，格式：["技术1", "技术2"] |
 
 #### 响应示例
 
@@ -413,6 +409,7 @@ Authorization: Bearer <token>
 
 - 路径：`PUT /api/project/{id}`
 - 认证：需要 JWT
+- Content-Type: multipart/form-data
 
 #### 路径参数
 
@@ -420,35 +417,24 @@ Authorization: Bearer <token>
 |--------|------|------|------|
 | id | integer | 是 | 项目ID |
 
-#### 请求体
+#### 请求参数
 
-```json
-{
-  "title": "项目标题",
-  "description": "项目描述",
-  "content": "项目详细介绍",
-  "tags": ["React", "TypeScript"],
-  "github": {
-    "url": "https://github.com/...",
-    "disabled": false,
-    "disabledReason": null
-  },
-  "demo": {
-    "url": "https://demo.com",
-    "disabled": false,
-    "disabledReason": null
-  },
-  "status": "maintaining",
-  "features": [
-    "特性1",
-    "特性2"
-  ],
-  "techStack": [
-    "技术栈1",
-    "技术栈2"
-  ]
-}
-```
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| title | string | 是 | 项目标题 |
+| description | string | 是 | 项目描述 |
+| content | string | 否 | 项目详细介绍 |
+| image | file | 否 | 项目图片（不传则保持原图片不变） |
+| tags | array | 否 | 项目标签列表 |
+| github.url | string | 否 | GitHub 仓库地址 |
+| github.disabled | boolean | 否 | 是否禁用源码按钮 |
+| github.disabledReason | string | 否 | 源码按钮禁用原因 |
+| demo.url | string | 否 | 演示地址 |
+| demo.disabled | boolean | 否 | 是否禁用演示按钮 |
+| demo.disabledReason | string | 否 | 演示按钮禁用原因 |
+| status | string | 是 | 项目状态 |
+| features | array | 否 | 项目特性列表 |
+| techStack | array | 否 | 技术栈列表 |
 
 #### 响应示例
 
@@ -852,6 +838,8 @@ Authorization: Bearer <token>
 | title | varchar(255) | 标题 |
 | description | varchar(500) | 描述 |
 | content | text | 详细介绍 |
+| image_path | varchar(255) | 图片文件名 |
+| image_name | varchar(255) | 原始图片名称 |
 | tags | varchar(255) | 标签（JSON数组） |
 | github_url | varchar(255) | GitHub仓库地址 |
 | github_disabled | tinyint | 是否禁用源码按钮 |
@@ -1020,4 +1008,80 @@ Authorization: Bearer <token>
 | 1001 | 用户名或密码错误 |
 | 1002 | 账号已被禁用 |
 | 1003 | 旧密码错误 |
-| 1004 | 令牌已失效 | 
+| 1004 | 令牌已失效 |
+
+## 统计接口
+
+### 获取仪表盘统计数据
+
+#### 请求信息
+
+- 路径：`GET /api/stats/dashboard`
+- 认证：需要 JWT
+
+#### 响应字段说明
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| totalArticles | integer | 文章总数 |
+| totalProjects | integer | 项目总数 |
+| totalCategories | integer | 分类总数 |
+| totalTags | integer | 标签总数 |
+| visitTrend | array | 最近7天的访问趋势 |
+| visitTrend[].date | string | 日期，格式：YYYY-MM-DD |
+| visitTrend[].value | integer | 访问量 |
+| categoryStats | array | 分类统计（按文章数量排序，最多5个） |
+| categoryStats[].category | string | 分类名称 |
+| categoryStats[].value | integer | 文章数量 |
+| projectStats | array | 项目状态统计 |
+| projectStats[].type | string | 项目状态（developing-开发中, maintaining-维护中, paused-暂停维护） |
+| projectStats[].value | integer | 项目数量 |
+
+#### 响应示例
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "totalArticles": 100,
+    "totalProjects": 10,
+    "totalCategories": 8,
+    "totalTags": 20,
+    "visitTrend": [
+      {
+        "date": "2024-03-15",
+        "value": 150
+      },
+      {
+        "date": "2024-03-16",
+        "value": 180
+      }
+    ],
+    "categoryStats": [
+      {
+        "category": "技术博客",
+        "value": 50
+      },
+      {
+        "category": "学习笔记",
+        "value": 30
+      }
+    ],
+    "projectStats": [
+      {
+        "type": "maintaining",
+        "value": 5
+      },
+      {
+        "type": "developing",
+        "value": 3
+      },
+      {
+        "type": "paused",
+        "value": 2
+      }
+    ]
+  }
+}
+``` 
