@@ -241,7 +241,7 @@ const Blog: React.FC = () => {
 
   const [query, setQuery] = useState<BlogQuery>({
     page: searchParams.get('page') || '1',
-    pageSize: '10',
+    pageSize: '12',
     keyword: searchParams.get('keyword') || '',
     category: searchParams.get('category') || undefined,
     tag: searchParams.get('tag') || undefined,
