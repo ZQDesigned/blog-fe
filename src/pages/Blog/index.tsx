@@ -9,7 +9,7 @@ import { useTitle } from '../../hooks/useTitle';
 import { blogApi, BlogQuery, CategoryData, TagData } from '../../services/api';
 import { BlogData } from '../../types/types';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
-import { useStandaloneMode } from "../../hooks/useStandaloneMode.ts";
+import { useStandaloneMode } from "../../hooks/useStandaloneMode";
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
 import type { SelectProps } from 'antd';
 
@@ -289,14 +289,16 @@ const Blog: React.FC = () => {
 
   useEffect(() => {
     loadBlogs();
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(location.search);
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== '') {
         params.set(key, String(value));
+      } else {
+        params.delete(key);
       }
     });
     navigate({ search: params.toString() }, { replace: true });
-  }, [query, loadBlogs, navigate]);
+  }, [query, loadBlogs, navigate, location.search]);
 
   const handleCategoryChange: SelectProps['onChange'] = (value) => {
     setQuery(prev => ({ ...prev, category: value?.toString() || undefined, page: '1' }));
