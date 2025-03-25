@@ -13,16 +13,10 @@ export const useGameEasterEgg = () => {
   const location = useLocation();
   const isStandalone = useStandaloneMode();
 
-  // 如果是独立模式，直接返回不显示游戏的状态
-  if (isStandalone) {
-    return {
-      showGameModal: false,
-      handleCloseGameModal: () => {}
-    };
-  }
-
   // 在组件挂载时检查是否需要重置计数器
   useEffect(() => {
+    if (isStandalone) return;
+
     const lastRefreshTime = localStorage.getItem(PAGE_REFRESH_KEY);
     const currentTime = new Date().getTime();
 
@@ -33,10 +27,9 @@ export const useGameEasterEgg = () => {
 
     // 更新刷新时间
     localStorage.setItem(PAGE_REFRESH_KEY, currentTime.toString());
-  }, []);
+  }, [isStandalone]);
 
   useEffect(() => {
-    // 如果是独立模式，不执行任何操作
     if (isStandalone) return;
 
     // 只在博客详情页面计数
