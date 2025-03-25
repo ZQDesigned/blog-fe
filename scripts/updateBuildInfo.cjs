@@ -36,6 +36,7 @@ function updateEnvFile() {
     // 更新或添加构建时间和 Git Hash
     const buildTime = isDev ? '' : Date.now().toString();
     const gitHash = getGitHash(isDev);
+    const apiBaseUrl = isDev ? 'http://localhost:8080' : 'https://api.blog.zqdesigned.city';
     
     const lines = envContent.split('\n');
     const newLines = lines.map(line => {
@@ -44,6 +45,9 @@ function updateEnvFile() {
       }
       if (line.startsWith('VITE_GIT_HASH=')) {
         return `VITE_GIT_HASH=${gitHash}`;
+      }
+      if (line.startsWith('VITE_API_BASE_URL=')) {
+        return `VITE_API_BASE_URL=${apiBaseUrl}`;
       }
       return line;
     });
@@ -55,12 +59,16 @@ function updateEnvFile() {
     if (!lines.some(line => line.startsWith('VITE_GIT_HASH='))) {
       newLines.push(`VITE_GIT_HASH=${gitHash}`);
     }
+    if (!lines.some(line => line.startsWith('VITE_API_BASE_URL='))) {
+      newLines.push(`VITE_API_BASE_URL=${apiBaseUrl}`);
+    }
 
     // 写入更新后的内容
     fs.writeFileSync(envPath, newLines.join('\n'));
     console.log('Build info updated successfully:', {
       buildTime: isDev ? 'development' : new Date(Number(buildTime)).toISOString(),
       gitHash,
+      apiBaseUrl,
       environment: isDev ? 'development' : 'production'
     });
   } catch (error) {
