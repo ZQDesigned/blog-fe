@@ -87,11 +87,12 @@ const BlogDetail: React.FC = () => {
 
       try {
         setLoading(true);
-        const data = await blogApi.getDetail(Number(id));
+        const blogId = parseInt(id, 10);
+        const data = await blogApi.getDetail(blogId);
         setBlog(data);
 
         // 增加阅读量
-        await blogApi.increaseViewCount(Number(id));
+        await blogApi.increaseViewCount(blogId);
       } catch (error) {
         console.error('Failed to load blog:', error);
       } finally {
