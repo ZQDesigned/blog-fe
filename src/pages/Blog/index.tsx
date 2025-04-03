@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Typography, Space, Tag, Radio, Modal, Button, Select, Pagination, Spin } from 'antd';
+import { Card, Typography, Space, Tag, Radio, Modal, Button, Select, Pagination } from 'antd';
 import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, FolderOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import { BlogData } from '../../types/types';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useStandaloneMode } from "../../hooks/useStandaloneMode.ts";
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
+import PageLoading from '../../components/PageLoading';
 
 const { Title } = Typography;
 
@@ -203,10 +204,10 @@ const PaginationContainer = styled.div`
 `;
 
 const LoadingContainer = styled.div`
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 `;
 
 const BlogMeta = styled.div`
@@ -406,7 +407,7 @@ const Blog: React.FC = () => {
 
         {loading ? (
           <LoadingContainer>
-            <Spin size="large" />
+            <PageLoading tip="正在加载博客列表" />
           </LoadingContainer>
         ) : (
           <>

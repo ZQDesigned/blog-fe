@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Space, Tag, Modal, Button, Spin } from 'antd';
+import { Card, Typography, Space, Tag, Modal, Button } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { projectApi, Project } from '../../services/api';
 import { getFullResourceUrl } from '../../utils/request';
 import LazyImage from '../../components/LazyImage';
+import PageLoading from '../../components/PageLoading';
 
 const { Title, Paragraph } = Typography;
 
@@ -121,10 +122,10 @@ const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
 `;
 
 const LoadingContainer = styled.div`
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 `;
 
 const ModalContent = styled.div`
@@ -209,7 +210,7 @@ const Projects: React.FC = () => {
   if (loading) {
     return (
       <LoadingContainer>
-        <Spin size="large" />
+        <PageLoading tip="正在加载项目列表" />
       </LoadingContainer>
     );
   }
