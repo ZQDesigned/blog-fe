@@ -6,12 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
-import { blogApi, BlogQuery, CategoryData, TagData } from '../../services/api';
+import { blogApi, CategoryData, TagData } from '../../services/api';
 import { BlogData } from '../../types/types';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
-import { useStandaloneMode } from "../../hooks/useStandaloneMode";
+import { useStandaloneMode } from "../../hooks/useStandaloneMode.ts";
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
-import type { SelectProps } from 'antd';
 
 const { Title } = Typography;
 
@@ -225,104 +224,119 @@ const MetaDivider = styled.span`
 `;
 
 const Blog: React.FC = () => {
-  useTitle('博客', { restoreOnUnmount: true });
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const isStandaloneMode = useStandaloneMode();
 
   const [selectedBlog, setSelectedBlog] = useState<BlogData | null>(null);
   const [blogs, setBlogs] = useState<BlogData[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [tags, setTags] = useState<TagData[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
 
-  const [query, setQuery] = useState<BlogQuery>({
-    page: searchParams.get('page') || '1',
-    pageSize: '12',
-    keyword: searchParams.get('keyword') || '',
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+
+  const [filterParams, setFilterParams] = useState({
     category: searchParams.get('category') || undefined,
     tag: searchParams.get('tag') || undefined,
   });
 
   const dedupe = useDedupeRequest();
 
-  const loadBlogs = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await dedupe(
-        `blogs-${JSON.stringify(query)}`,
-        () => blogApi.getList(query)
-      );
-      setBlogs(response.content);
-      setTotal(response.total);
-      // @ts-ignore
-      if (response.page !== query.page) {
-        // @ts-ignore
-        setQuery(prev => ({ ...prev, page: response.page }));
+  useTitle('博客', { restoreOnUnmount: true });
+
+  useEffect(() => {
+    const loadMetadata = async () => {
+      try {
+        const [categoriesData, tagsData] = await Promise.all([
+          dedupe('categories', () => blogApi.getCategories()),
+          dedupe('tags', () => blogApi.getTags())
+        ]);
+        setCategories(categoriesData);
+        setTags(tagsData);
+      } catch (error) {
+        console.error('Failed to load metadata:', error);
       }
+    };
+    loadMetadata();
+  }, [dedupe]);
+
+  const loadBlogs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await dedupe(
+        `blogs-${JSON.stringify({ ...filterParams, page: currentPage, pageSize })}`,
+        () => blogApi.getList({
+          page: currentPage.toString(),
+          pageSize: pageSize.toString(),
+          keyword: '',
+          ...filterParams
+        })
+      );
+      setBlogs(data.content);
+      setTotal(data.total);
     } catch (error) {
       console.error('Failed to load blogs:', error);
     } finally {
       setLoading(false);
     }
-  }, [query, dedupe]);
-
-  const loadFilters = useCallback(async () => {
-    try {
-      const [categoriesData, tagsData] = await Promise.all([
-        dedupe('categories', () => blogApi.getCategories()),
-        dedupe('tags', () => blogApi.getTags()),
-      ]);
-      setCategories(categoriesData);
-      setTags(tagsData);
-    } catch (error) {
-      console.error('Failed to load filters:', error);
-    }
-  }, [dedupe]);
+  }, [filterParams, currentPage, pageSize, dedupe]);
 
   useEffect(() => {
-    loadFilters();
-  }, [loadFilters]);
+    const params = new URLSearchParams(location.search);
+    
+    const mode = params.get('mode');
+    
+    params.forEach((_, key) => params.delete(key));
+    
+    if (mode) {
+      params.set('mode', mode);
+    }
+    
+    Object.entries(filterParams).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
+    
+    setSearchParams(params);
+    setCurrentPage(1);
+  }, [filterParams, setSearchParams, location.search]);
 
   useEffect(() => {
     loadBlogs();
-    const params = new URLSearchParams(location.search);
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
-        params.set(key, String(value));
-      } else {
-        params.delete(key);
-      }
-    });
-    navigate({ search: params.toString() }, { replace: true });
-  }, [query, loadBlogs, navigate, location.search]);
+  }, [loadBlogs]);
 
-  const handleCategoryChange: SelectProps['onChange'] = (value) => {
-    setQuery(prev => ({ ...prev, category: value?.toString() || undefined, page: '1' }));
-  };
+  const handleCategoryChange = useCallback((value: string | undefined) => {
+    setFilterParams(prev => ({ ...prev, category: value }));
+  }, []);
 
-  const handleTagClick: SelectProps['onChange'] = (value) => {
-    setQuery(prev => ({ ...prev, tag: Array.isArray(value) && value.length > 0 ? value.join(',') : undefined, page: '1' }));
-  };
+  const handleTagChange = useCallback((value: string | undefined) => {
+    setFilterParams(prev => ({ ...prev, tag: value }));
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    setQuery(prev => ({ ...prev, page: page.toString() }));
-  };
+  const handlePageChange = useCallback((page: number, size?: number) => {
+    setCurrentPage(page);
+    if (size) {
+      setPageSize(size);
+    }
+  }, []);
 
-  const handleViewModeChange = (e: any) => {
-    setViewMode(e.target.value);
-  };
+  const handleViewModeChange = useCallback((mode: 'list' | 'grid') => {
+    setViewMode(mode);
+  }, []);
 
-  const handleBlogClick = (blog: BlogData) => {
+  const handleBlogClick = useCallback((blog: BlogData) => {
     if (isStandaloneMode) {
       handleNavigateToBlog(blog);
     } else {
       setSelectedBlog(blog);
     }
-  };
+  }, [isStandaloneMode]);
 
   const handleReadMore = (e: React.MouseEvent, blog: BlogData) => {
     e.stopPropagation();
@@ -330,8 +344,9 @@ const Blog: React.FC = () => {
   };
 
   const handleNavigateToBlog = (blog: BlogData) => {
-    const searchParams = new URLSearchParams(location.search);
-    const blogPath = `/blog/${blog.id}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode');
+    const blogPath = `/blog/${blog.id}${mode ? `?mode=${mode}` : ''}`;
     navigate(blogPath);
   };
 
@@ -343,7 +358,7 @@ const Blog: React.FC = () => {
           <div className="view-mode-controls">
             <Radio.Group
               value={viewMode}
-              onChange={handleViewModeChange}
+              onChange={(e) => handleViewModeChange(e.target.value as 'list' | 'grid')}
             >
               <Radio.Button value="grid">
                 <AppstoreOutlined /> 网格视图
@@ -362,7 +377,8 @@ const Blog: React.FC = () => {
           <StyledSelect
             allowClear
             placeholder="选择分类"
-            value={query.category || null}
+            value={filterParams.category}
+            // @ts-ignore
             onChange={handleCategoryChange}
             options={categories.map(category => ({
               label: `${category.name} (${category.articleCount})`,
@@ -378,8 +394,9 @@ const Blog: React.FC = () => {
             mode="multiple"
             allowClear
             placeholder="选择标签"
-            value={query.tag ? query.tag.split(',') : []}
-            onChange={handleTagClick}
+            value={filterParams.tag ? filterParams.tag.split(',') : []}
+            // @ts-ignore
+            onChange={(values) => handleTagChange(values.join(','))}
             options={tags.map(tag => ({
               label: `${tag.name} (${tag.articleCount})`,
               value: tag.name
@@ -425,7 +442,8 @@ const Blog: React.FC = () => {
                             color={tags.some(t => t.name === tag) ? 'blue' : 'default'}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleTagClick([tag]);
+                              // @ts-ignore
+                              handleTagChange([tag]);
                             }}
                           >
                             {tag}
@@ -447,11 +465,9 @@ const Blog: React.FC = () => {
 
             <PaginationContainer>
               <Pagination
-                // @ts-ignore
-                current={query.page}
+                current={currentPage}
+                pageSize={pageSize}
                 total={total}
-                // @ts-ignore
-                pageSize={query.pageSize!}
                 onChange={handlePageChange}
                 showSizeChanger={false}
               />
