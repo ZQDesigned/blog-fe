@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Space, Tag, Modal, Button } from 'antd';
+import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -314,28 +314,38 @@ const Projects: React.FC = () => {
                   </Space>
                 </div>
                 <Space>
-                  {selectedProject.github && !selectedProject.github.disabled && (
-                    <Button
-                      type="primary"
-                      icon={<GithubOutlined />}
-                      href={selectedProject.github.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={selectedProject.github.disabledReason || undefined}
+                  {selectedProject.github && (
+                    <Tooltip 
+                      title={selectedProject.github.disabled ? selectedProject.github.disabledReason : null}
+                      placement="top"
                     >
-                      查看源码
-                    </Button>
+                      <Button
+                        type="primary"
+                        icon={<GithubOutlined />}
+                        href={selectedProject.github.disabled ? undefined : selectedProject.github.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        disabled={selectedProject.github.disabled}
+                      >
+                        查看源码
+                      </Button>
+                    </Tooltip>
                   )}
-                  {selectedProject.demo && !selectedProject.demo.disabled && (
-                    <Button
-                      icon={<LinkOutlined />}
-                      href={selectedProject.demo.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={selectedProject.demo.disabledReason || undefined}
+                  {selectedProject.demo && (
+                    <Tooltip 
+                      title={selectedProject.demo.disabled ? selectedProject.demo.disabledReason : null}
+                      placement="top"
                     >
-                      在线演示
-                    </Button>
+                      <Button
+                        icon={<LinkOutlined />}
+                        href={selectedProject.demo.disabled ? undefined : selectedProject.demo.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        disabled={selectedProject.demo.disabled}
+                      >
+                        在线演示
+                      </Button>
+                    </Tooltip>
                   )}
                 </Space>
               </Space>
