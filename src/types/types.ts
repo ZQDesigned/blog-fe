@@ -10,4 +10,99 @@ export interface BlogData {
   viewCount: number;
   createTime: string;
   updateTime: string;
+}
+
+// 首页内容类型定义
+export type HomeContentType = 'banner' | 'features' | 'skills' | 'timeline' | 'contact';
+
+// Banner 类型
+export interface HomeBanner {
+  type: 'banner';
+  title: string;
+  description: string;
+  banner: {
+    subtitle: string;
+    backgroundImage: string;
+    buttons: {
+      text: string;
+      link: string;
+      type?: 'primary' | 'default';
+      icon?: string;
+    }[];
+  };
+}
+
+// 特性展示类型
+export interface HomeFeature {
+  type: 'features';
+  title: string;
+  description: string;
+  items: {
+    icon: string;
+    title: string;
+    description: string;
+    link?: string;
+  }[];
+}
+
+// 技能展示类型
+export interface HomeSkills {
+  type: 'skills';
+  title: string;
+  description: string;
+  categories: {
+    name: string;
+    items: {
+      name: string;
+      icon?: string;
+      level: number; // 1-5
+      description?: string;
+    }[];
+  }[];
+}
+
+// 时间线类型
+export interface HomeTimeline {
+  type: 'timeline';
+  title: string;
+  description: string;
+  timelineItems: {
+    date: string;
+    title: string;
+    description: string;
+    icon?: string;
+    color?: string;
+  }[];
+}
+
+// 联系方式类型
+export interface HomeContact {
+  type: 'contact';
+  title: string;
+  description: string;
+  contactItems: {
+    type: string;
+    icon: string;
+    value: string;
+    link?: string;
+  }[];
+}
+
+// 首页内容项类型
+export type HomeContentItem = 
+  | HomeBanner 
+  | HomeFeature 
+  | HomeSkills 
+  | HomeTimeline 
+  | HomeContact;
+
+// 首页完整数据结构
+export interface HomeData {
+  sections: HomeContentItem[];
+  meta: {
+    title: string;
+    description: string;
+    keywords: string[];
+    updateTime: string;
+  };
 } 

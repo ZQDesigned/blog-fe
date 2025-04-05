@@ -1,5 +1,5 @@
 import { http } from '../utils/request';
-import { BlogData } from '../types/types';
+import {BlogData, HomeData} from '../types/types';
 
 // 博客相关接口
 export interface BlogQuery {
@@ -118,4 +118,20 @@ export const projectApi = {
   // 获取项目详情
   getDetail: (id: number) =>
     http.get<Project>(`/api/project/${id}`),
+};
+
+// 首页相关接口
+export const homeApi = {
+  // 获取首页内容
+  getContent: () =>
+    http.get<HomeData>('/api/home/content'),
+
+  // 获取首页统计数据
+  getStats: () =>
+    http.get<{
+      totalArticles: number;
+      totalProjects: number;
+      totalViews: number;
+      lastUpdateTime: string;
+    }>('/api/home/stats'),
 };

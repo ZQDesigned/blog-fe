@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
@@ -315,7 +315,7 @@ const Projects: React.FC = () => {
                 </div>
                 <Space>
                   {selectedProject.github && (
-                    <Tooltip 
+                    <Tooltip
                       title={selectedProject.github.disabled ? selectedProject.github.disabledReason : null}
                       placement="top"
                     >
@@ -332,7 +332,7 @@ const Projects: React.FC = () => {
                     </Tooltip>
                   )}
                   {selectedProject.demo && (
-                    <Tooltip 
+                    <Tooltip
                       title={selectedProject.demo.disabled ? selectedProject.demo.disabledReason : null}
                       placement="top"
                     >
