@@ -130,4 +130,14 @@ export interface FloatSidebarData {
   settings: {
     showWeather: boolean;
   };
+}
+
+// 页脚个人资料数据类型
+export interface FooterProfile {
+  links: {
+    title: string;
+    url: string;
+    icon?: string;
+    isExternal?: boolean;
+  }[];
 } 

@@ -1,5 +1,10 @@
 import { http } from '../utils/request';
-import {BlogData, FloatSidebarData, HomeData} from '../types/types';
+import {
+  BlogData,
+  FloatSidebarData,
+  HomeData,
+  FooterProfile
+} from '../types/types';
 
 // 博客相关接口
 export interface BlogQuery {
@@ -138,4 +143,9 @@ export const homeApi = {
   // 获取浮动侧边栏数据
   getSidebarData: () =>
     http.get<FloatSidebarData>('/api/home/sidebar'),
+};
+
+// 获取页脚个人资料数据
+export const getFooterProfile = () => {
+  return http.get<FooterProfile>('/api/footer/profile');
 };

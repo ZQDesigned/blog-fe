@@ -21,6 +21,9 @@ import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
 import SettingsDrawer from '../SettingsDrawer';
 import FloatSidebar from '../FloatSidebar';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
+import { getFooterProfile } from '../../services/api';
+import { FooterProfile } from '../../types/types';
+import * as Icons from '@ant-design/icons';
 
 const GameModal = React.lazy(() => import('../GameModal'));
 
@@ -265,6 +268,8 @@ export const MainLayout: React.FC = () => {
   const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
   const { showToast } = useToast();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [footerLinks, setFooterLinks] = useState<FooterProfile['links']>([]);
+  const [loadingFooter, setLoadingFooter] = useState(false);
   const {
     backgroundType,
     backgroundUrl,
@@ -273,6 +278,32 @@ export const MainLayout: React.FC = () => {
     refreshBackground
   } = useBackgroundSettings();
   const isStandalone = useStandaloneMode();
+
+  // 获取页脚数据
+  useEffect(() => {
+    const loadFooterData = async () => {
+      try {
+        setLoadingFooter(true);
+        const data = await getFooterProfile();
+        setFooterLinks(data.links);
+      } catch (error) {
+        console.error('Failed to load footer data:', error);
+      } finally {
+        setLoadingFooter(false);
+      }
+    };
+
+    if (!isStandalone) {
+      loadFooterData();
+    }
+  }, [isStandalone]);
+
+  // 获取图标组件
+  const getIcon = (iconName?: string) => {
+    if (!iconName) return null;
+    const IconComponent = (Icons as any)[iconName];
+    return IconComponent ? <IconComponent className="link-icon" /> : null;
+  };
 
   // 监听路由变化，自动滚动到顶部
   useEffect(() => {
@@ -493,18 +524,25 @@ export const MainLayout: React.FC = () => {
               </FooterColumn>
               <FooterColumn>
                 <FooterTitle>我的</FooterTitle>
-                <ExternalLinkContainer>
-                  <ExternalLink href="https://github.com/ZQDesigned" target="_blank">
-                    GitHub
-                  </ExternalLink>
-                  <LinkIcon className="link-icon" />
-                </ExternalLinkContainer>
-                <ExternalLinkContainer>
-                  <ExternalLink href="mailto:zqdesigned@mail.lnyynet.com">
-                    联系我
-                  </ExternalLink>
-                  <LinkIcon className="link-icon" />
-                </ExternalLinkContainer>
+                {loadingFooter ? (
+                  <Spin size="small" />
+                ) : (
+                  footerLinks.map((link, index) => (
+                    <ExternalLinkContainer key={index}>
+                      {link.icon && getIcon(link.icon)}
+                      {link.isExternal ? (
+                        <ExternalLink href={link.url} target="_blank" rel="noopener noreferrer">
+                          {link.title}
+                        </ExternalLink>
+                      ) : (
+                        <FooterLink onClick={() => navigate(link.url)}>
+                          {link.title}
+                        </FooterLink>
+                      )}
+                      <LinkIcon className="link-icon" />
+                    </ExternalLinkContainer>
+                  ))
+                )}
               </FooterColumn>
               <FooterColumn>
                 <FooterTitle>友情链接</FooterTitle>
