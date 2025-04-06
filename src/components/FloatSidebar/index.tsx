@@ -7,6 +7,10 @@ import { globalStyles } from '../../styles/theme';
 import LazyImage from '../LazyImage';
 import { useWeather } from '../../hooks/useWeather';
 import { formatDate } from '../../utils/dateUtils';
+import { FloatSidebarData } from '../../types/types';
+import { homeApi } from '../../services/api';
+import { useDedupeRequest } from '../../hooks/useDedupeRequest';
+import { getFullResourceUrl } from '../../utils/request';
 
 const { Title, Paragraph } = Typography;
 
@@ -171,9 +175,12 @@ const WeatherTitle = styled.div`
 `;
 
 const FloatSidebar: React.FC = () => {
-  const { weather, loading, error } = useWeather();
+  const { weather, loading: weatherLoading, error: weatherError } = useWeather();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [sidebarData, setSidebarData] = useState<FloatSidebarData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const dedupe = useDedupeRequest();
 
   // 检测操作系统
   const isMacOS = useMemo(() => {
@@ -196,6 +203,23 @@ const FloatSidebar: React.FC = () => {
     );
   }, [isMacOS]);
 
+  // 加载侧边栏数据
+  useEffect(() => {
+    const loadSidebarData = async () => {
+      try {
+        setLoading(true);
+        const data = await dedupe('sidebar-data', () => homeApi.getSidebarData());
+        setSidebarData(data);
+      } catch (error) {
+        console.error('Failed to load sidebar data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSidebarData();
+  }, [dedupe]);
+
   // 处理鼠标进入触发区域
   useEffect(() => {
     let timeoutId: number;
@@ -212,7 +236,7 @@ const FloatSidebar: React.FC = () => {
   }, [isHovering]);
 
   const renderWeatherContent = () => {
-    if (loading) {
+    if (weatherLoading) {
       return (
         <div style={{ textAlign: 'center', padding: globalStyles.spacing.md }}>
           <Spin size="small" />
@@ -220,8 +244,8 @@ const FloatSidebar: React.FC = () => {
       );
     }
 
-    if (error) {
-      return <WeatherError>{error}</WeatherError>;
+    if (weatherError) {
+      return <WeatherError>{weatherError}</WeatherError>;
     }
 
     if (!weather) {
@@ -245,6 +269,10 @@ const FloatSidebar: React.FC = () => {
     );
   };
 
+  if (loading || !sidebarData) {
+    return null;
+  }
+
   return (
     <>
       <SidebarTrigger
@@ -264,7 +292,7 @@ const FloatSidebar: React.FC = () => {
             <ProfileCard>
               <ProfileHeader>
                 <LazyImage
-                  src="/avatar.jpg"
+                  src={getFullResourceUrl(sidebarData.profile.avatar)}
                   alt="头像"
                   style={{
                     width: '120px',
@@ -274,47 +302,54 @@ const FloatSidebar: React.FC = () => {
                   }}
                 />
                 <Title level={4} style={{ marginTop: globalStyles.spacing.sm, marginBottom: 0 }}>
-                  ZQDesigned
+                  {sidebarData.profile.name}
                 </Title>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  分享开发历程、科技生活～
+                  {sidebarData.profile.bio}
                 </Paragraph>
                 <OnlineStatus>
-                  <StatusDot />
-                  <span>一日之计在于晨</span>
+                  <StatusDot style={{ backgroundColor: sidebarData.profile.status.online ? '#52c41a' : '#ff4d4f' }} />
+                  <span>{sidebarData.profile.status.text}</span>
                 </OnlineStatus>
               </ProfileHeader>
               <ProfileContent>
                 <Space direction="vertical" size="small">
                   <Tag color="blue">公告</Tag>
-                  <Paragraph>
-                    👋 Hi, 我是 ZQDesigned！欢迎你！
-                  </Paragraph>
-                  <Paragraph>
-                    ❓ 有任何问题欢迎评论区交流！
-                  </Paragraph>
+                  {sidebarData.announcements.map((announcement, index) => (
+                    announcement.type === 'link' ? (
+                      <Paragraph key={index}>
+                        {announcement.title}：<a href={announcement.link}>{announcement.content}</a>
+                      </Paragraph>
+                    ) : (
+                      <Paragraph key={index}>
+                        {announcement.title} {announcement.content}
+                      </Paragraph>
+                    )
+                  ))}
                   <Paragraph>
                     🖱️ 页面异常？ 尝试 {refreshShortcut}
                   </Paragraph>
                   <Paragraph>
-                    📧 如需联系：<a href="mailto:zqdesigned@mail.lnyynet.com">发送邮件📨</a>
+                    📧 如需联系：<a href={`mailto:${sidebarData.contact.email}`}>发送邮件📨</a>
                   </Paragraph>
                 </Space>
               </ProfileContent>
             </ProfileCard>
 
-            <WeatherCard 
-              title={
-                <WeatherTitle>
-                  天气
-                  <Tooltip title="此位置基于您的 IP，可能存在错误">
-                    <QuestionCircleOutlined className="weather-tip" />
-                  </Tooltip>
-                </WeatherTitle>
-              }
-            >
-              {renderWeatherContent()}
-            </WeatherCard>
+            {sidebarData.settings.showWeather && (
+              <WeatherCard 
+                title={
+                  <WeatherTitle>
+                    天气
+                    <Tooltip title="此位置基于您的 IP，可能存在错误">
+                      <QuestionCircleOutlined className="weather-tip" />
+                    </Tooltip>
+                  </WeatherTitle>
+                }
+              >
+                {renderWeatherContent()}
+              </WeatherCard>
+            )}
           </SidebarContainer>
         )}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import { http } from '../utils/request';
-import {BlogData, HomeData} from '../types/types';
+import {BlogData, FloatSidebarData, HomeData} from '../types/types';
 
 // 博客相关接口
 export interface BlogQuery {
@@ -134,4 +134,8 @@ export const homeApi = {
       totalViews: number;
       lastUpdateTime: string;
     }>('/api/home/stats'),
+
+  // 获取浮动侧边栏数据
+  getSidebarData: () =>
+    http.get<FloatSidebarData>('/api/home/sidebar'),
 };

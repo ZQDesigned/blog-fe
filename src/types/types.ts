@@ -105,4 +105,29 @@ export interface HomeData {
     keywords: string[];
     updateTime: string;
   };
+}
+
+// 浮动侧边栏数据类型
+export interface FloatSidebarData {
+  profile: {
+    avatar: string;
+    name: string;
+    bio: string;
+    status: {
+      online: boolean;
+      text: string;
+    };
+  };
+  announcements: {
+    title: string;
+    content: string;
+    type?: 'text' | 'link';
+    link?: string;
+  }[];
+  contact: {
+    email: string;
+  };
+  settings: {
+    showWeather: boolean;
+  };
 } 
