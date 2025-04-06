@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import ImageLoading from '../ImageLoading';
@@ -15,6 +15,8 @@ type LazyImageProps = Omit<HTMLMotionProps<"img">, "src" | "alt" | "initial" | "
 const ImageContainer = styled.div`
   position: relative;
   display: inline-block;
+  width: 100%;
+  height: 100%;
 `;
 
 const StyledImage = styled(motion.img)`
@@ -44,6 +46,12 @@ const LazyImage: React.FC<LazyImageProps> = ({
   ...imgProps
 }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setCurrentSrc(src);
+  }, [src]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -53,14 +61,17 @@ const LazyImage: React.FC<LazyImageProps> = ({
     <ImageContainer className={containerClassName}>
       <AnimatePresence mode="wait">
         {isLoading && (
-          <LoadingWrapper>
+          <LoadingWrapper
+            key={`loading-${src}`}
+          >
             <ImageLoading size={loadingSize} color={loadingColor} />
           </LoadingWrapper>
         )}
       </AnimatePresence>
       <StyledImage
         {...imgProps}
-        src={src}
+        key={`image-${src}`}
+        src={currentSrc}
         alt={alt}
         onLoad={handleLoad}
         initial={{ opacity: 0 }}
