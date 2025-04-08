@@ -3,7 +3,8 @@ import {
   BlogData,
   FloatSidebarData,
   HomeData,
-  FooterProfile
+  FooterProfile,
+  AboutMeData
 } from '../types/types';
 
 // 博客相关接口
@@ -148,4 +149,11 @@ export const homeApi = {
 // 获取页脚个人资料数据
 export const getFooterProfile = () => {
   return http.get<FooterProfile>('/api/footer/profile');
+};
+
+// 关于我页面接口
+export const aboutApi = {
+  // 获取关于我页面内容
+  getAboutMe: () =>
+    http.get<AboutMeData>('/api/about/me'),
 };

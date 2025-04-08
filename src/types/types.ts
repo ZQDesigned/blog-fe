@@ -89,11 +89,11 @@ export interface HomeContact {
 }
 
 // 首页内容项类型
-export type HomeContentItem = 
-  | HomeBanner 
-  | HomeFeature 
-  | HomeSkills 
-  | HomeTimeline 
+export type HomeContentItem =
+  | HomeBanner
+  | HomeFeature
+  | HomeSkills
+  | HomeTimeline
   | HomeContact;
 
 // 首页完整数据结构
@@ -140,4 +140,97 @@ export interface FooterProfile {
     icon?: string;
     isExternal?: boolean;
   }[];
-} 
+}
+
+// 关于我页面区块类型定义
+export type AboutSectionType = 'profile' | 'skills' | 'journey' | 'contact' | 'custom';
+
+// 个人资料区块
+export interface AboutProfile {
+  type: 'profile';
+  title: string;
+  profile: {
+    avatar?: string;
+    bio: string;
+    education: {
+      school: string;
+      degree: string;
+      major: string;
+      time?: string;
+    }[];
+    location: string;
+    highlights: string[];
+  };
+}
+
+// 技能区块
+export interface AboutSkills {
+  type: 'skills';
+  title: string;
+  skills: {
+    categories: {
+      name: string;
+      items: string[];
+    }[];
+  };
+}
+
+// 旅程区块
+export interface AboutJourney {
+  type: 'journey';
+  title: string;
+  journey: {
+    description: string[];
+    milestones?: {
+      year: string;
+      title: string;
+      description: string;
+    }[];
+  };
+}
+
+// 联系方式区块
+export interface AboutContact {
+  type: 'contact';
+  title: string;
+  contact: {
+    items: {
+      type: string;
+      icon: string;
+      value: string;
+      link?: string;
+      isQrCode?: boolean;
+      qrCodeUrl?: string;
+    }[];
+  };
+}
+
+// 自定义区块
+export interface AboutCustom {
+  type: 'custom';
+  title: string;
+  custom: {
+    description: string;
+    blockType: 'text' | 'list' | 'cards';
+    items?: {
+      title?: string;
+      description: string;
+      icon?: string;
+      imageUrl?: string;
+      link?: string;
+    }[];
+  };
+}
+
+// 关于我页面内容项类型
+export type AboutSectionItem =
+  | AboutProfile
+  | AboutSkills
+  | AboutJourney
+  | AboutContact
+  | AboutCustom;
+
+// 关于我页面完整数据结构
+export interface AboutMeData {
+  sections: AboutSectionItem[];
+}
