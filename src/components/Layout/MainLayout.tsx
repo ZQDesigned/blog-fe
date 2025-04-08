@@ -53,15 +53,16 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
   }
 `;
 
-const StyledHeader = styled(Header)`
-  background: #fff;
-  box-shadow: ${globalStyles.shadows.small};
+const StyledHeader = styled(Header)<{ $scrolled: boolean }>`
+  background: ${props => props.$scrolled ? '#fff' : 'transparent'};
+  box-shadow: ${props => props.$scrolled ? globalStyles.shadows.small : 'none'};
   position: fixed;
   width: 100%;
   z-index: 1;
   display: flex;
   align-items: center;
   padding: 0 ${globalStyles.spacing.xl};
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     padding: 0 ${globalStyles.spacing.md};
@@ -95,11 +96,15 @@ const StyledContent = styled(Content)<{ $isStandalone?: boolean }>`
   }
 `;
 
-const StyledMenu = styled(Menu)`
+const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
   flex: 1;
   border-bottom: none;
   justify-content: flex-end;
   background: transparent;
+  
+  &.ant-menu {
+    color: ${props => props.$scrolled ? globalStyles.colors.text : globalStyles.colors.text};
+  }
 `;
 
 const IcpLink = styled.a`
@@ -270,6 +275,7 @@ export const MainLayout: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [footerLinks, setFooterLinks] = useState<FooterProfile['links']>([]);
   const [loadingFooter, setLoadingFooter] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const {
     backgroundType,
     backgroundUrl,
@@ -297,6 +303,22 @@ export const MainLayout: React.FC = () => {
       loadFooterData();
     }
   }, [isStandalone]);
+
+  // 监听滚动事件
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // 初始检查
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // 获取图标组件
   const getIcon = (iconName?: string) => {
@@ -467,7 +489,7 @@ export const MainLayout: React.FC = () => {
   return (
     <StyledLayout $backgroundUrl={backgroundType === 'anime' ? backgroundUrl : null} $isStandalone={isStandalone}>
       {!isStandalone && (
-        <StyledHeader>
+        <StyledHeader $scrolled={scrolled}>
           <HeaderLeft>
             <StyledAvatar
               size={40}
@@ -478,6 +500,7 @@ export const MainLayout: React.FC = () => {
           <StyledMenu
             mode="horizontal"
             selectedKeys={[location.pathname]}
+            $scrolled={scrolled}
             items={NAV_ITEMS.map((item) => ({
               key: item.path,
               label: item.label,
