@@ -5,7 +5,7 @@ export const mockAboutData: AboutMeData = {
     {
       type: 'profile',
       title: '关于我',
-      content: {
+      profile: {
         avatar: 'https://www.loliapi.com/acg/pp/',
         bio: '👋 你好，我是 ZQDesigned，一名专注于 全栈开发 & 游戏开发 的开发者。我热爱技术，擅长 Spring Boot 后端开发、Kotlin 移动端开发、云原生架构，同时也在探索 Unity + xLua 进行游戏开发。这里是我的个人空间，记录我的思考、成长与项目经验。欢迎交流！',
         education: [
@@ -33,7 +33,7 @@ export const mockAboutData: AboutMeData = {
     {
       type: 'skills',
       title: '专业技能',
-      content: {
+      skills: {
         categories: [
           {
             name: '后端开发',
@@ -57,7 +57,7 @@ export const mockAboutData: AboutMeData = {
     {
       type: 'journey',
       title: '开发旅程',
-      content: {
+      journey: {
         description: [
           '🌍 旅途仍在继续，探索从未止步。',
           '🔭 我追逐技术的光，穿梭于代码的星海。',
@@ -84,9 +84,8 @@ export const mockAboutData: AboutMeData = {
     },
     {
       type: 'custom',
-      id: 'projects',
       title: '代表作品',
-      content: {
+      custom: {
         description: '以下是我的一些代表性项目，展示了我在不同领域的技术能力和创新思维。',
         blockType: 'cards',
         items: [
@@ -113,9 +112,8 @@ export const mockAboutData: AboutMeData = {
     },
     {
       type: 'custom',
-      id: 'awards',
       title: '获奖与认证',
-      content: {
+      custom: {
         description: '我的专业能力得到了多方面的认可：',
         blockType: 'list',
         items: [
@@ -140,7 +138,7 @@ export const mockAboutData: AboutMeData = {
     {
       type: 'contact',
       title: '联系方式',
-      content: {
+      contact: {
         items: [
           {
             type: 'GitHub',

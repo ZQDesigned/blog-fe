@@ -1,25 +1,37 @@
 import React from 'react';
-import { Typography, Space, Timeline } from 'antd';
+import { Typography, Timeline } from 'antd';
 import styled from '@emotion/styled';
 import { AboutJourney } from '../../../types/types';
 import { globalStyles } from '../../../styles/theme';
 import AboutSection from './AboutSection';
 
-const { Text, Paragraph } = Typography;
+const {Paragraph } = Typography;
 
 interface JourneySectionProps {
   data: AboutJourney;
   delay?: number;
 }
 
+const TimelineLabel = styled.div`
+  padding: ${globalStyles.spacing.xs} 0;
+`;
+
+const TimelineContent = styled.div`
+  padding: ${globalStyles.spacing.sm} 0;
+`;
+
 const JourneySection: React.FC<JourneySectionProps> = ({ data, delay = 0 }) => {
   const { journey } = data;
-  
+
   return (
     <AboutSection title={data.title} delay={delay}>
-      <Paragraph>
-        {journey.description}
-      </Paragraph>
+        {journey.description.map(
+            (desc, index) => (
+                <Paragraph key={index} style={{ marginTop: globalStyles.spacing.sm }}>
+                {desc}
+                </Paragraph>
+            )
+        )}
 
       {journey.milestones && journey.milestones.length > 0 && (
         <Timeline mode="left" style={{ marginTop: globalStyles.spacing.lg }}>
@@ -45,4 +57,4 @@ const JourneySection: React.FC<JourneySectionProps> = ({ data, delay = 0 }) => {
   );
 };
 
-export default JourneySection; 
+export default JourneySection;

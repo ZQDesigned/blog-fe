@@ -345,6 +345,7 @@ export const MainLayout: React.FC = () => {
           const successful = document.execCommand('copy');
           document.body.removeChild(textArea);
           return successful;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
           document.body.removeChild(textArea);
           return false;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Typography } from 'antd';
 import styled from '@emotion/styled';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
@@ -7,14 +6,12 @@ import { aboutApi } from '../../services/api';
 import { AboutMeData, AboutSectionItem } from '../../types/types';
 import PageLoading from '../../components/PageLoading';
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
-import { mockAboutData } from '../../mock/aboutData';
 import ProfileSection from './components/ProfileSection';
 import SkillsSection from './components/SkillsSection';
 import JourneySection from './components/JourneySection';
 import ContactSection from './components/ContactSection';
 import CustomSection from './components/CustomSection';
 
-const { Title } = Typography;
 
 const Container = styled.div`
   max-width: 1200px;

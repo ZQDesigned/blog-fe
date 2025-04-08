@@ -1,16 +1,9 @@
 import React from 'react';
-import { Space, Typography, Tag } from 'antd';
+import { Typography, Tag } from 'antd';
 import styled from '@emotion/styled';
 import { AboutSkills } from '../../../types/types';
 import { globalStyles } from '../../../styles/theme';
 import AboutSection from './AboutSection';
-
-const { Text, Paragraph } = Typography;
-
-interface SkillsCategoryProps {
-  name: string;
-  items: string[];
-}
 
 const SkillTag = styled(Tag)`
   margin: 4px;
@@ -18,11 +11,6 @@ const SkillTag = styled(Tag)`
   font-size: 14px;
   border-radius: 4px;
 `;
-
-const SkillsContainer = styled.div`
-  margin-bottom: ${globalStyles.spacing.md};
-`;
-
 const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -36,7 +24,7 @@ interface SkillsSectionProps {
 
 const SkillsSection: React.FC<SkillsSectionProps> = ({ data, delay = 0 }) => {
   const { skills } = data;
-  
+
   return (
     <AboutSection title={data.title} delay={delay}>
       {skills.categories.map((category, index) => (
@@ -55,4 +43,4 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({ data, delay = 0 }) => {
   );
 };
 
-export default SkillsSection; 
+export default SkillsSection;
