@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Toast from './index';
 import { ToastContext, ToastOptions } from '../../hooks/useToast.ts';
+import { globalToast } from '../../utils/globalToast';
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toast, setToast] = useState<{
@@ -30,6 +31,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       });
     }, 100);
   }, []);
+
+  // 注册全局Toast函数
+  useEffect(() => {
+    globalToast.register(showToast);
+    return () => {
+      globalToast.unregister();
+    };
+  }, [showToast]);
 
   const handleClose = useCallback(() => {
     setToast(prev => ({ ...prev, visible: false }));

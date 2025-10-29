@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { globalToast } from './globalToast';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,7 +25,7 @@ interface ApiResponse<T = any> {
 export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   try {
     const { params, signal, ...restOptions } = options;
-    
+
     // 处理查询参数
     const url = new URL(endpoint, BASE_URL);
     if (params) {
@@ -61,7 +61,7 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     }
 
     const response = await fetch(url.toString(), finalOptions);
-    
+
     // 如果请求被取消，直接返回
     if (signal?.aborted) {
       return Promise.reject(new Error('Request aborted'));
@@ -79,7 +79,7 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     if ((error as Error).name === 'AbortError') {
       return Promise.reject(error);
     }
-    message.error((error as Error).message || '网络错误');
+    globalToast.error((error as Error).message || '网络错误');
     throw error;
   }
 }
@@ -97,4 +97,4 @@ export const http = {
 
   delete: <T>(endpoint: string, signal?: AbortSignal) =>
     request<T>(endpoint, { method: 'DELETE', signal }),
-}; 
+};
