@@ -99,11 +99,50 @@ const StyledContent = styled(Content)<{ $isStandalone?: boolean }>`
 const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
   flex: 1;
   border-bottom: none;
-  justify-content: flex-end;
+  justify-content: center;
   background: transparent;
   
   &.ant-menu {
     color: ${props => props.$scrolled ? globalStyles.colors.text : globalStyles.colors.text};
+  }
+
+  .ant-menu-item {
+    border-radius: 20px !important;
+    margin: 0 8px !important;
+    padding: 0 16px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    background: ${props => props.$scrolled ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.1)'} !important;
+    border: 1px solid ${props => props.$scrolled ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)'} !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px);
+    
+    &:hover {
+      background: ${globalStyles.colors.primary} !important;
+      border-color: ${globalStyles.colors.primary} !important;
+      color: #fff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    &.ant-menu-item-selected {
+      background: ${globalStyles.colors.primary} !important;
+      border-color: ${globalStyles.colors.primary} !important;
+      color: #fff !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    &::after {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ant-menu-item {
+      margin: 0 4px !important;
+      padding: 0 12px !important;
+      font-size: 14px !important;
+    }
   }
 `;
 
