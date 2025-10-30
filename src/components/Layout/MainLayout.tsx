@@ -7,7 +7,8 @@ import {
   ArrowUpOutlined,
   CopyOutlined,
   ShareAltOutlined,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  BugOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
@@ -362,6 +363,7 @@ export const MainLayout: React.FC = () => {
   // 获取图标组件
   const getIcon = (iconName?: string) => {
     if (!iconName) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const IconComponent = (Icons as any)[iconName];
     return IconComponent ? <IconComponent className="link-icon" /> : null;
   };
@@ -481,6 +483,112 @@ export const MainLayout: React.FC = () => {
     }
   };
 
+  // 根据平台提示打开开发者工具的快捷键
+  const handleOpenDevTools = async () => {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+    const shortcutTips = isMac
+      ? '打开开发者工具：⌘ + ⌥ + I（或 ⌘ + ⌥ + J）'
+      : '打开开发者工具：Ctrl + Shift + I（或 F12）';
+
+    type ExtendedWindow = typeof window & {
+      __TAURI__?: {
+        invoke?: (command: string, args?: Record<string, unknown>) => Promise<unknown>;
+        window?: {
+          appWindow?: {
+            openDevTools?: () => Promise<void> | void;
+          };
+        };
+      };
+      electron?: {
+        openDevTools?: () => Promise<void> | void;
+        ipcRenderer?: {
+          invoke?: (channel: string, ...args: unknown[]) => Promise<unknown>;
+          send?: (channel: string, ...args: unknown[]) => void;
+        };
+      };
+      ipcRenderer?: {
+        invoke?: (channel: string, ...args: unknown[]) => Promise<unknown>;
+        send?: (channel: string, ...args: unknown[]) => void;
+      };
+      chrome?: {
+        devtools?: {
+          open?: () => Promise<void> | void;
+        };
+        developerPrivate?: {
+          openDevTools?: () => Promise<void> | void;
+        };
+      };
+    };
+
+    const extendedWindow = window as ExtendedWindow;
+    const openers: Array<() => unknown | Promise<unknown>> = [];
+
+    const tauriInvoke = extendedWindow.__TAURI__?.invoke;
+    const tauriAppWindow = extendedWindow.__TAURI__?.window?.appWindow;
+    if (tauriAppWindow?.openDevTools) {
+      openers.push(() => tauriAppWindow.openDevTools?.());
+    }
+    if (tauriInvoke) {
+      openers.push(() => tauriInvoke('plugin:window|toggle_devtools'));
+      openers.push(() => tauriInvoke('toggle_devtools'));
+    }
+
+    const electronBridge = extendedWindow.electron;
+    if (electronBridge?.openDevTools) {
+      openers.push(() => electronBridge.openDevTools?.());
+    }
+    const electronIpc = electronBridge?.ipcRenderer;
+    if (electronIpc?.invoke) {
+      openers.push(() => electronIpc.invoke?.('open-devtools'));
+    }
+    if (electronIpc?.send) {
+      openers.push(() => electronIpc.send?.('open-devtools'));
+    }
+
+    const standaloneIpc = extendedWindow.ipcRenderer;
+    if (standaloneIpc?.invoke) {
+      openers.push(() => standaloneIpc.invoke?.('open-devtools'));
+    }
+    if (standaloneIpc?.send) {
+      openers.push(() => standaloneIpc.send?.('open-devtools'));
+    }
+
+    const chromeDevtools = extendedWindow.chrome?.devtools;
+    if (chromeDevtools?.open) {
+      openers.push(() => chromeDevtools.open?.());
+    }
+    const chromeDeveloperPrivate = extendedWindow.chrome?.developerPrivate;
+    if (chromeDeveloperPrivate?.openDevTools) {
+      openers.push(() => chromeDeveloperPrivate.openDevTools?.());
+    }
+
+    let opened = false;
+    for (const openDevTools of openers) {
+      try {
+        const result = openDevTools();
+        await Promise.resolve(result);
+        opened = true;
+        break;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // 忽略单个通道失败，尝试其他方式
+      }
+    }
+
+    if (opened) return;
+
+    showToast(`未能自动打开开发者工具，请手动操作。${shortcutTips}`, {
+      type: 'warning',
+      duration: 3000,
+    });
+    // 也在控制台输出醒目提示，便于用户确认
+    console.log(
+      '%c提示',
+      'background:#1677ff;color:#fff;padding:2px 6px;border-radius:3px',
+      shortcutTips
+    );
+  };
+
   const contextMenuItems = [
     {
       key: 'home',
@@ -511,6 +619,15 @@ export const MainLayout: React.FC = () => {
       label: '分享页面',
       icon: <ShareAltOutlined />,
       onClick: handleShare,
+    },
+    // 新增分割线
+    { key: 'divider-1', type: 'divider' as const },
+    // 打开开发者工具
+    {
+      key: 'devtools',
+      label: '打开开发者工具',
+      icon: <BugOutlined />,
+      onClick: handleOpenDevTools,
     },
     {
       key: 'github',

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
 import { globalStyles } from '../../styles/theme';
@@ -17,8 +17,15 @@ interface MenuItem {
   disabled?: boolean;
 }
 
+// New divider item type
+interface DividerItem {
+  key: string;
+  type: 'divider';
+}
+
+// Accept union of menu and divider items
 interface ContextMenuProps {
-  items: MenuItem[];
+  items: Array<MenuItem | DividerItem>;
 }
 
 const MenuContainer = styled(motion.div)`
@@ -80,6 +87,17 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
     &:last-child {
       margin-bottom: 0;
     }
+  }
+`;
+
+// Divider style
+const Divider = styled.div`
+  height: 1px;
+  background-color: ${globalStyles.colors.border};
+  margin: 4px 0;
+
+  @media (max-width: 768px) {
+    margin: ${globalStyles.spacing.xs} 0;
   }
 `;
 
@@ -156,15 +174,15 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
   const touchStartTime = useRef<number>(0);
   const isMobile = window.innerWidth <= 768;
 
-  const handleContextMenu = (event: MouseEvent) => {
+  const handleContextMenu = useCallback((event: MouseEvent) => {
     if (isMobile) return; // 移动端不响应右键事件
     event.preventDefault();
     const x = event.clientX;
     const y = event.clientY;
     setPosition({ x, y });
-  };
+  }, [isMobile]);
 
-  const handleTouchStart = (event: TouchEvent) => {
+  const handleTouchStart = useCallback((event: TouchEvent) => {
     if (!isMobile) return;
     const touch = event.touches[0];
     touchStartTime.current = Date.now();
@@ -177,9 +195,9 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
         navigator.vibrate(50);
       }
     }, 500); // 500ms 长按触发
-  };
+  }, [isMobile]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (!isMobile) return;
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
@@ -189,21 +207,21 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
     if (Date.now() - touchStartTime.current < 500 && position) {
       setPosition(null);
     }
-  };
+  }, [isMobile, position]);
 
-  const handleTouchMove = () => {
+  const handleTouchMove = useCallback(() => {
     if (!isMobile) return;
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-  };
+  }, [isMobile]);
 
-  const handleClick = (e: MouseEvent) => {
+  const handleClick = useCallback((e: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
       setPosition(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.addEventListener('contextmenu', handleContextMenu);
@@ -222,7 +240,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
         clearTimeout(longPressTimer.current);
       }
     };
-  }, []);
+  }, [handleClick, handleContextMenu, handleTouchEnd, handleTouchMove, handleTouchStart]);
 
   // 处理菜单位置，确保不会超出视窗
   const adjustedPosition = position ? {
@@ -249,22 +267,28 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items }) => {
             {...(isMobile ? mobileMenuAnimation : menuAnimation)}
           >
             {isMobile && <MenuHandle />}
-            {items.map((item) => (
-              <MenuItem
-                key={item.key}
-                danger={item.danger}
-                disabled={item.disabled}
-                onClick={() => {
-                  if (!item.disabled && item.onClick) {
-                    item.onClick();
-                    setPosition(null);
-                  }
-                }}
-              >
-                {item.icon && <span className="icon">{item.icon}</span>}
-                {item.label}
-              </MenuItem>
-            ))}
+            {items.map((item) => {
+              if ((item as DividerItem).type === 'divider') {
+                return <Divider key={item.key} />;
+              }
+              const mi = item as MenuItem;
+              return (
+                <MenuItem
+                  key={mi.key}
+                  danger={mi.danger}
+                  disabled={mi.disabled}
+                  onClick={() => {
+                    if (!mi.disabled && mi.onClick) {
+                      mi.onClick();
+                      setPosition(null);
+                    }
+                  }}
+                >
+                  {mi.icon && <span className="icon">{mi.icon}</span>}
+                  {mi.label}
+                </MenuItem>
+              );
+            })}
           </MenuContainer>
         </>
       )}
