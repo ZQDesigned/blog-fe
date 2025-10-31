@@ -56,7 +56,6 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
       try {
         await onRetry();
       } catch (retryError) {
-        // eslint-disable-next-line no-console
         console.error('数据刷新失败:', retryError);
       }
     } finally {
