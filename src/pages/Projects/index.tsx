@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
@@ -10,6 +10,7 @@ import { projectApi, Project } from '../../services/api';
 import { getFullResourceUrl } from '../../utils/request';
 import LazyImage from '../../components/LazyImage';
 import PageLoading from '../../components/PageLoading';
+import DataErrorFallback from '../../components/DataErrorFallback';
 
 const { Title, Paragraph } = Typography;
 
@@ -174,24 +175,27 @@ const Projects: React.FC = () => {
   const isStandalone = useStandaloneMode();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [brokenImages, setBrokenImages] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        setLoading(true);
-        const data = await projectApi.getList();
-        setProjects(data);
-      } catch (error) {
-        console.error('Failed to load projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProjects();
+  const loadProjects = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await projectApi.getList();
+      setProjects(data);
+    } catch (err) {
+      console.error('Failed to load projects:', err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void loadProjects();
+  }, [loadProjects]);
 
   const handleImageError = (projectId: number) => {
     setBrokenImages(prev => new Set([...prev, projectId]));
@@ -212,6 +216,16 @@ const Projects: React.FC = () => {
       <LoadingContainer>
         <PageLoading tip="正在加载项目列表" />
       </LoadingContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <DataErrorFallback
+        context="项目列表"
+        error={error}
+        onRetry={loadProjects}
+      />
     );
   }
 

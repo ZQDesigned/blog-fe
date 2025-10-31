@@ -1,5 +1,6 @@
 import React from 'react';
 import { Result, Button } from 'antd';
+import { CONTACT_EMAIL, CONTACT_QQ } from '../../constants/contact';
 
 type GlobalErrorBoundaryProps = {
   children: React.ReactNode;
@@ -34,8 +35,8 @@ class GlobalErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      const contactQQ = '2990918167';
-      const contactEmail = 'zqdesigned@mail.lnyynet.com';
+      const contactQQ = CONTACT_QQ;
+      const contactEmail = CONTACT_EMAIL;
       const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
       const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
       const { error } = this.state;

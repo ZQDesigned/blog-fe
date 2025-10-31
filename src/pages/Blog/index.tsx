@@ -12,6 +12,7 @@ import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useStandaloneMode } from "../../hooks/useStandaloneMode.ts";
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
 import PageLoading from '../../components/PageLoading';
+import DataErrorFallback from '../../components/DataErrorFallback';
 
 const { Title } = Typography;
 
@@ -234,6 +235,7 @@ const Blog: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogData[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [tags, setTags] = useState<TagData[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
@@ -267,6 +269,7 @@ const Blog: React.FC = () => {
   }, [dedupe]);
 
   const loadBlogs = useCallback(async () => {
+    setError(null);
     setLoading(true);
     try {
       const data = await dedupe(
@@ -280,8 +283,9 @@ const Blog: React.FC = () => {
       );
       setBlogs(data.content);
       setTotal(data.total);
-    } catch (error) {
-      console.error('Failed to load blogs:', error);
+    } catch (err) {
+      console.error('Failed to load blogs:', err);
+      setError(err as Error);
     } finally {
       setLoading(false);
     }
@@ -350,6 +354,16 @@ const Blog: React.FC = () => {
     const blogPath = `/blog/${blog.id}${mode ? `?mode=${mode}` : ''}`;
     navigate(blogPath);
   };
+
+  if (error) {
+    return (
+      <DataErrorFallback
+        context="博客列表"
+        error={error}
+        onRetry={loadBlogs}
+      />
+    );
+  }
 
   return (
     <Container>

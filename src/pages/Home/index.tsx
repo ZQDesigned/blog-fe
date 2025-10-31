@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { HomeData, HomeContentItem } from '../../types/types';
 import { useTitle } from '../../hooks/useTitle';
@@ -10,6 +10,7 @@ import HomeSkills from './components/HomeSkills';
 import HomeTimeline from './components/HomeTimeline';
 import HomeContact from './components/HomeContact';
 import PageLoading from '../../components/PageLoading';
+import DataErrorFallback from '../../components/DataErrorFallback';
 
 const LoadingContainer = styled.div`
   min-height: calc(100vh - 64px);
@@ -18,37 +19,37 @@ const LoadingContainer = styled.div`
 const Home: React.FC = () => {
   const [homeData, setHomeData] = useState<HomeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const dedupe = useDedupeRequest();
 
   // 使用 useTitle hook，设置首页标题
   useTitle('首页', { restoreOnUnmount: true });
 
-  useEffect(() => {
-    const loadHomeContent = async () => {
-      try {
-        setLoading(true);
-        const data: HomeData = await dedupe('home-content', () => homeApi.getContent());
+  const loadHomeContent = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data: HomeData = await dedupe('home-content', () => homeApi.getContent());
+      setHomeData(data);
 
-
-        setHomeData(data);
-
-        // 更新页面标题和描述
-        if (data.meta) {
-          document.title = `${data.meta.title} - ${import.meta.env.VITE_APP_TITLE}`;
-          const metaDescription = document.querySelector('meta[name="description"]');
-          if (metaDescription) {
-            metaDescription.setAttribute('content', data.meta.description);
-          }
+      if (data.meta) {
+        document.title = `${data.meta.title} - ${import.meta.env.VITE_APP_TITLE}`;
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', data.meta.description);
         }
-      } catch (error) {
-        console.error('Failed to load home content:', error);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadHomeContent();
+    } catch (err) {
+      console.error('Failed to load home content:', err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   }, [dedupe]);
+
+  useEffect(() => {
+    void loadHomeContent();
+  }, [loadHomeContent]);
 
   // 渲染内容区块
   const renderSection = (section: HomeContentItem) => {
@@ -73,6 +74,16 @@ const Home: React.FC = () => {
       <LoadingContainer>
         <PageLoading tip="正在加载首页内容" />
       </LoadingContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <DataErrorFallback
+        context="首页内容"
+        error={error}
+        onRetry={loadHomeContent}
+      />
     );
   }
 

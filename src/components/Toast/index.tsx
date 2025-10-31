@@ -83,7 +83,7 @@ const getDefaultIcon = (type: ToastType): React.ReactNode => {
 const Toast: React.FC<ToastProps> = ({
   message,
   type = 'success',
-  duration = 3000,
+  duration = 2000,
   icon,
   backgroundColor,
   textColor = '#fff',
@@ -125,4 +125,4 @@ const Toast: React.FC<ToastProps> = ({
   );
 };
 
-export default Toast; 
+export default Toast;

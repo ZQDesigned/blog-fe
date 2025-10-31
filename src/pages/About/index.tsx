@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { globalStyles } from '../../styles/theme';
 import { useTitle } from '../../hooks/useTitle';
@@ -6,6 +6,7 @@ import { aboutApi } from '../../services/api';
 import { AboutMeData, AboutSectionItem } from '../../types/types';
 import PageLoading from '../../components/PageLoading';
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
+import DataErrorFallback from '../../components/DataErrorFallback';
 import ProfileSection from './components/ProfileSection';
 import SkillsSection from './components/SkillsSection';
 import JourneySection from './components/JourneySection';
@@ -34,30 +35,30 @@ const LoadingContainer = styled.div`
 const About: React.FC = () => {
   const [aboutData, setAboutData] = useState<AboutMeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const dedupe = useDedupeRequest();
 
   // 设置关于页面标题
   useTitle('关于我', { restoreOnUnmount: true });
 
   // 加载数据
-  useEffect(() => {
-    const loadAboutData = async () => {
-      try {
-        setLoading(true);
-
-        const data = await dedupe('about-data', () => aboutApi.getAboutMe());
-
-        setAboutData(data);
-
-      } catch (error) {
-        console.error('Failed to load about data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadAboutData();
+  const loadAboutData = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await dedupe('about-data', () => aboutApi.getAboutMe());
+      setAboutData(data);
+    } catch (err) {
+      console.error('Failed to load about data:', err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   }, [dedupe]);
+
+  useEffect(() => {
+    void loadAboutData();
+  }, [loadAboutData]);
 
   // 渲染内容区块
   const renderSection = (section: AboutSectionItem, index: number) => {
@@ -93,6 +94,16 @@ const About: React.FC = () => {
       <LoadingContainer>
         <PageLoading tip="正在加载个人信息" />
       </LoadingContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <DataErrorFallback
+        context="个人信息"
+        error={error}
+        onRetry={loadAboutData}
+      />
     );
   }
 

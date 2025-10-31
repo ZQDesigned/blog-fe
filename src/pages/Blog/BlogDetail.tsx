@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Typography, Space, Tag, Button, Skeleton } from 'antd';
 import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
@@ -11,6 +11,7 @@ import { blogApi } from '../../services/api';
 import { BlogData } from '../../types/types';
 import GameModal from '../../components/GameModal';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg';
+import DataErrorFallback from '../../components/DataErrorFallback';
 
 const { Title } = Typography;
 
@@ -77,31 +78,56 @@ const BlogDetail: React.FC = () => {
 
   const [blog, setBlog] = useState<BlogData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   // 使用 useTitle hook
   useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
 
-  useEffect(() => {
-    const loadBlog = async () => {
-      if (!id) return;
+  const loadBlog = useCallback(async () => {
+    if (!id) {
+      setError(new Error('未提供文章 ID'));
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        const blogId = parseInt(id, 10);
-        const data = await blogApi.getDetail(blogId);
-        setBlog(data);
+    const blogId = Number(id);
 
-        // 增加阅读量
-        await blogApi.increaseViewCount(blogId);
-      } catch (error) {
-        console.error('Failed to load blog:', error);
-      } finally {
-        setLoading(false);
+    if (Number.isNaN(blogId)) {
+      setError(new Error('无效的文章 ID'));
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setError(null);
+      setNotFound(false);
+      setLoading(true);
+      const data = await blogApi.getDetail(blogId);
+      setBlog(data);
+      setNotFound(false);
+
+      void blogApi.increaseViewCount(blogId).catch((err) => {
+        console.error('Failed to increase blog view count:', err);
+      });
+    } catch (err) {
+      console.error('Failed to load blog:', err);
+      const message = (err as Error).message ?? '';
+      if (message.includes('不存在') || message.toLowerCase().includes('not found')) {
+        setNotFound(true);
+        setBlog(null);
+        setError(null);
+      } else {
+        setError(err as Error);
       }
-    };
-
-    loadBlog();
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    void loadBlog();
+  }, [loadBlog]);
 
   const handleBack = () => {
     const searchParams = new URLSearchParams(location.search);
@@ -120,7 +146,22 @@ const BlogDetail: React.FC = () => {
     );
   }
 
-  if (!blog) {
+  if (error) {
+    return (
+      <Container>
+        <BackButton type="link" icon={<ArrowLeftOutlined />} onClick={handleBack}>
+          返回博客列表
+        </BackButton>
+        <DataErrorFallback
+          context="文章内容"
+          error={error}
+          onRetry={loadBlog}
+        />
+      </Container>
+    );
+  }
+
+  if (notFound || !blog) {
     return (
       <Container>
         <BackButton type="link" icon={<ArrowLeftOutlined />} onClick={handleBack}>
