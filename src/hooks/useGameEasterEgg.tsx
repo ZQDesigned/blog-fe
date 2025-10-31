@@ -52,6 +52,8 @@ export const useGameEasterEgg = () => {
 
     // 当阅读大于等于3篇文章时显示通知
     if (count >= 3) {
+      localStorage.setItem(GAME_SHOWN_TIME_KEY, currentTime.toString());
+      localStorage.setItem(ARTICLE_READ_COUNT_KEY, '0'); // 重置计数
       // 延迟3秒显示，给用户一些阅读时间
       setTimeout(() => {
         notification.info({
@@ -74,8 +76,6 @@ export const useGameEasterEgg = () => {
             </div>
           ),
         });
-        localStorage.setItem(GAME_SHOWN_TIME_KEY, currentTime.toString());
-        localStorage.setItem(ARTICLE_READ_COUNT_KEY, '0'); // 重置计数
       }, 3000);
     }
   }, [location.pathname, isStandalone]);
