@@ -27,22 +27,22 @@ class GlobalToastManager {
     }
   }
 
-  // 便捷方法
-  success(message: string, options?: Omit<ToastOptions, 'type'>) {
+  // 便捷方法（使用箭头函数以保持 this 上下文）
+  success = (message: string, options?: Omit<ToastOptions, 'type'>) => {
     this.show(message, { ...options, type: 'success' });
-  }
+  };
 
-  error(message: string, options?: Omit<ToastOptions, 'type'>) {
+  error = (message: string, options?: Omit<ToastOptions, 'type'>) => {
     this.show(message, { ...options, type: 'error' });
-  }
+  };
 
-  warning(message: string, options?: Omit<ToastOptions, 'type'>) {
+  warning = (message: string, options?: Omit<ToastOptions, 'type'>) => {
     this.show(message, { ...options, type: 'warning' });
-  }
+  };
 
-  info(message: string, options?: Omit<ToastOptions, 'type'>) {
+  info = (message: string, options?: Omit<ToastOptions, 'type'>) => {
     this.show(message, { ...options, type: 'info' });
-  }
+  };
 }
 
 // 导出单例实例
