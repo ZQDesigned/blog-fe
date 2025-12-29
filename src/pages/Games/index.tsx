@@ -12,6 +12,7 @@ import GameSudoku from '../../components/GameSudoku';
 import GameReversi from '../../components/GameReversi';
 import GameHanoi from '../../components/GameHanoi';
 import GameGo from '../../components/GameGo';
+import GameDevilRoulette from '../../components/GameDevilRoulette';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
@@ -141,6 +142,13 @@ const MINI_GAMES = [
     description: '经典的汉诺塔益智游戏，目标是将所有圆盘从第一根柱子移动到最后一根柱子，每次只能移动一个圆盘，且不能将大圆盘放在小圆盘上。',
     image: '/images/hanoi.png',
     component: GameHanoi,
+  },
+  {
+    id: 'devil-roulette',
+    title: '恶魔轮盘',
+    description: '与发牌者对决的赌命轮盘：实弹/空包弹随机装填，善用道具获取优势，撑到最后一刻。',
+    image: '/images/devil-roulette.png',
+    component: GameDevilRoulette,
   },
 ];
 
