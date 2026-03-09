@@ -59,8 +59,8 @@
 
 ### 1. 开发环境要求
 
-- Node.js 18+（建议 LTS）
-- Bun 1.1+
+- Node.js 20+（建议 LTS）
+- Bun 1.3+
 - 推荐使用现代浏览器（Chrome / Edge / Safari 最新版）
 
 ### 2. 本地启动
