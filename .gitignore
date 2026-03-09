@@ -54,3 +54,4 @@ id_rsa*
 !deploy.config.example.sh
 
 starry.html
+scripts/style-token-baseline.json
