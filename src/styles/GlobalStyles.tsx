@@ -5,10 +5,21 @@ const GlobalStyles = () => {
   const isStandalone = useStandaloneMode();
 
   const globalCss = css`
+    :root {
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      touch-action: manipulation;
       user-select: ${isStandalone ? 'auto' : 'none'};
     }
 
