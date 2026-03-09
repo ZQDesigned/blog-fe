@@ -11,6 +11,8 @@ const COLOR_PATTERNS = [
   /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/g,
   /\brgba?\([^\)]*\)/g,
   /\bhsla?\([^\)]*\)/g,
+  /(?<![$\w-])(?:color|background(?:-color)?|border(?:-color)?|box-shadow)\s*:\s*[^;]*(?:\bwhite\b|\bblack\b|\bred\b|\bblue\b|\bgreen\b|\borange\b|\byellow\b|\bpurple\b|\bpink\b|\bgray\b|\bgrey\b)/gi,
+  /(?<![$\w-])(?:color|background(?:Color)?|border(?:Color)?|boxShadow)\s*:\s*['"](?:white|black|red|blue|green|orange|yellow|purple|pink|gray|grey)['"]/gi,
 ];
 
 const ALLOWED_PATH_SEGMENTS = [

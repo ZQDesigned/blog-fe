@@ -10,7 +10,7 @@ const { Title, Paragraph } = Typography;
 
 const SectionContainer = styled.div`
   padding: ${themeVars.spacing.xl} 0;
-  background: #fff;
+  background: ${themeVars.colors.background};
 `;
 
 const Content = styled.div`

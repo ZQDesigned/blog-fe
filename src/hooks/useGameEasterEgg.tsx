@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { notification } from 'antd';
 import { ReadOutlined } from '@ant-design/icons';
 import { useStandaloneMode } from './useStandaloneMode';
+import { themeVars } from '../theme';
 
 const ARTICLE_READ_COUNT_KEY = 'article_read_count';
 const GAME_SHOWN_TIME_KEY = 'game_shown_time';
@@ -59,7 +60,7 @@ export const useGameEasterEgg = () => {
         notification.info({
           message: '要不要休息一下？',
           description: '看了这么多文章，要不要玩个小游戏放松一下？',
-          icon: <ReadOutlined style={{ color: '#1890ff' }} />,
+          icon: <ReadOutlined style={{ color: themeVars.colors.primary }} />,
           duration: 0,
           placement: 'topRight',
           btn: (

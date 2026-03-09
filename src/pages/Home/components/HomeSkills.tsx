@@ -42,7 +42,7 @@ const SkillsGrid = styled.div`
 `;
 
 const CategoryContainer = styled(motion.div)`
-  background: #fff;
+  background: ${themeVars.colors.background};
   padding: ${themeVars.spacing.lg};
   border-radius: ${themeVars.borderRadius.medium};
   box-shadow: ${themeVars.shadows.small};

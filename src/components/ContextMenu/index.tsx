@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { themeVars } from '../../theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 interface Position {
   x: number;
@@ -30,7 +30,7 @@ interface ContextMenuProps {
 
 const MenuContainer = styled(motion.div)`
   position: fixed;
-  background: white;
+  background: ${themeVars.colors.background};
   border-radius: 8px;
   padding: 4px;
   min-width: 200px;
@@ -51,7 +51,7 @@ const MenuContainer = styled(motion.div)`
     border-radius: 16px 16px 0 0;
     padding: ${themeVars.spacing.md};
     padding-bottom: calc(${themeVars.spacing.md} + env(safe-area-inset-bottom));
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 10px ${withThemeAlpha(themeVars.colors.text, 0.1)};
   }
 `;
 
@@ -63,7 +63,7 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   color: ${props => {
     if (props.disabled) return themeVars.colors.lightText;
-    if (props.danger) return '#ff4d4f';
+    if (props.danger) return themeVars.colors.error;
     return 'inherit';
   }};
   opacity: ${props => props.disabled ? 0.5 : 1};
@@ -107,7 +107,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: ${withThemeAlpha(themeVars.colors.text, 0.4)};
   z-index: 999;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);

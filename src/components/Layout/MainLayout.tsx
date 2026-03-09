@@ -13,7 +13,7 @@ import {
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import {NAV_ITEMS, ROUTES} from '../../constants/routes';
-import { themeVars } from '../../theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
 import { formatDate } from '../../utils/dateUtils';
@@ -55,7 +55,7 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
 `;
 
 const StyledHeader = styled(Header)<{ $scrolled: boolean }>`
-  background: ${props => props.$scrolled ? '#fff' : 'transparent'};
+  background: ${props => props.$scrolled ? themeVars.colors.background : 'transparent'};
   box-shadow: ${props => props.$scrolled ? themeVars.shadows.small : 'none'};
   position: fixed;
   width: 100%;
@@ -113,24 +113,30 @@ const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
     padding: 0 16px !important;
     height: 36px !important;
     line-height: 36px !important;
-    background: ${props => props.$scrolled ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.1)'} !important;
-    border: 1px solid ${props => props.$scrolled ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)'} !important;
+    background: ${props =>
+      props.$scrolled
+        ? withThemeAlpha(themeVars.colors.text, 0.05)
+        : withThemeAlpha(themeVars.colors.onPrimary, 0.1)} !important;
+    border: 1px solid ${props =>
+      props.$scrolled
+        ? withThemeAlpha(themeVars.colors.text, 0.1)
+        : withThemeAlpha(themeVars.colors.onPrimary, 0.2)} !important;
     transition: all 0.3s ease !important;
     backdrop-filter: blur(10px);
     
     &:hover {
       background: ${themeVars.colors.primary} !important;
       border-color: ${themeVars.colors.primary} !important;
-      color: #fff !important;
+      color: ${themeVars.colors.onPrimary} !important;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px ${withThemeAlpha(themeVars.colors.text, 0.15)};
     }
     
     &.ant-menu-item-selected {
       background: ${themeVars.colors.primary} !important;
       border-color: ${themeVars.colors.primary} !important;
-      color: #fff !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      color: ${themeVars.colors.onPrimary} !important;
+      box-shadow: 0 2px 8px ${withThemeAlpha(themeVars.colors.text, 0.1)};
     }
     
     &::after {
@@ -173,7 +179,7 @@ const BadgesGroup = styled.div`
 `;
 
 const FooterContainer = styled.div`
-  background: #fff;
+  background: ${themeVars.colors.background};
   padding: ${themeVars.spacing.xl} 0 0;
 `;
 
@@ -584,7 +590,7 @@ export const MainLayout: React.FC = () => {
     // 也在控制台输出醒目提示，便于用户确认
     console.log(
       '%c提示',
-      'background:#1677ff;color:#fff;padding:2px 6px;border-radius:3px',
+      `background:${themeVars.colors.primary};color:${themeVars.colors.onPrimary};padding:2px 6px;border-radius:3px`,
       shortcutTips
     );
   };

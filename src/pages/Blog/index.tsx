@@ -94,10 +94,19 @@ const StyledCard = styled(motion(Card))`
   }
 `;
 
-const BlogTag = styled(Tag)`
+const BlogTag = styled(Tag)<{ $active?: boolean }>`
   margin: ${themeVars.spacing.xs};
   cursor: pointer;
   transition: all 0.3s ease;
+  color: ${({ $active }) => ($active ? themeVars.colors.primary : themeVars.colors.lightText)};
+  border-color: ${({ $active }) =>
+    $active
+      ? withThemeAlpha(themeVars.colors.primary, 0.35)
+      : withThemeAlpha(themeVars.colors.borderStrong, 0.35)};
+  background: ${({ $active }) =>
+    $active
+      ? withThemeAlpha(themeVars.colors.primary, 0.1)
+      : withThemeAlpha(themeVars.colors.border, 0.18)};
 `;
 
 const TagsContainer = styled.div`
@@ -136,7 +145,10 @@ const PreviewMarkdownRenderer = styled(MarkdownRenderer)`
     left: 0;
     right: 0;
     height: 40px;
-    background: linear-gradient(transparent, white);
+    background: linear-gradient(
+      ${withThemeAlpha(themeVars.colors.background, 0)},
+      ${themeVars.colors.background}
+    );
   }
 `;
 
@@ -153,7 +165,10 @@ const ModalMarkdownRenderer = styled(MarkdownRenderer)`
     left: 0;
     right: 0;
     height: 60px;
-    background: linear-gradient(transparent, white);
+    background: linear-gradient(
+      ${withThemeAlpha(themeVars.colors.background, 0)},
+      ${themeVars.colors.background}
+    );
     pointer-events: none;
   }
 `;
@@ -439,7 +454,15 @@ const Blog: React.FC = () => {
                   >
                     <Title level={4}>{blog.title}</Title>
                     <BlogMeta>
-                      <Tag color="blue">{blog.categoryName}</Tag>
+                      <Tag
+                        style={{
+                          color: themeVars.colors.primary,
+                          borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
+                          background: withThemeAlpha(themeVars.colors.primary, 0.1),
+                        }}
+                      >
+                        {blog.categoryName}
+                      </Tag>
                       <Space>
                         <EyeOutlined /> {blog.viewCount} 次浏览
                       </Space>
@@ -454,7 +477,7 @@ const Blog: React.FC = () => {
                         {blog.tagNames.map((tag) => (
                           <BlogTag
                             key={tag}
-                            color={tags.some(t => t.name === tag) ? 'blue' : 'default'}
+                            $active={tags.some(t => t.name === tag)}
                             onClick={(e) => {
                               e.stopPropagation();
                               // @ts-ignore
@@ -499,10 +522,19 @@ const Blog: React.FC = () => {
         >
           {selectedBlog && (
             <ModalContent>
-              <Tag color="blue" style={{ marginBottom: themeVars.spacing.sm }}>{selectedBlog.categoryName}</Tag>
+              <Tag
+                style={{
+                  marginBottom: themeVars.spacing.sm,
+                  color: themeVars.colors.primary,
+                  borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
+                  background: withThemeAlpha(themeVars.colors.primary, 0.1),
+                }}
+              >
+                {selectedBlog.categoryName}
+              </Tag>
               <Space>
                 {selectedBlog.tagNames.map((tag) => (
-                  <BlogTag key={tag} color="blue">{tag}</BlogTag>
+                  <BlogTag key={tag} $active>{tag}</BlogTag>
                 ))}
               </Space>
               <ModalMarkdownRenderer content={selectedBlog.content} />

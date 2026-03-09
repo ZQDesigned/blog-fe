@@ -308,13 +308,27 @@ const FloatSidebar: React.FC = () => {
                   {sidebarData.profile.bio}
                 </Paragraph>
                 <OnlineStatus>
-                  <StatusDot style={{ backgroundColor: sidebarData.profile.status.online ? '#52c41a' : '#ff4d4f' }} />
+                  <StatusDot
+                    style={{
+                      backgroundColor: sidebarData.profile.status.online
+                        ? themeVars.colors.success
+                        : themeVars.colors.error,
+                    }}
+                  />
                   <span>{sidebarData.profile.status.text}</span>
                 </OnlineStatus>
               </ProfileHeader>
               <ProfileContent>
                 <Space direction="vertical" size="small">
-                  <Tag color="blue">公告</Tag>
+                  <Tag
+                    style={{
+                      color: themeVars.colors.primary,
+                      borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
+                      background: withThemeAlpha(themeVars.colors.primary, 0.1),
+                    }}
+                  >
+                    公告
+                  </Tag>
                   {sidebarData.announcements.map((announcement, index) => (
                     announcement.type === 'link' ? (
                       <Paragraph key={index}>

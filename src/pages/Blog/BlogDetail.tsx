@@ -4,7 +4,7 @@ import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } fro
 import styled from '@emotion/styled';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { themeVars } from '../../theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
 import { blogApi } from '../../services/api';
@@ -27,7 +27,7 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.9);
+  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
   padding: ${themeVars.spacing.xl};
   border-radius: 8px;
   box-shadow: ${themeVars.shadows.small};
@@ -42,6 +42,9 @@ const ContentWrapper = styled(motion.div)`
 
 const BlogTag = styled(Tag)`
   margin: ${themeVars.spacing.xs};
+  color: ${themeVars.colors.primary};
+  border-color: ${withThemeAlpha(themeVars.colors.primary, 0.35)};
+  background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
 `;
 
 const BackButton = styled(Button)`
@@ -202,7 +205,7 @@ const BlogDetail: React.FC = () => {
 
         <Space wrap>
           {blog.tagNames.map((tag) => (
-            <BlogTag key={tag} color="blue">{tag}</BlogTag>
+            <BlogTag key={tag}>{tag}</BlogTag>
           ))}
         </Space>
 

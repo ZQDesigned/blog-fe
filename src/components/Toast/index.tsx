@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { themeVars } from '../../theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { CheckCircleOutlined, InfoCircleOutlined, WarningOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 export type ToastType = 'success' | 'info' | 'warning' | 'error';
@@ -23,8 +23,8 @@ const ToastContainer = styled(motion.div)<{ $backgroundColor?: string; $textColo
   left: 0;
   right: 0;
   height: 64px;
-  background-color: ${props => props.$backgroundColor || '#4CAF50'};
-  color: ${props => props.$textColor || '#fff'};
+  background-color: ${props => props.$backgroundColor || themeVars.colors.success};
+  color: ${props => props.$textColor || themeVars.colors.onPrimary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,21 +47,21 @@ const ProgressBar = styled(motion.div)`
   bottom: 0;
   left: 0;
   height: 3px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: ${withThemeAlpha(themeVars.colors.onPrimary, 0.3)};
 `;
 
 const getDefaultBackgroundColor = (type: ToastType): string => {
   switch (type) {
     case 'success':
-      return '#4CAF50';
+      return themeVars.colors.success;
     case 'info':
-      return '#2196F3';
+      return themeVars.colors.info;
     case 'warning':
-      return '#FF9800';
+      return themeVars.colors.warning;
     case 'error':
-      return '#F44336';
+      return themeVars.colors.error;
     default:
-      return '#4CAF50';
+      return themeVars.colors.success;
   }
 };
 
@@ -86,7 +86,7 @@ const Toast: React.FC<ToastProps> = ({
   duration = 2000,
   icon,
   backgroundColor,
-  textColor = '#fff',
+  textColor = themeVars.colors.onPrimary,
   onClose,
   visible,
 }) => {

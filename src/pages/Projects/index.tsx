@@ -54,6 +54,9 @@ const StyledCard = styled(motion(Card))`
 
 const ProjectTag = styled(Tag)`
   margin: ${themeVars.spacing.xs};
+  color: ${themeVars.colors.primary};
+  border-color: ${withThemeAlpha(themeVars.colors.primary, 0.35)};
+  background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
 `;
 
 const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused' }>`
@@ -62,6 +65,21 @@ const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused'
   right: 12px;
   padding: 0 ${themeVars.spacing.sm};
   border-radius: 12px;
+  border-color: ${({ $status }) => {
+    if ($status === 'developing') return themeVars.colors.info;
+    if ($status === 'maintaining') return themeVars.colors.success;
+    return themeVars.colors.borderStrong;
+  }};
+  color: ${({ $status }) => {
+    if ($status === 'developing') return themeVars.colors.info;
+    if ($status === 'maintaining') return themeVars.colors.success;
+    return themeVars.colors.lightText;
+  }};
+  background: ${({ $status }) => {
+    if ($status === 'developing') return withThemeAlpha(themeVars.colors.info, 0.12);
+    if ($status === 'maintaining') return withThemeAlpha(themeVars.colors.success, 0.12);
+    return withThemeAlpha(themeVars.colors.border, 0.2);
+  }};
 `;
 
 const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
@@ -152,19 +170,6 @@ const ListItem = styled.li`
   margin-bottom: ${themeVars.spacing.sm};
   color: ${themeVars.colors.text};
 `;
-
-const getStatusColor = (status: 'developing' | 'maintaining' | 'paused') => {
-  switch (status) {
-    case 'developing':
-      return 'processing';
-    case 'maintaining':
-      return 'success';
-    case 'paused':
-      return 'default';
-    default:
-      return 'default';
-  }
-};
 
 const getStatusText = (status: 'developing' | 'maintaining' | 'paused') => {
   switch (status) {
@@ -271,7 +276,6 @@ const Projects: React.FC = () => {
             >
               <StatusTag
                 $status={project.status}
-                color={getStatusColor(project.status)}
               >
                 {getStatusText(project.status)}
               </StatusTag>
@@ -279,7 +283,7 @@ const Projects: React.FC = () => {
               <Paragraph ellipsis={{ rows: 2 }}>{project.description}</Paragraph>
               <Space wrap>
                 {project.techStack.map((tech) => (
-                  <ProjectTag key={tech} color="blue">{tech}</ProjectTag>
+                  <ProjectTag key={tech}>{tech}</ProjectTag>
                 ))}
               </Space>
             </StyledCard>
@@ -330,9 +334,9 @@ const Projects: React.FC = () => {
                   <Title level={4}>技术栈</Title>
                   <Space size={[0, 8]} wrap>
                     {selectedProject.techStack.map((tech) => (
-                      <Tag key={tech} color="blue">
+                      <ProjectTag key={tech}>
                         {tech}
-                      </Tag>
+                      </ProjectTag>
                     ))}
                   </Space>
                 </div>

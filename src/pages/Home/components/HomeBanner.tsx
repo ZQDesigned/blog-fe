@@ -15,7 +15,7 @@ const BannerContainer = styled.div<{ $backgroundImage?: string }>`
   justify-content: center;
   padding: ${themeVars.spacing.xl};
   background: ${props => props.$backgroundImage 
-    ? `linear-gradient(rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.00)), url(${getFullResourceUrl(props.$backgroundImage)})`
+    ? `url(${getFullResourceUrl(props.$backgroundImage)})`
     : themeVars.colors.secondary};
   background-size: cover;
   background-position: center;

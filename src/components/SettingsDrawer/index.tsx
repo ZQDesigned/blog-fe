@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer, Typography, Space, Spin } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { themeVars } from '../../theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { BackgroundType } from '../../hooks/useBackgroundSettings';
 import LazyImage from '../LazyImage';
 
@@ -53,7 +53,7 @@ const RefreshButton = styled.div`
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -65,7 +65,7 @@ const RefreshButton = styled.div`
   transition: all 0.3s ease;
 
   &:hover {
-    background: white;
+    background: ${themeVars.colors.background};
     transform: rotate(180deg);
   }
 `;
