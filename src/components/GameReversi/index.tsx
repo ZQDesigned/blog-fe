@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal, Select } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 import { Board, Player, Position, AIDifficulty } from './types';
 import { BOARD_SIZE, getValidMoves, makeMove, calculateScores } from './utils';
 import { ReversiAIFactory } from './ai';
@@ -11,8 +11,8 @@ const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${globalStyles.spacing.lg};
-  padding: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   max-width: 100%;
   margin: 0 auto;
 `;
@@ -23,12 +23,12 @@ const GameInfo = styled.div`
   align-items: center;
   width: 100%;
   max-width: 400px;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
-  background: ${globalStyles.colors.secondary};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
+  background: ${themeVars.colors.secondary};
   border-radius: 4px;
   font-weight: 500;
 `;
@@ -37,7 +37,7 @@ const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 2px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   padding: 2px;
   border-radius: 4px;
   width: 100%;
@@ -46,7 +46,7 @@ const GameBoard = styled.div`
 `;
 
 const Cell = styled.div<{ $canPlace?: boolean }>`
-  background: ${globalStyles.colors.background};
+  background: ${themeVars.colors.background};
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@ const Cell = styled.div<{ $canPlace?: boolean }>`
   transition: background-color 0.3s;
 
   &:hover {
-    background: ${props => props.$canPlace ? globalStyles.colors.secondary : globalStyles.colors.background};
+    background: ${props => props.$canPlace ? themeVars.colors.secondary : themeVars.colors.background};
   }
 `;
 
@@ -63,9 +63,15 @@ const Disc = styled.div<{ $color: 'black' | 'white' }>`
   width: 80%;
   height: 80%;
   border-radius: 50%;
-  background: ${props => props.$color === 'black' ? '#000' : '#fff'};
-  border: 2px solid ${props => props.$color === 'black' ? '#333' : '#ccc'};
-  box-shadow: ${globalStyles.shadows.small};
+  background: ${props =>
+    props.$color === 'black'
+      ? themeVars.games.reversi.black
+      : themeVars.games.reversi.white};
+  border: 2px solid ${props =>
+    props.$color === 'black'
+      ? themeVars.games.reversi.black
+      : themeVars.games.reversi.whiteBorder};
+  box-shadow: ${themeVars.shadows.small};
   transition: transform 0.3s;
   animation: place 0.3s ease-out;
 
@@ -83,7 +89,7 @@ const GlobalStyles = () => (
   <Global
     styles={css`
       .hell-mode-option {
-        color: ${globalStyles.colors.error} !important;
+        color: ${themeVars.colors.error} !important;
         font-weight: 500;
       }
     `}

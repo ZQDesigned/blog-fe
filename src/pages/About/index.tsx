@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 import { useTitle } from '../../hooks/useTitle';
 import { aboutApi } from '../../services/api';
 import { AboutMeData, AboutSectionItem } from '../../types/types';
@@ -18,7 +18,7 @@ const Container = styled.div`
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   display: flex;
   flex-direction: column;
   align-items: stretch;

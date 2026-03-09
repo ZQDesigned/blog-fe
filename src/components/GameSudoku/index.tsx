@@ -1,31 +1,31 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
 `;
 
 const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 1px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
   aspect-ratio: 1;
 
   // 添加粗边框分隔 3x3 区块
   & > div:nth-of-type(3n) {
-    border-right: 2px solid ${globalStyles.colors.border};
+    border-right: 2px solid ${themeVars.colors.border};
   }
   & > div:nth-of-type(n+19):nth-of-type(-n+27),
   & > div:nth-of-type(n+46):nth-of-type(-n+54) {
-    border-bottom: 2px solid ${globalStyles.colors.border};
+    border-bottom: 2px solid ${themeVars.colors.border};
   }
 `;
 
@@ -40,28 +40,28 @@ const Cell = styled.div<{ $isFixed: boolean; $isSelected: boolean; $isError: boo
   cursor: ${props => props.$isFixed ? 'default' : 'pointer'};
   user-select: none;
   background-color: ${props => 
-    props.$isError ? '#ff4d4f20' :
-    props.$isSelected ? globalStyles.colors.primary + '20' :
-    '#fff'
+    props.$isError ? themeVars.games.sudoku.errorBackground :
+    props.$isSelected ? withThemeAlpha(themeVars.colors.primary, 0.125) :
+    themeVars.colors.background
   };
   color: ${props => 
-    props.$isError ? '#ff4d4f' :
-    props.$isFixed ? globalStyles.colors.text :
-    globalStyles.colors.primary
+    props.$isError ? themeVars.games.sudoku.errorText :
+    props.$isFixed ? themeVars.colors.text :
+    themeVars.colors.primary
   };
   transition: all 0.1s ease;
 
   &:hover {
     background-color: ${props => 
-      !props.$isFixed && globalStyles.colors.primary + '10'
+      !props.$isFixed && withThemeAlpha(themeVars.colors.primary, 0.0625)
     };
   }
 `;
 const NumberPad = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: ${globalStyles.spacing.xs};
-  margin-top: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.xs};
+  margin-top: ${themeVars.spacing.md};
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(9, 1fr);
@@ -75,15 +75,15 @@ const NumberButton = styled(Button)`
 
 const GameInfo = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.md};
-  margin-bottom: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 `;
 

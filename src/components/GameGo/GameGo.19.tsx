@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Select, Button, Modal, Tooltip } from 'antd';
 import styled from '@emotion/styled';
 import { GlobalStyles } from '../../styles/GlobalStyles';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { Board, Player, Position, AIDifficulty } from './types.19';
 import { getValidMoves, makeMove, calculateScore } from './utils.19';
 import { GoAIFactory } from './ai.19';
@@ -11,13 +12,13 @@ const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  gap: 20px;
+  padding: ${themeVars.spacing.lg};
+  gap: ${themeVars.spacing.lg};
 `;
 
 const GameInfo = styled.div`
   display: flex;
-  gap: 20px;
+  gap: ${themeVars.spacing.lg};
   align-items: center;
 `;
 
@@ -31,9 +32,9 @@ const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(19, 30px);
   grid-template-rows: repeat(19, 30px);
-  background-color: #DEB887;
+  background-color: ${themeVars.games.go.board19};
   padding: 15px;
-  border: 2px solid #8B4513;
+  border: 2px solid ${withThemeAlpha(themeVars.games.go.line, 0.45)};
 `;
 
 const BoardLines = styled.div`
@@ -48,7 +49,7 @@ const BoardLines = styled.div`
   &::after {
     content: '';
     position: absolute;
-    background-color: #000;
+    background-color: ${themeVars.games.go.line};
   }
 
   &::before {
@@ -58,8 +59,8 @@ const BoardLines = styled.div`
     background: repeating-linear-gradient(
       to bottom,
       transparent 14px,
-      #000 14px,
-      #000 44px
+      ${themeVars.games.go.line} 14px,
+      ${themeVars.games.go.line} 44px
     );
     background-position: 0 0;
     left: 14px;
@@ -73,8 +74,8 @@ const BoardLines = styled.div`
     background: repeating-linear-gradient(
       to right,
       transparent 14px,
-      #000 14px,
-      #000 44px
+      ${themeVars.games.go.line} 14px,
+      ${themeVars.games.go.line} 44px
     );
     background-position: 0 0;
     top: 14px;
@@ -99,7 +100,7 @@ const Cell = styled.div<{ $canPlace: boolean }>`
         width: 26px;
         height: 26px;
         transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: ${themeVars.games.go.hover};
         border-radius: 50%;
       }
     `}
@@ -114,9 +115,15 @@ const Stone = styled.div<{ $color: Player }>`
   height: 26px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background-color: ${props => props.$color === 'black' ? '#000' : '#fff'};
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
-  border: 1px solid ${props => props.$color === 'black' ? '#000' : '#ccc'};
+  background-color: ${props =>
+    props.$color === 'black'
+      ? themeVars.games.go.blackStone
+      : themeVars.games.go.whiteStone};
+  box-shadow: 2px 2px 2px ${withThemeAlpha(themeVars.games.go.line, 0.2)};
+  border: 1px solid ${props =>
+    props.$color === 'black'
+      ? themeVars.games.go.blackStone
+      : themeVars.games.go.whiteStoneBorder};
 `;
 
 const StarPoint = styled.div`
@@ -127,11 +134,11 @@ const StarPoint = styled.div`
   height: 8px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background-color: #000;
+  background-color: ${themeVars.games.go.starPoint};
 `;
 
 const PassButton = styled(Button)`
-  margin-top: 10px;
+  margin-top: ${themeVars.spacing.md};
 `;
 
 const GameGo19: React.FC = () => {

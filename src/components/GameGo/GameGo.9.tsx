@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal, Select, Tooltip } from 'antd';
 import { Global, css } from '@emotion/react';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 import { Board, Player, Position, AIDifficulty, BOARD_SIZE, STAR_POINTS } from './types';
 import { getValidMoves, makeMove, calculateScore } from './utils';
 import { GoAIFactory } from './ai';
@@ -11,8 +11,8 @@ const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${globalStyles.spacing.lg};
-  padding: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   max-width: 100%;
   margin: 0 auto;
 `;
@@ -23,12 +23,12 @@ const GameInfo = styled.div`
   align-items: center;
   width: 100%;
   max-width: 400px;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
-  background: ${globalStyles.colors.secondary};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
+  background: ${themeVars.colors.secondary};
   border-radius: 4px;
   font-weight: 500;
 `;
@@ -38,13 +38,13 @@ const GameBoard = styled.div`
   grid-template-columns: repeat(${BOARD_SIZE}, 1fr);
   grid-template-rows: repeat(${BOARD_SIZE}, 1fr);
   position: relative;
-  background: #E8C285; /* 棋盘木色 */
+  background: ${themeVars.games.go.board9};
   padding: 2px;
   border-radius: 4px;
   width: 100%;
   max-width: 400px;
   aspect-ratio: 1;
-  box-shadow: ${globalStyles.shadows.medium};
+  box-shadow: ${themeVars.shadows.medium};
 `;
 
 const BoardLines = styled.div`
@@ -61,7 +61,7 @@ const BoardLines = styled.div`
   &::before, &::after {
     content: '';
     position: absolute;
-    background-color: #000;
+    background-color: ${themeVars.games.go.line};
   }
   
   /* 横线 */
@@ -73,8 +73,8 @@ const BoardLines = styled.div`
     background: repeating-linear-gradient(
       to bottom,
       transparent calc(100% / ${BOARD_SIZE} / 2),
-      #000 calc(100% / ${BOARD_SIZE} / 2),
-      #000 calc(100% / ${BOARD_SIZE} / 2 + 1px),
+      ${themeVars.games.go.line} calc(100% / ${BOARD_SIZE} / 2),
+      ${themeVars.games.go.line} calc(100% / ${BOARD_SIZE} / 2 + 1px),
       transparent calc(100% / ${BOARD_SIZE} / 2 + 1px),
       transparent calc(100% / ${BOARD_SIZE} + 100% / ${BOARD_SIZE} / 2)
     );
@@ -89,8 +89,8 @@ const BoardLines = styled.div`
     background: repeating-linear-gradient(
       to right,
       transparent calc(100% / ${BOARD_SIZE} / 2),
-      #000 calc(100% / ${BOARD_SIZE} / 2),
-      #000 calc(100% / ${BOARD_SIZE} / 2 + 1px),
+      ${themeVars.games.go.line} calc(100% / ${BOARD_SIZE} / 2),
+      ${themeVars.games.go.line} calc(100% / ${BOARD_SIZE} / 2 + 1px),
       transparent calc(100% / ${BOARD_SIZE} / 2 + 1px),
       transparent calc(100% / ${BOARD_SIZE} + 100% / ${BOARD_SIZE} / 2)
     );
@@ -107,7 +107,7 @@ const Cell = styled.div<{ $canPlace?: boolean }>`
   z-index: 1;
   
   &:hover {
-    background-color: ${props => props.$canPlace ? 'rgba(0, 0, 0, 0.1)' : 'transparent'};
+    background-color: ${props => (props.$canPlace ? themeVars.games.go.hover : 'transparent')};
   }
 `;
 
@@ -115,9 +115,16 @@ const Stone = styled.div<{ $color: 'black' | 'white' }>`
   width: 80%;
   height: 80%;
   border-radius: 50%;
-  background: ${props => props.$color === 'black' ? '#000' : '#fff'};
-  border: 1px solid ${props => props.$color === 'black' ? '#000' : '#ccc'};
-  box-shadow: ${globalStyles.shadows.small};
+  background: ${props =>
+    props.$color === 'black'
+      ? themeVars.games.go.blackStone
+      : themeVars.games.go.whiteStone};
+  border: 1px solid
+    ${props =>
+      props.$color === 'black'
+        ? themeVars.games.go.blackStone
+        : themeVars.games.go.whiteStoneBorder};
+  box-shadow: ${themeVars.shadows.small};
   transition: transform 0.3s;
   animation: place 0.3s ease-out;
   z-index: 2;
@@ -136,20 +143,20 @@ const StarPoint = styled.div`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #000;
+  background: ${themeVars.games.go.starPoint};
   position: absolute;
   z-index: 1;
 `;
 
 const PassButton = styled(Button)`
-  margin-top: ${globalStyles.spacing.md};
+  margin-top: ${themeVars.spacing.md};
 `;
 
 const GlobalStyles = () => (
   <Global
     styles={css`
       .hard-mode-option {
-        color: ${globalStyles.colors.error} !important;
+        color: ${themeVars.colors.error} !important;
         font-weight: 500;
       }
     `}

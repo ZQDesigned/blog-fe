@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 interface Position {
   x: number;
@@ -34,7 +34,7 @@ const MenuContainer = styled(motion.div)`
   border-radius: 8px;
   padding: 4px;
   min-width: 200px;
-  box-shadow: ${globalStyles.shadows.medium};
+  box-shadow: ${themeVars.shadows.medium};
   z-index: 1000;
   user-select: none;
   -webkit-user-select: none;
@@ -49,20 +49,20 @@ const MenuContainer = styled(motion.div)`
     top: auto !important;
     transform: none !important;
     border-radius: 16px 16px 0 0;
-    padding: ${globalStyles.spacing.md};
-    padding-bottom: calc(${globalStyles.spacing.md} + env(safe-area-inset-bottom));
+    padding: ${themeVars.spacing.md};
+    padding-bottom: calc(${themeVars.spacing.md} + env(safe-area-inset-bottom));
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   color: ${props => {
-    if (props.disabled) return globalStyles.colors.lightText;
+    if (props.disabled) return themeVars.colors.lightText;
     if (props.danger) return '#ff4d4f';
     return 'inherit';
   }};
@@ -71,7 +71,7 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
   border-radius: 4px;
 
   &:hover {
-    background-color: ${props => props.disabled ? 'transparent' : globalStyles.colors.secondary};
+    background-color: ${props => props.disabled ? 'transparent' : themeVars.colors.secondary};
   }
 
   .icon {
@@ -79,10 +79,10 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
   }
 
   @media (max-width: 768px) {
-    padding: ${globalStyles.spacing.md};
+    padding: ${themeVars.spacing.md};
     font-size: 16px;
     border-radius: 8px;
-    margin-bottom: ${globalStyles.spacing.xs};
+    margin-bottom: ${themeVars.spacing.xs};
 
     &:last-child {
       margin-bottom: 0;
@@ -93,11 +93,11 @@ const MenuItem = styled.div<{ danger?: boolean; disabled?: boolean }>`
 // Divider style
 const Divider = styled.div`
   height: 1px;
-  background-color: ${globalStyles.colors.border};
+  background-color: ${themeVars.colors.border};
   margin: 4px 0;
 
   @media (max-width: 768px) {
-    margin: ${globalStyles.spacing.xs} 0;
+    margin: ${themeVars.spacing.xs} 0;
   }
 `;
 
@@ -161,9 +161,9 @@ const overlayAnimation = {
 const MenuHandle = styled.div`
   width: 36px;
   height: 4px;
-  background-color: ${globalStyles.colors.border};
+  background-color: ${themeVars.colors.border};
   border-radius: 2px;
-  margin: 0 auto ${globalStyles.spacing.sm};
+  margin: 0 auto ${themeVars.spacing.sm};
   opacity: 0.8;
 `;
 

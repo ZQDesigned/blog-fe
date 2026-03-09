@@ -13,7 +13,7 @@ import {
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import {NAV_ITEMS, ROUTES} from '../../constants/routes';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import ContextMenu from '../ContextMenu';
 import { formatDate } from '../../utils/dateUtils';
@@ -56,24 +56,24 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
 
 const StyledHeader = styled(Header)<{ $scrolled: boolean }>`
   background: ${props => props.$scrolled ? '#fff' : 'transparent'};
-  box-shadow: ${props => props.$scrolled ? globalStyles.shadows.small : 'none'};
+  box-shadow: ${props => props.$scrolled ? themeVars.shadows.small : 'none'};
   position: fixed;
   width: 100%;
   z-index: 1;
   display: flex;
   align-items: center;
-  padding: 0 ${globalStyles.spacing.xl};
+  padding: 0 ${themeVars.spacing.xl};
   transition: all 0.3s ease;
 
   @media (max-width: 768px) {
-    padding: 0 ${globalStyles.spacing.md};
+    padding: 0 ${themeVars.spacing.md};
   }
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -86,9 +86,9 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 const StyledContent = styled(Content)<{ $isStandalone?: boolean }>`
-  padding: ${props => props.$isStandalone ? 0 : globalStyles.spacing.xl};
+  padding: ${props => props.$isStandalone ? 0 : themeVars.spacing.xl};
   margin-top: ${props => props.$isStandalone ? 0 : '64px'};
-  background: ${globalStyles.colors.secondary};
+  background: ${themeVars.colors.secondary};
   min-height: ${props => props.$isStandalone ? '100vh' : 'calc(100vh - 64px - 70px)'};
   width: 100%;
 
@@ -104,7 +104,7 @@ const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
   background: transparent;
   
   &.ant-menu {
-    color: ${props => props.$scrolled ? globalStyles.colors.text : globalStyles.colors.text};
+    color: ${props => props.$scrolled ? themeVars.colors.text : themeVars.colors.text};
   }
 
   .ant-menu-item {
@@ -119,16 +119,16 @@ const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
     backdrop-filter: blur(10px);
     
     &:hover {
-      background: ${globalStyles.colors.primary} !important;
-      border-color: ${globalStyles.colors.primary} !important;
+      background: ${themeVars.colors.primary} !important;
+      border-color: ${themeVars.colors.primary} !important;
       color: #fff !important;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     
     &.ant-menu-item-selected {
-      background: ${globalStyles.colors.primary} !important;
-      border-color: ${globalStyles.colors.primary} !important;
+      background: ${themeVars.colors.primary} !important;
+      border-color: ${themeVars.colors.primary} !important;
       color: #fff !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
@@ -151,14 +151,14 @@ const IcpLink = styled.a`
   color: inherit;
   text-decoration: none;
   &:hover {
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
   }
 `;
 
 const BadgesGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   flex-wrap: wrap;
   justify-content: center;
 
@@ -174,29 +174,29 @@ const BadgesGroup = styled.div`
 
 const FooterContainer = styled.div`
   background: #fff;
-  padding: ${globalStyles.spacing.xl} 0 0;
+  padding: ${themeVars.spacing.xl} 0 0;
 `;
 
 const FooterContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 ${globalStyles.spacing.xl};
+  padding: 0 ${themeVars.spacing.xl};
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  gap: ${globalStyles.spacing.xl};
+  gap: ${themeVars.spacing.xl};
 
   @media (max-width: 768px) {
     display: flex;
     flex-direction: column;
-    padding: 0 ${globalStyles.spacing.lg};
-    gap: ${globalStyles.spacing.xl};
+    padding: 0 ${themeVars.spacing.lg};
+    gap: ${themeVars.spacing.xl};
   }
 `;
 
 const FooterColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 
   @media (max-width: 768px) {
     width: 100%;
@@ -209,26 +209,26 @@ const FooterMiddleRow = styled.div`
   @media (max-width: 768px) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: ${globalStyles.spacing.lg};
+    gap: ${themeVars.spacing.lg};
   }
 `;
 
 const FooterTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
-  margin: 0 0 ${globalStyles.spacing.md};
-  color: ${globalStyles.colors.text};
+  margin: 0 0 ${themeVars.spacing.md};
+  color: ${themeVars.colors.text};
 `;
 
 const FooterLink = styled.span<{ $isExternal?: boolean }>`
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   text-decoration: none;
   transition: color 0.3s ease;
   font-size: 14px;
   cursor: pointer;
 
   &:hover {
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
   }
 `;
 
@@ -236,17 +236,17 @@ const ExternalLinkContainer = styled.div`
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: ${globalStyles.spacing.xs};
+  gap: ${themeVars.spacing.xs};
 `;
 
 const ExternalLink = styled.a`
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   text-decoration: none;
   transition: color 0.3s ease;
   font-size: 14px;
 
   &:hover {
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
   }
 
   &:hover + .link-icon {
@@ -259,28 +259,28 @@ const LinkIcon = styled(ArrowRightOutlined)`
   opacity: 0;
   transform: translateX(-10px);
   transition: all 0.3s ease;
-  color: ${globalStyles.colors.primary};
+  color: ${themeVars.colors.primary};
 `;
 
 const FooterBottom = styled.div`
-  margin-top: ${globalStyles.spacing.xl};
-  padding: ${globalStyles.spacing.md} ${globalStyles.spacing.xl};
-  border-top: 1px solid ${globalStyles.colors.border};
+  margin-top: ${themeVars.spacing.xl};
+  padding: ${themeVars.spacing.md} ${themeVars.spacing.xl};
+  border-top: 1px solid ${themeVars.colors.border};
   text-align: center;
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   font-size: 14px;
 
   @media (max-width: 768px) {
-    padding: ${globalStyles.spacing.md};
+    padding: ${themeVars.spacing.md};
   }
 `;
 const BuildInfo = styled.div`
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   font-size: 12px;
   opacity: 0.8;
   white-space: nowrap;
   display: flex;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: flex-start;
@@ -297,13 +297,13 @@ const IcpContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   margin-top: 8px;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: ${globalStyles.spacing.sm};
+    gap: ${themeVars.spacing.sm};
   }
 `;
 
@@ -677,12 +677,12 @@ export const MainLayout: React.FC = () => {
               <FooterLink style={{
                 fontSize: '16px',
                 fontWeight: 600,
-                marginBottom: globalStyles.spacing.xs
+                marginBottom: themeVars.spacing.xs
               }}>
                 LumiCMS
               </FooterLink>
               <Paragraph style={{
-                color: globalStyles.colors.lightText,
+                color: themeVars.colors.lightText,
                 fontSize: '14px',
                 margin: 0,
                 lineHeight: '1.6'

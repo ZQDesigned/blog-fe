@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   outline: none;
   touch-action: none;
 `;
@@ -17,9 +17,9 @@ const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 1px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
   aspect-ratio: 1;
 `;
 
@@ -42,23 +42,23 @@ const Cell = styled.div<{
   background-color: ${props => 
     props.$revealed 
       ? props.$isMine 
-        ? props.$isGameOver ? '#ff4d4f' : globalStyles.colors.secondary
-        : globalStyles.colors.secondary
-      : globalStyles.colors.primary + '40'
+        ? props.$isGameOver ? themeVars.games.minesweeper.danger : themeVars.colors.secondary
+        : themeVars.colors.secondary
+      : themeVars.colors.primaryA40
   };
   color: ${props => {
-    if (props.$isFlagged) return '#f5222d';
+    if (props.$isFlagged) return themeVars.games.minesweeper.flag;
     if (!props.$revealed) return 'transparent';
-    if (props.$isMine) return '#000';
+    if (props.$isMine) return themeVars.games.minesweeper.mine;
     switch (props.$value) {
-      case 1: return '#1890ff';
-      case 2: return '#52c41a';
-      case 3: return '#f5222d';
-      case 4: return '#722ed1';
-      case 5: return '#fa8c16';
-      case 6: return '#13c2c2';
-      case 7: return '#eb2f96';
-      case 8: return '#faad14';
+      case 1: return themeVars.games.minesweeper.numberColors['1'];
+      case 2: return themeVars.games.minesweeper.numberColors['2'];
+      case 3: return themeVars.games.minesweeper.numberColors['3'];
+      case 4: return themeVars.games.minesweeper.numberColors['4'];
+      case 5: return themeVars.games.minesweeper.numberColors['5'];
+      case 6: return themeVars.games.minesweeper.numberColors['6'];
+      case 7: return themeVars.games.minesweeper.numberColors['7'];
+      case 8: return themeVars.games.minesweeper.numberColors['8'];
       default: return 'transparent';
     }
   }};
@@ -67,7 +67,7 @@ const Cell = styled.div<{
   &:hover {
     background-color: ${props => 
       !props.$revealed && !props.$isGameOver 
-        ? globalStyles.colors.primary + '60'
+        ? themeVars.colors.primaryA60
         : undefined
     };
   }
@@ -77,27 +77,27 @@ const GameControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const GameInfo = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 `;
 
 const TouchControls = styled.div`
   display: flex;
   justify-content: center;
-  gap: ${globalStyles.spacing.md};
-  margin-top: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.md};
+  margin-top: ${themeVars.spacing.lg};
 
   @media (min-width: 769px) {
     display: none;
@@ -107,32 +107,32 @@ const TouchControls = styled.div`
 const ModeButton = styled(Button)<{ $active: boolean }>`
   flex: 1;
   max-width: 120px;
-  background-color: ${props => props.$active ? globalStyles.colors.primary : undefined};
-  color: ${props => props.$active ? '#fff' : undefined};
+  background-color: ${props => props.$active ? themeVars.colors.primary : undefined};
+  color: ${props => props.$active ? themeVars.colors.onPrimary : undefined};
 
   &:hover {
-    background-color: ${props => props.$active ? globalStyles.colors.primary + 'dd' : undefined};
-    color: ${props => props.$active ? '#fff' : undefined};
+    background-color: ${props => props.$active ? withThemeAlpha(themeVars.colors.primary, 0.8667) : undefined};
+    color: ${props => props.$active ? themeVars.colors.onPrimary : undefined};
   }
 `;
 
 const ModeIndicator = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.xs};
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.xs};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 
   .tip-icon {
-    color: ${globalStyles.colors.lightText};
+    color: ${themeVars.colors.lightText};
     cursor: help;
-    transition: color ${globalStyles.transitions.fast};
+    transition: color ${themeVars.transitions.fast};
 
     &:hover {
-      color: ${globalStyles.colors.primary};
+      color: ${themeVars.colors.primary};
     }
   }
 

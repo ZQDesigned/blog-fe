@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 const LoadingContainer = styled(motion.div)`
   display: flex;
@@ -10,20 +10,20 @@ const LoadingContainer = styled(motion.div)`
   align-items: center;
   min-height: 400px;
   width: 100%;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const LoadingText = styled(motion.div)`
   font-size: 16px;
-  color: ${globalStyles.colors.primary};
-  margin-top: ${globalStyles.spacing.md};
+  color: ${themeVars.colors.primary};
+  margin-top: ${themeVars.spacing.md};
   text-align: center;
 `;
 
 const EmojisContainer = styled(motion.div)`
   display: flex;
   gap: 16px;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const EmojiWrapper = styled(motion.div)`

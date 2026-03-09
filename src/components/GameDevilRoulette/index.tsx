@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal, Tag } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 type Turn = 'player' | 'dealer';
 
@@ -47,26 +47,30 @@ const ITEM_POOL: Item[] = [
 const AI_DELAY = 1000;
 
 const GameShell = styled.div`
-  background: radial-gradient(circle at 20% 20%, #111827 0, #0b0c10 40%);
-  border: 1px solid ${globalStyles.colors.border};
+  background: radial-gradient(
+    circle at 20% 20%,
+    ${withThemeAlpha(themeVars.colors.primaryActive, 0.45)} 0,
+    ${themeVars.games.devilRoulette.shellBackground} 40%
+  );
+  border: 1px solid ${themeVars.colors.border};
   border-radius: 12px;
-  padding: ${globalStyles.spacing.lg};
-  color: ${globalStyles.colors.text};
+  padding: ${themeVars.spacing.lg};
+  color: ${themeVars.colors.text};
   font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px ${withThemeAlpha(themeVars.colors.text, 0.3)};
 `;
 
 const Section = styled.div`
-  padding: ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.md};
   border-radius: 10px;
-  background: #0f1016;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: ${themeVars.games.devilRoulette.sectionBackground};
+  border: 1px solid ${themeVars.games.devilRoulette.sectionBorder};
 `;
 
 const Header = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
   align-items: start;
 
   @media (max-width: 768px) {
@@ -78,21 +82,29 @@ const SectionTitle = styled.div`
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9ca3af;
-  margin-bottom: ${globalStyles.spacing.sm};
+  color: ${themeVars.colors.mutedText};
+  margin-bottom: ${themeVars.spacing.sm};
 `;
 
 const ItemGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const ItemCard = styled.button<{ $variant?: 'dealer' | 'player'; $disabled?: boolean }>`
-  border: 1px solid ${({ $variant }) => ($variant === 'dealer' ? '#7f1d1d' : '#374151')};
-  background: ${({ $variant }) => ($variant === 'dealer' ? 'rgba(127, 29, 29, 0.1)' : 'rgba(55, 65, 81, 0.2)')};
-  color: ${({ $variant }) => ($variant === 'dealer' ? '#f87171' : globalStyles.colors.text)};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.xs};
+  border: 1px solid
+    ${({ $variant }) =>
+      $variant === 'dealer'
+        ? withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.45)
+        : themeVars.colors.borderStrong};
+  background: ${({ $variant }) =>
+    $variant === 'dealer'
+      ? withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.1)
+      : withThemeAlpha(themeVars.colors.borderStrong, 0.2)};
+  color: ${({ $variant }) =>
+    $variant === 'dealer' ? themeVars.games.devilRoulette.dealerAccent : themeVars.colors.text};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.xs};
   border-radius: 8px;
   min-height: 68px;
   text-align: center;
@@ -105,7 +117,8 @@ const ItemCard = styled.button<{ $variant?: 'dealer' | 'player'; $disabled?: boo
 
   &:hover {
     transform: ${({ $disabled }) => ($disabled ? 'none' : 'translateY(-2px)')};
-    box-shadow: ${({ $disabled }) => ($disabled ? 'none' : '0 8px 24px rgba(239, 68, 68, 0.15)')};
+    box-shadow: ${({ $disabled }) =>
+      $disabled ? 'none' : `0 8px 24px ${withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.15)}`};
   }
 `;
 
@@ -113,17 +126,17 @@ const StatRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const HealthBar = styled.div`
   height: 12px;
-  background: #111;
-  border: 1px solid #1f2937;
+  background: ${withThemeAlpha(themeVars.colors.text, 0.07)};
+  border: 1px solid ${themeVars.colors.borderStrong};
   width: 100%;
   border-radius: 999px;
   overflow: hidden;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 10px ${withThemeAlpha(themeVars.colors.text, 0.6)};
 `;
 
 const HealthFill = styled.div<{ $ratio: number; $variant: 'player' | 'dealer' }>`
@@ -131,10 +144,14 @@ const HealthFill = styled.div<{ $ratio: number; $variant: 'player' | 'dealer' }>
   width: ${({ $ratio }) => Math.max(0, Math.min(1, $ratio)) * 100}%;
   background: ${({ $variant }) =>
     $variant === 'player'
-      ? 'linear-gradient(90deg, #14532d, #22c55e)'
-      : 'linear-gradient(90deg, #7f1d1d, #ef4444)'};
+      ? `linear-gradient(90deg, ${withThemeAlpha(themeVars.games.devilRoulette.playerAccent, 0.45)}, ${themeVars.games.devilRoulette.playerAccent})`
+      : `linear-gradient(90deg, ${withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.45)}, ${themeVars.games.devilRoulette.dealerAccent})`};
   transition: width 0.35s ease;
-  box-shadow: 0 0 12px ${({ $variant }) => ($variant === 'player' ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.5)')};
+  box-shadow: 0 0 12px
+    ${({ $variant }) =>
+      $variant === 'player'
+        ? withThemeAlpha(themeVars.games.devilRoulette.playerAccent, 0.4)
+        : withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.5)};
 `;
 
 const AmmoRow = styled.div`
@@ -148,18 +165,26 @@ const AmmoIcon = styled.div<{ $type: 'live' | 'blank' }>`
   width: 12px;
   height: 22px;
   border-radius: 3px;
-  background: ${({ $type }) => ($type === 'live' ? '#ef4444' : '#374151')};
-  box-shadow: ${({ $type }) => ($type === 'live' ? '0 0 8px rgba(239,68,68,0.6)' : 'none')};
+  background: ${({ $type }) =>
+    $type === 'live' ? themeVars.games.devilRoulette.dealerAccent : themeVars.colors.borderStrong};
+  box-shadow: ${({ $type }) =>
+    $type === 'live'
+      ? `0 0 8px ${withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.6)}`
+      : 'none'};
 `;
 
 const GunContainer = styled.div<{ $shake?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: ${globalStyles.spacing.md};
-  margin: ${globalStyles.spacing.sm} 0 ${globalStyles.spacing.md};
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: ${themeVars.spacing.md};
+  margin: ${themeVars.spacing.sm} 0 ${themeVars.spacing.md};
+  background: linear-gradient(
+    135deg,
+    ${withThemeAlpha(themeVars.colors.onPrimary, 0.02)},
+    transparent
+  );
+  border: 1px solid ${withThemeAlpha(themeVars.colors.onPrimary, 0.04)};
   border-radius: 12px;
   transform: ${({ $shake }) => ($shake ? 'rotate(-1deg) translateY(-2px)' : 'none')};
   transition: transform 0.2s ease;
@@ -168,39 +193,39 @@ const GunContainer = styled.div<{ $shake?: boolean }>`
 const LogPanel = styled(Section)`
   height: 200px;
   overflow: auto;
-  background: #0a0b10;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: ${withThemeAlpha(themeVars.colors.text, 0.98)};
+  border: 1px solid ${withThemeAlpha(themeVars.colors.onPrimary, 0.04)};
 `;
 
 const LogEntryRow = styled.div<{ $tone: LogEntry['tone'] }>`
   padding: 8px 10px;
   border-left: 2px solid
     ${({ $tone }) => {
-      if ($tone === 'danger') return '#ef4444';
-      if ($tone === 'info') return '#f59e0b';
-      if ($tone === 'success') return '#22c55e';
-      return '#1f2937';
+      if ($tone === 'danger') return themeVars.games.devilRoulette.dealerAccent;
+      if ($tone === 'info') return themeVars.colors.warning;
+      if ($tone === 'success') return themeVars.games.devilRoulette.playerAccent;
+      return themeVars.colors.borderStrong;
     }};
   color: ${({ $tone }) => {
-    if ($tone === 'danger') return '#fca5a5';
-    if ($tone === 'info') return '#fcd34d';
-    if ($tone === 'success') return '#bbf7d0';
-    return '#9ca3af';
+    if ($tone === 'danger') return themeVars.colors.error;
+    if ($tone === 'info') return themeVars.colors.warning;
+    if ($tone === 'success') return themeVars.colors.success;
+    return themeVars.colors.mutedText;
   }};
   font-size: 13px;
   display: flex;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const Actions = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const ActionButtons = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   justify-content: center;
   flex-wrap: wrap;
 `;
@@ -209,27 +234,61 @@ const FooterRow = styled.div`
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #6b7280;
+  color: ${themeVars.colors.mutedText};
   align-items: center;
   flex-wrap: wrap;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const GunInfo = styled.div`
   font-weight: 900;
   font-size: 20px;
   letter-spacing: 0.12em;
-  color: #ef4444;
-  text-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+  color: ${themeVars.games.devilRoulette.dealerAccent};
+  text-shadow: 0 0 6px ${withThemeAlpha(themeVars.games.devilRoulette.dealerAccent, 0.3)};
 `;
 
 const gunSvg = (
   <svg width="320" height="100" viewBox="0 0 320 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 40C10 40 5 45 5 60C5 75 10 85 40 85H60L55 40H10Z" fill="#2a2a2a" />
-    <rect x="65" y="65" width="30" height="15" rx="5" stroke="#333" strokeWidth="3" />
-    <rect x="55" y="40" width="120" height="30" fill="#1a1a1a" stroke="#333" strokeWidth="2" />
-    <rect x="175" y="42" width="140" height="18" fill="#111" stroke="#333" strokeWidth="2" />
-    <rect x="120" y="65" width="50" height="12" rx="2" fill="#222" />
+    <path
+      d="M10 40C10 40 5 45 5 60C5 75 10 85 40 85H60L55 40H10Z"
+      fill={withThemeAlpha(themeVars.colors.text, 0.16)}
+    />
+    <rect
+      x="65"
+      y="65"
+      width="30"
+      height="15"
+      rx="5"
+      stroke={withThemeAlpha(themeVars.colors.text, 0.2)}
+      strokeWidth="3"
+    />
+    <rect
+      x="55"
+      y="40"
+      width="120"
+      height="30"
+      fill={withThemeAlpha(themeVars.colors.text, 0.1)}
+      stroke={withThemeAlpha(themeVars.colors.text, 0.2)}
+      strokeWidth="2"
+    />
+    <rect
+      x="175"
+      y="42"
+      width="140"
+      height="18"
+      fill={withThemeAlpha(themeVars.colors.text, 0.07)}
+      stroke={withThemeAlpha(themeVars.colors.text, 0.2)}
+      strokeWidth="2"
+    />
+    <rect
+      x="120"
+      y="65"
+      width="50"
+      height="12"
+      rx="2"
+      fill={withThemeAlpha(themeVars.colors.text, 0.13)}
+    />
   </svg>
 );
 
@@ -466,7 +525,11 @@ const GameDevilRoulette: React.FC = () => {
           if (next !== undefined) {
             if (owner === 'player') {
               addLog(
-                `查看枪膛... 下一发是: ${next === 1 ? '<span style="color:#ef4444">实弹</span>' : '<span style="color:#9ca3af">空包弹</span>'}`,
+                `查看枪膛... 下一发是: ${
+                  next === 1
+                    ? `<span style="color:${themeVars.games.devilRoulette.dealerAccent}">实弹</span>`
+                    : `<span style="color:${themeVars.colors.mutedText}">空包弹</span>`
+                }`,
               );
             } else {
               updateState(prev => ({ ...prev, dealerKnowsNext: next }));
@@ -700,7 +763,7 @@ const GameDevilRoulette: React.FC = () => {
             </HealthBar>
           </StatRow>
 
-          <div style={{ marginTop: globalStyles.spacing.md }}>
+          <div style={{ marginTop: themeVars.spacing.md }}>
             <SectionTitle>Ammo</SectionTitle>
             <AmmoRow>
               {Array.from({ length: ammoStats.live }).map((_, idx) => (
@@ -713,7 +776,7 @@ const GameDevilRoulette: React.FC = () => {
             </AmmoRow>
           </div>
 
-          <div style={{ marginTop: globalStyles.spacing.sm, textAlign: 'right' }}>
+          <div style={{ marginTop: themeVars.spacing.sm, textAlign: 'right' }}>
             <GunInfo>{state.isSawedOff ? 'SAWED OFF' : 'READY'}</GunInfo>
           </div>
         </Section>

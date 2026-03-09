@@ -3,7 +3,7 @@ import { Typography, Timeline } from 'antd';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { AboutJourney } from '../../../types/types';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import AboutSection from './AboutSection';
 
 const { Paragraph } = Typography;
@@ -14,16 +14,16 @@ interface JourneySectionProps {
 }
 
 const TimelineContainer = styled(motion.div)`
-  margin-top: ${globalStyles.spacing.lg};
+  margin-top: ${themeVars.spacing.lg};
 `;
 
 const TimelineTitle = styled(Typography.Title)`
-  margin-bottom: ${globalStyles.spacing.xs} !important;
+  margin-bottom: ${themeVars.spacing.xs} !important;
 `;
 
 const TimelineDate = styled(Paragraph)`
-  color: ${globalStyles.colors.lightText};
-  margin-bottom: ${globalStyles.spacing.sm} !important;
+  color: ${themeVars.colors.lightText};
+  margin-bottom: ${themeVars.spacing.sm} !important;
 `;
 
 const JourneySection: React.FC<JourneySectionProps> = ({ data, delay = 0 }) => {
@@ -32,7 +32,7 @@ const JourneySection: React.FC<JourneySectionProps> = ({ data, delay = 0 }) => {
   return (
     <AboutSection title={data.title} delay={delay}>
       {journey.description.map((desc, index) => (
-        <Paragraph key={index} style={{ marginTop: globalStyles.spacing.sm }}>
+        <Paragraph key={index} style={{ marginTop: themeVars.spacing.sm }}>
           {desc}
         </Paragraph>
       ))}

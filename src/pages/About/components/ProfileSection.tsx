@@ -3,7 +3,7 @@ import { Typography } from 'antd';
 import styled from '@emotion/styled';
 import { BookOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { AboutProfile } from '../../../types/types';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import AboutSection from './AboutSection';
 
 const { Text, Paragraph } = Typography;
@@ -18,12 +18,12 @@ const Avatar = styled.img`
   height: 120px;
   border-radius: 60px;
   object-fit: cover;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
   transition: all 0.3s ease;
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 `;
 
@@ -31,12 +31,12 @@ const ProfileHeader = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
   
   @media (min-width: 768px) {
     flex-direction: row;
     align-items: flex-start;
-    gap: ${globalStyles.spacing.xl};
+    gap: ${themeVars.spacing.xl};
   }
 `;
 
@@ -47,12 +47,12 @@ const ProfileInfo = styled.div`
 const ContactInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.sm};
-  margin: ${globalStyles.spacing.sm} 0;
+  gap: ${themeVars.spacing.sm};
+  margin: ${themeVars.spacing.sm} 0;
 `;
 
 const EducationItem = styled.div`
-  margin-bottom: ${globalStyles.spacing.sm};
+  margin-bottom: ${themeVars.spacing.sm};
 `;
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({ data, delay = 0 }) => {
@@ -94,7 +94,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ data, delay = 0 }) => {
         <Text>{profile.location}</Text>
       </ContactInfo>
 
-      <Paragraph style={{ marginTop: globalStyles.spacing.sm }}>
+      <Paragraph style={{ marginTop: themeVars.spacing.sm }}>
         {profile.highlights.map((highlight, index) => (
           <React.Fragment key={index}>
             {highlight}<br />

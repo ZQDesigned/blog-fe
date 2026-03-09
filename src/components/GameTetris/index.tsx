@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   outline: none;
   touch-action: none;
 `;
 
 const GameArea = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
   justify-content: center;
-  margin-bottom: ${globalStyles.spacing.lg};
+  margin-bottom: ${themeVars.spacing.lg};
 `;
 
 const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 1px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
   aspect-ratio: 1/2;
   width: 50%;
 `;
@@ -33,7 +33,7 @@ const GameBoard = styled.div`
 const SidePanel = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   width: 30%;
 `;
 
@@ -41,9 +41,9 @@ const NextPieceBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
   aspect-ratio: 1;
 `;
 
@@ -53,21 +53,21 @@ const Cell = styled.div<{ $type: 'empty' | 'piece' | 'ghost'; $color?: string }>
   background-color: ${props => {
     switch (props.$type) {
       case 'piece':
-        return props.$color || globalStyles.colors.primary;
+        return props.$color || themeVars.colors.primary;
       case 'ghost':
-        return props.$color ? `${props.$color}40` : `${globalStyles.colors.primary}40`;
+        return withThemeAlpha(props.$color || themeVars.colors.primary, 0.25);
       default:
-        return globalStyles.colors.secondary;
+        return themeVars.colors.secondary;
     }
   }};
   transition: background-color 0.1s ease;
 `;
 
 const Score = styled.div`
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 `;
 
@@ -75,19 +75,19 @@ const GameControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const TouchControls = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${globalStyles.spacing.sm};
-  margin-top: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.sm};
+  margin-top: ${themeVars.spacing.lg};
   max-width: 300px;
   margin-left: auto;
   margin-right: auto;
-  padding: ${globalStyles.spacing.md};
-  background: ${globalStyles.colors.secondary}40;
+  padding: ${themeVars.spacing.md};
+  background: ${withThemeAlpha(themeVars.colors.secondary, 0.25)};
   border-radius: 12px;
 
   @media (min-width: 769px) {
@@ -105,24 +105,24 @@ const DirectionButton = styled(Button)`
 `;
 
 const DropButton = styled(DirectionButton)`
-  background: ${globalStyles.colors.primary}40;
-  color: ${globalStyles.colors.primary};
+  background: ${themeVars.colors.primaryA40};
+  color: ${themeVars.colors.primary};
   
   &:hover {
-    background: ${globalStyles.colors.primary}60;
-    border-color: ${globalStyles.colors.primary};
+    background: ${themeVars.colors.primaryA60};
+    border-color: ${themeVars.colors.primary};
   }
 `;
 
 // 俄罗斯方块的形状定义
 const TETROMINOES = {
-  I: { shape: [[1, 1, 1, 1]], color: '#00f0f0' },
-  O: { shape: [[1, 1], [1, 1]], color: '#f0f000' },
-  T: { shape: [[0, 1, 0], [1, 1, 1]], color: '#a000f0' },
-  S: { shape: [[0, 1, 1], [1, 1, 0]], color: '#00f000' },
-  Z: { shape: [[1, 1, 0], [0, 1, 1]], color: '#f00000' },
-  J: { shape: [[1, 0, 0], [1, 1, 1]], color: '#0000f0' },
-  L: { shape: [[0, 0, 1], [1, 1, 1]], color: '#f0a000' }
+  I: { shape: [[1, 1, 1, 1]], color: themeVars.games.tetris.pieces.I },
+  O: { shape: [[1, 1], [1, 1]], color: themeVars.games.tetris.pieces.O },
+  T: { shape: [[0, 1, 0], [1, 1, 1]], color: themeVars.games.tetris.pieces.T },
+  S: { shape: [[0, 1, 1], [1, 1, 0]], color: themeVars.games.tetris.pieces.S },
+  Z: { shape: [[1, 1, 0], [0, 1, 1]], color: themeVars.games.tetris.pieces.Z },
+  J: { shape: [[1, 0, 0], [1, 1, 1]], color: themeVars.games.tetris.pieces.J },
+  L: { shape: [[0, 0, 1], [1, 1, 1]], color: themeVars.games.tetris.pieces.L },
 };
 
 const BOARD_WIDTH = 10;

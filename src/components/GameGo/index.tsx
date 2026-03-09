@@ -3,21 +3,21 @@ import GameGo19 from './GameGo.19';
 import GameGo9 from './GameGo.9';
 import { Select, Alert } from 'antd';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${globalStyles.spacing.lg};
-  padding: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   max-width: 100%;
   margin: 0 auto;
 `;
 
 const BoardSizeSelector = styled(Select)`
   width: 120px;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const isPC = () => {
@@ -54,7 +54,7 @@ const GoGameProxy: React.FC = () => {
           message="提示：您正在使用PC端浏览器，可以切换到19×19棋盘来获得完整的游戏体验"
           type="warning"
           showIcon
-          style={{ marginTop: globalStyles.spacing.md }}
+          style={{ marginTop: themeVars.spacing.md }}
         />
       )}
     </GameContainer>

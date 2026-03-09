@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Card, Typography, Space, Tag, Spin, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import LazyImage from '../LazyImage';
 import { useWeather } from '../../hooks/useWeather';
 import { formatDate } from '../../utils/dateUtils';
@@ -17,13 +17,13 @@ const { Title, Paragraph } = Typography;
 const SidebarContainer = styled(motion.div)`
   position: fixed;
   right: 0;
-  top: calc(64px + ${globalStyles.spacing.xl});
+  top: calc(64px + ${themeVars.spacing.xl});
   width: 300px;
   display: flex;
   flex-direction: column;
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
   z-index: 1;
-  padding-right: ${globalStyles.spacing.xl};
+  padding-right: ${themeVars.spacing.xl};
 
   @media (max-width: 1500px) {
     display: none;
@@ -36,7 +36,7 @@ const SidebarTrigger = styled(motion.div)`
   top: 0;
   height: 100vh;
   width: 8px;
-  background: ${globalStyles.colors.primary}20;
+  background: ${themeVars.colors.primaryA20};
   border-radius: 4px 0 0 4px;
   cursor: pointer;
   z-index: 1;
@@ -52,7 +52,7 @@ const SidebarTrigger = styled(motion.div)`
     background: linear-gradient(
       90deg,
       transparent,
-      ${globalStyles.colors.primary}40,
+      ${themeVars.colors.primaryA40},
       transparent
     );
     animation: wave 3s ease-in-out infinite;
@@ -77,9 +77,9 @@ const SidebarTrigger = styled(motion.div)`
 `;
 
 const StyledCard = styled(Card)`
-  box-shadow: ${globalStyles.shadows.small};
+  box-shadow: ${themeVars.shadows.small};
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 `;
@@ -91,21 +91,21 @@ const ProfileCard = styled(StyledCard)`
 `;
 
 const ProfileHeader = styled.div`
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   text-align: center;
-  border-bottom: 1px solid ${globalStyles.colors.border};
+  border-bottom: 1px solid ${themeVars.colors.border};
 `;
 
 const ProfileContent = styled.div`
-  padding: ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.md};
 `;
 
 const OnlineStatus = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.xs};
-  margin-top: ${globalStyles.spacing.xs};
-  color: ${globalStyles.colors.lightText};
+  gap: ${themeVars.spacing.xs};
+  margin-top: ${themeVars.spacing.xs};
+  color: ${themeVars.colors.lightText};
   font-size: 14px;
   justify-content: center;
 `;
@@ -114,32 +114,32 @@ const StatusDot = styled.div`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #52c41a;
+  background-color: ${themeVars.colors.success};
 `;
 
 const WeatherCard = styled(StyledCard)`
   .ant-card-body {
-    padding: ${globalStyles.spacing.md};
+    padding: ${themeVars.spacing.md};
   }
 `;
 
 const WeatherInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const WeatherRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
 `;
 
 const WeatherError = styled.div`
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   text-align: center;
-  padding: ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.md};
 `;
 
 const KeyboardShortcut = styled.span`
@@ -149,11 +149,11 @@ const KeyboardShortcut = styled.span`
     font-size: 12px;
     font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
     line-height: 1;
-    color: ${globalStyles.colors.text};
-    background-color: ${globalStyles.colors.secondary};
-    border: 1px solid ${globalStyles.colors.border};
+    color: ${themeVars.colors.text};
+    background-color: ${themeVars.colors.secondary};
+    border: 1px solid ${themeVars.colors.border};
     border-radius: 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 1px ${withThemeAlpha(themeVars.colors.text, 0.2)};
     margin: 0 2px;
   }
 `;
@@ -161,15 +161,15 @@ const KeyboardShortcut = styled.span`
 const WeatherTitle = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.xs};
+  gap: ${themeVars.spacing.xs};
 
   .weather-tip {
-    color: ${globalStyles.colors.lightText};
+    color: ${themeVars.colors.lightText};
     cursor: help;
     font-size: 14px;
 
     &:hover {
-      color: ${globalStyles.colors.primary};
+      color: ${themeVars.colors.primary};
     }
   }
 `;
@@ -238,7 +238,7 @@ const FloatSidebar: React.FC = () => {
   const renderWeatherContent = () => {
     if (weatherLoading) {
       return (
-        <div style={{ textAlign: 'center', padding: globalStyles.spacing.md }}>
+        <div style={{ textAlign: 'center', padding: themeVars.spacing.md }}>
           <Spin size="small" />
         </div>
       );
@@ -301,7 +301,7 @@ const FloatSidebar: React.FC = () => {
                     margin: '0 auto',
                   }}
                 />
-                <Title level={4} style={{ marginTop: globalStyles.spacing.sm, marginBottom: 0 }}>
+                <Title level={4} style={{ marginTop: themeVars.spacing.sm, marginBottom: 0 }}>
                   {sidebarData.profile.name}
                 </Title>
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 import { CheckCircleOutlined, InfoCircleOutlined, WarningOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 export type ToastType = 'success' | 'info' | 'warning' | 'error';
@@ -28,16 +28,16 @@ const ToastContainer = styled(motion.div)<{ $backgroundColor?: string; $textColo
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 ${globalStyles.spacing.xl};
+  padding: 0 ${themeVars.spacing.xl};
   z-index: 1001;
-  box-shadow: ${globalStyles.shadows.medium};
+  box-shadow: ${themeVars.shadows.medium};
   overflow: hidden;
 `;
 
 const ToastContent = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   font-size: 16px;
   font-weight: 500;
 `;
