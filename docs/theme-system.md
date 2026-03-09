@@ -48,12 +48,12 @@ The styling system is centralized under `src/theme/` and now uses a single sourc
 - Avoid direct `#hex/rgb/rgba/hsl` in UI code.
 
 ## Compatibility Layer
-`/Users/zouquan/Projects/WebstormProjects/blog-fe-p/src/styles/theme.ts`
+`src/styles/theme.ts`
 - keeps deprecated exports for rollback safety
 - `globalStyles` is still exported but no longer consumed by active modules
 
 ## Ant Design Integration
-`/Users/zouquan/Projects/WebstormProjects/blog-fe-p/src/App.tsx`
+`src/App.tsx`
 - `ThemeProvider` wraps app root
 - `ConfigProvider` consumes `useTheme().antdTheme`
 - custom components and AntD components now share one config source
