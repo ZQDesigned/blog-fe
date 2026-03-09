@@ -1,173 +1,173 @@
-# 个人博客前端项目
+# LumiCMS Blog Frontend
 
-基于 React + TypeScript + Vite 开发的个人博客前端项目。
+一个基于 React + TypeScript + Vite 的个人博客前端项目。  
+项目覆盖内容展示、互动组件、可视化样式系统和多款内置小游戏，适合用于个人站点、作品集和前端工程实践。
+
+## 项目定位
+
+- 面向个人博客与作品展示的前端应用
+- 支持动态内容页面与统一 UI 体验
+- 内置可扩展主题系统，支持后续暗色模式接入
+- 同时包含娱乐模块（小游戏）与工程化质量门禁（视觉回归、样式规则检查）
+
+## 功能模块
+
+### 站点页面
+
+- 首页：Banner、功能区、技能区、时间线、联系方式
+- 博客列表：分类/标签筛选、关键词检索、分页
+- 博客详情：Markdown 渲染、目录与内容展示
+- 项目页：项目卡片、技术栈、状态与外链
+- 关于页：个人信息、技能、经历、扩展模块
+- 游戏页：统一游戏入口与弹窗容器
+
+### 通用交互能力
+
+- 响应式布局（桌面 + 移动）
+- 自定义右键菜单
+- 浮动侧边栏（个人信息、公告、天气等）
+- 全局 Toast 通知
+- 自定义光标动画
+- 全局异常兜底与请求错误兜底
+
+### 游戏模块亮点
+
+- 2048
+- 贪吃蛇
+- 俄罗斯方块
+- 扫雷
+- 数独
+- 汉诺塔
+- 黑白棋（Reversi）
+- 围棋（9x9 / 19x19）
+- 恶魔轮盘
+- Web 游戏入口（Minecraft 1.8）
 
 ## 技术栈
 
 - React 18
 - TypeScript
 - Vite
+- React Router
 - Ant Design
-- Emotion (CSS-in-JS)
+- Emotion（CSS-in-JS）
 - Framer Motion
+- Playwright（视觉回归）
+- ESLint（静态检查）
 
-## 功能特性
+## 开发指导文档
 
-- 📱 响应式布局，完美适配移动端
-- ✨ 自定义光标动画
-- 🎮 游戏彩蛋（2048小游戏）
-- 🎨 自定义加载动画
-- 📝 Markdown 文章渲染
-- 🖱️ 自定义右键菜单
-- 🕒 构建时间显示
-- 🔗 友情链接支持
-- 🌓 页面主题定制
+### 1. 开发环境要求
 
-## 开始使用
+- Node.js 18+（建议 LTS）
+- Bun 1.1+
+- 推荐使用现代浏览器（Chrome / Edge / Safari 最新版）
 
-1. 克隆项目
+### 2. 本地启动
+
 ```bash
-git clone git@github.com:ZQDesigned/blog-fe.git
-cd blog-fe
-```
+# 1) 安装依赖
+bun install
 
-2. 安装依赖
-```bash
-npm install
-```
-
-3. 创建环境变量文件
-```bash
+# 2) 创建环境变量
 cp .env.example .env
+
+# 3) 启动开发服务器
+bun run dev
 ```
 
-4. 配置环境变量
-```env
-# ICP备案信息
-VITE_ICP_NUMBER=你的ICP备案号
-VITE_ICP_LINK=备案链接
+默认启动后可通过本地地址访问（Vite 控制台会输出具体 URL）。
 
-# API接口地址
-VITE_API_BASE_URL=你的API地址
+### 3. 环境变量配置
 
-# 其他配置
-VITE_APP_TITLE=网站标题
-```
+项目使用 `.env` 管理环境变量，常用配置如下：
 
-5. 启动开发服务器
+| 变量名 | 说明 |
+| --- | --- |
+| `VITE_APP_TITLE` | 站点标题 |
+| `VITE_ICP_NUMBER` | ICP 备案号 |
+| `VITE_ICP_LINK` | ICP 备案跳转地址 |
+| `VITE_API_BASE_URL` | 后端 API 基础地址 |
+| `VITE_BUILD_TIME` | 构建时间（构建脚本自动写入） |
+| `VITE_GIT_HASH` | 构建 Git Hash（构建脚本自动写入） |
+| `VITE_QWEATHER_API_KEY` | 和风天气 API Key |
+| `VITE_API_HEALTH_PATH` | 健康检查路径列表（逗号分隔） |
+
+### 4. 常用命令
+
 ```bash
-npm run dev
+# 启动开发环境
+bun run dev
+
+# 构建生产包
+bun run build
+
+# 本地预览构建产物
+bun run preview
+
+# 代码检查
+bun run lint
+
+# 样式 token 字面量检查
+bun run lint:style-tokens
+
+# 更新样式检查基线
+bun run lint:style-tokens:update-baseline
+
+# 运行视觉回归
+bun run test:visual
+
+# 更新视觉快照
+bun run test:visual:update
 ```
 
-## 构建部署
+首次执行视觉测试前建议安装浏览器依赖：
 
 ```bash
-npm run build
+bunx playwright install chromium
 ```
 
-构建产物将生成在 `dist` 目录下。
+### 5. 代码结构建议阅读顺序
 
-## 部署建议
-
-在生产环境中，建议使用 **Apache 服务器** 部署，以确保前端路由正常工作。  
-
-### **为什么不推荐使用 Nginx？**
-Nginx 默认不会自动重定向前端路由，例如访问 `https://example.com/about` 可能会导致 **404 错误**，除非手动修改 Nginx 配置。
-
-### **推荐使用 Apache**
-如果你使用 **Apache** 作为前端静态服务器，请确保服务器支持 `.htaccess` 规则。  
-本项目已包含 **`.htaccess` 文件**，部署时无需额外修改，即可自动处理 SPA 路由。
-
-> 📌 **如何确保 `.htaccess` 生效？**
-> 1. 确保 Apache 已启用 `mod_rewrite` 模块
-> 2. 服务器允许 `.htaccess`（在 Apache 配置中 `AllowOverride All`）
-> 3. 直接将 `dist/` 目录部署至 Apache，默认即可正常工作
-
-### **其他服务器**
-如果你无法使用 Apache，可以尝试以下方案：
-- **Nginx**：需要手动修改 `nginx.conf`，使用 `try_files` 规则处理 SPA 路由
-- **HashRouter**：修改前端代码，将 `BrowserRouter` 替换为 `HashRouter`（但 URL 会变为 `/#/about`，影响 SEO）
-- **Vercel / Netlify**：使用支持 SPA 重写规则的托管服务
-
-🚀 **推荐使用 Apache，开箱即用，无需额外配置！**
-
-
-## 项目结构
-
-```
+```text
 src/
-  ├── components/        # 公共组件
-  │   ├── AnimatedCursor/   # 自定义光标动画
-  │   ├── ContextMenu/      # 自定义右键菜单
-  │   ├── GameModal/        # 游戏彩蛋模态框
-  │   ├── Game2048/         # 2048游戏组件
-  │   ├── Layout/           # 布局组件
-  │   ├── MarkdownRenderer/ # Markdown渲染器
-  │   └── PageLoading/      # 页面加载动画
-  ├── pages/           # 页面组件
-  │   ├── Home/           # 首页
-  │   ├── Blog/           # 博客列表
-  │   ├── BlogDetail/     # 博客详情
-  │   ├── Projects/       # 项目展示
-  │   └── About/          # 关于页面
-  ├── hooks/           # 自定义Hooks
-  ├── styles/          # 全局样式
-  ├── constants/       # 常量定义
-  ├── types/           # TypeScript类型定义
-  └── utils/           # 工具函数
+  components/     # 通用组件与游戏组件
+  pages/          # 页面级模块
+  services/       # API 访问层
+  hooks/          # 自定义 Hooks
+  theme/          # 主题配置中心与运行时
+  styles/         # 全局样式入口
+  utils/          # 工具函数
 ```
 
-## 开发规范
+### 6. 样式开发建议
 
-- 使用 ESLint 进行代码规范检查
-- 使用 TypeScript 进行类型检查
-- 遵循组件化开发原则
-- 使用 CSS-in-JS (Emotion) 进行样式管理
-- 使用 Framer Motion 处理动画效果
+- 优先使用 `src/theme` 提供的主题变量和语义 token
+- 避免在业务组件中直接写硬编码颜色
+- 变更样式后建议同时执行视觉回归与样式 token 检查
 
-## 环境变量说明
+### 7. 提交规范建议
 
-项目使用 `.env` 文件管理环境变量，支持以下配置：
+- 建议使用 Conventional Commits，例如：
+  - `feat: add xxx`
+  - `fix: resolve xxx`
+  - `refactor: improve xxx`
+  - `docs: update readme`
 
-| 变量名 | 说明 | 示例值 |
-|--------|------|--------|
-| VITE_APP_TITLE | 网站标题 | 个人博客 |
-| VITE_ICP_NUMBER | ICP备案号 | 辽ICP备XXXXXXXX号-1 |
-| VITE_ICP_LINK | 备案链接 | https://beian.miit.gov.cn/ |
-| VITE_API_BASE_URL | API接口地址 | http://localhost:8080 |
-| VITE_BUILD_TIME | 构建时间戳 | 自动生成 |
+## 文档导航
 
-## 特色功能说明
+- API 说明：`docs/api.md`
+- 主题系统：`docs/theme-system.md`
+- 主题迁移地图：`docs/theme-migration-map.md`
+- 暗色模式接入手册：`docs/dark-mode-playbook.md`
+- 视觉基线说明：`docs/theme-refactor-baseline.md`
 
-### 自定义右键菜单
-- 支持快捷导航
-- 页面操作（刷新、返回顶部）
-- 分享功能
-- 链接复制
+## 部署说明
 
-### 游戏彩蛋
-- 支持键盘和触摸操作
-- 自动保存游戏状态
-- 响应式设计
+- 生产构建输出目录：`dist/`
+- 可部署到任意静态托管平台（Nginx / Apache / CDN / Vercel / Netlify）
+- 使用前端路由时，请确保服务器配置了 SPA 回退（将未知路径回退到 `index.html`）
 
-### 构建时间显示
-- 自动记录每次构建时间
-- 优雅降级处理
-- 移动端自适应
+## License
 
-## 贡献指南
-
-1. Fork 本仓库
-2. 创建你的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的改动 (`git commit -m 'feat: 添加某个特性'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建一个 Pull Request
-
-## 许可证
-
-[MIT License](LICENSE)
-
-## 联系方式
-
-- GitHub：[ZQDesigned](https://github.com/ZQDesigned)
-- Email：zqdesigned@mail.lnyynet.com
+MIT
