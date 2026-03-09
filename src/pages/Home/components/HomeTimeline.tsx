@@ -3,49 +3,49 @@ import { Typography, Timeline } from 'antd';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { HomeTimeline as HomeTimelineType } from '../../../types/types';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import * as Icons from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
 const SectionContainer = styled.div`
-  padding: ${globalStyles.spacing.xl} 0;
-  background: #fff;
+  padding: ${themeVars.spacing.xl} 0;
+  background: ${themeVars.colors.background};
 `;
 
 const Content = styled.div`
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 ${globalStyles.spacing.lg};
+  padding: 0 ${themeVars.spacing.lg};
 `;
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: ${globalStyles.spacing.xl};
+  margin-bottom: ${themeVars.spacing.xl};
 `;
 
 const SectionTitle = styled(Title)`
-  margin-bottom: ${globalStyles.spacing.md} !important;
+  margin-bottom: ${themeVars.spacing.md} !important;
 `;
 
 const SectionDescription = styled(Paragraph)`
   font-size: 1.2em;
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   max-width: 600px;
   margin: 0 auto !important;
 `;
 
 const TimelineContainer = styled(motion.div)`
-  margin-top: ${globalStyles.spacing.xl};
+  margin-top: ${themeVars.spacing.xl};
 `;
 
 const TimelineTitle = styled(Title)`
-  margin-bottom: ${globalStyles.spacing.xs} !important;
+  margin-bottom: ${themeVars.spacing.xs} !important;
 `;
 
 const TimelineDate = styled(Paragraph)`
-  color: ${globalStyles.colors.lightText};
-  margin-bottom: ${globalStyles.spacing.sm} !important;
+  color: ${themeVars.colors.lightText};
+  margin-bottom: ${themeVars.spacing.sm} !important;
 `;
 
 interface HomeTimelineProps {
@@ -75,7 +75,7 @@ const HomeTimeline: React.FC<HomeTimelineProps> = ({ data }) => {
           <Timeline
             mode="alternate"
             items={data.timelineItems.map((item, index) => ({
-              color: item.color || globalStyles.colors.primary,
+              color: item.color || themeVars.colors.primary,
               dot: item.icon && getIcon(item.icon),
               children: (
                 <motion.div

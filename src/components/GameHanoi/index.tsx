@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal, Select } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   outline: none;
 `;
 
@@ -15,21 +15,21 @@ const GameControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
   flex-wrap: wrap;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
 `;
 
 const GameInfo = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 `;
 
@@ -37,18 +37,18 @@ const GameBoard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
 `;
 
 const TowersContainer = styled.div`
   display: flex;
   justify-content: space-around;
   width: 100%;
-  margin-top: ${globalStyles.spacing.lg};
-  gap: ${globalStyles.spacing.md};
+  margin-top: ${themeVars.spacing.lg};
+  gap: ${themeVars.spacing.md};
 
   @media (max-width: 500px) {
-    gap: ${globalStyles.spacing.xs};
+    gap: ${themeVars.spacing.xs};
   }
 `;
 
@@ -59,7 +59,7 @@ const Tower = styled.div<{ $disksCount: number }>`
   flex: 1;
   position: relative;
   cursor: pointer;
-  padding-top: ${globalStyles.spacing.lg};
+  padding-top: ${themeVars.spacing.lg};
   padding-bottom: 8px;
   
   &::before {
@@ -67,7 +67,7 @@ const Tower = styled.div<{ $disksCount: number }>`
     position: absolute;
     bottom: 8px;
     width: 8px;
-    background-color: #8c8c8c;
+    background-color: ${themeVars.games.hanoi.pole};
     border-radius: 4px;
     z-index: 1;
     height: calc(max(140px, ${props => (props.$disksCount * 20 + 40)}px));
@@ -79,7 +79,7 @@ const Tower = styled.div<{ $disksCount: number }>`
     bottom: 0;
     height: 8px;
     width: 80%;
-    background-color: #8c8c8c;
+    background-color: ${themeVars.games.hanoi.pole};
     border-radius: 4px;
     z-index: 3;
   }
@@ -115,15 +115,15 @@ interface HanoiState {
 }
 
 const DISK_COLORS = [
-  '#f5222d', // 红色
-  '#fa8c16', // 橙色
-  '#fadb14', // 黄色
-  '#52c41a', // 绿色
-  '#1890ff', // 蓝色
-  '#722ed1', // 紫色
-  '#eb2f96', // 粉色
-  '#fa541c', // 珊瑚色
-  '#13c2c2', // 青色
+  themeVars.games.hanoi.diskPalette[0],
+  themeVars.games.hanoi.diskPalette[1],
+  themeVars.games.hanoi.diskPalette[2],
+  themeVars.games.hanoi.diskPalette[3],
+  themeVars.games.hanoi.diskPalette[4],
+  themeVars.games.hanoi.diskPalette[5],
+  themeVars.games.hanoi.diskPalette[6],
+  themeVars.games.hanoi.diskPalette[7],
+  themeVars.games.hanoi.diskPalette[8],
 ];
 
 const GameHanoi: React.FC = () => {
@@ -234,7 +234,7 @@ const GameHanoi: React.FC = () => {
           />
           <Button
             onClick={() => initGame(state.disksCount)}
-            style={{ marginLeft: globalStyles.spacing.sm }}
+            style={{ marginLeft: themeVars.spacing.sm }}
           >
             重新开始
           </Button>
@@ -249,7 +249,7 @@ const GameHanoi: React.FC = () => {
               onClick={() => handleTowerClick(index)}
               $disksCount={state.disksCount}
               style={{
-                border: state.selectedTower === index ? `2px solid ${globalStyles.colors.primary}` : 'none',
+                border: state.selectedTower === index ? `2px solid ${themeVars.colors.primary}` : 'none',
                 borderRadius: '8px',
               }}
             >
@@ -278,7 +278,7 @@ const GameHanoi: React.FC = () => {
         <p>移动次数: {state.moves}</p>
         <p>最少步数: {Math.pow(2, state.disksCount) - 1}</p>
         {state.moves === Math.pow(2, state.disksCount) - 1 && (
-          <p style={{ color: globalStyles.colors.primary, fontWeight: 'bold' }}>
+          <p style={{ color: themeVars.colors.primary, fontWeight: 'bold' }}>
             太棒了！你用最少的步数完成了挑战！
           </p>
         )}

@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Tag } from 'antd';
 import styled from '@emotion/styled';
 import { AboutSkills } from '../../../types/types';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import AboutSection from './AboutSection';
 
 const SkillTag = styled(Tag)`
@@ -14,7 +14,7 @@ const SkillTag = styled(Tag)`
 const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-top: ${globalStyles.spacing.xs};
+  margin-top: ${themeVars.spacing.xs};
 `;
 
 interface SkillsSectionProps {
@@ -28,11 +28,11 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({ data, delay = 0 }) => {
   return (
     <AboutSection title={data.title} delay={delay}>
       {skills.categories.map((category, index) => (
-        <div key={index} style={{ marginBottom: globalStyles.spacing.md }}>
+        <div key={index} style={{ marginBottom: themeVars.spacing.md }}>
           <Typography.Title level={4}>{category.name}</Typography.Title>
           <TagsContainer>
             {category.items.map((skill, skillIndex) => (
-              <SkillTag key={skillIndex} color={globalStyles.colors.primary}>
+              <SkillTag key={skillIndex} color={themeVars.colors.primary}>
                 {skill}
               </SkillTag>
             ))}

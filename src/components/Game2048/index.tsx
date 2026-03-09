@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   outline: none;
   touch-action: none;
 `;
@@ -15,10 +15,10 @@ const GameContainer = styled.div`
 const GameGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: ${globalStyles.spacing.xs};
-  background: #bbada0;
+  gap: ${themeVars.spacing.xs};
+  background: ${themeVars.games.game2048.boardBackground};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
 `;
 
 const Cell = styled.div<{ value: number }>`
@@ -30,31 +30,31 @@ const Cell = styled.div<{ value: number }>`
   font-weight: bold;
   background-color: ${props => {
     const colors: { [key: number]: string } = {
-      0: '#ccc0b3',
-      2: '#eee4da',
-      4: '#ede0c8',
-      8: '#f2b179',
-      16: '#f59563',
-      32: '#f67c5f',
-      64: '#f65e3b',
-      128: '#edcf72',
-      256: '#edcc61',
-      512: '#edc850',
-      1024: '#edc53f',
-      2048: '#edc22e'
+      0: themeVars.games.game2048.tiles['0'],
+      2: themeVars.games.game2048.tiles['2'],
+      4: themeVars.games.game2048.tiles['4'],
+      8: themeVars.games.game2048.tiles['8'],
+      16: themeVars.games.game2048.tiles['16'],
+      32: themeVars.games.game2048.tiles['32'],
+      64: themeVars.games.game2048.tiles['64'],
+      128: themeVars.games.game2048.tiles['128'],
+      256: themeVars.games.game2048.tiles['256'],
+      512: themeVars.games.game2048.tiles['512'],
+      1024: themeVars.games.game2048.tiles['1024'],
+      2048: themeVars.games.game2048.tiles['2048'],
     };
-    return colors[props.value] || '#cdc1b4';
+    return colors[props.value] || themeVars.games.game2048.emptyCell;
   }};
-  color: ${props => props.value <= 4 ? '#776e65' : '#f9f6f2'};
+  color: ${props => props.value <= 4 ? themeVars.games.game2048.textDark : themeVars.games.game2048.textLight};
   border-radius: 4px;
   transition: all 0.15s ease;
 `;
 
 const Score = styled.div`
-  background: #bbada0;
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.games.game2048.boardBackground};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: white;
+  color: ${themeVars.colors.onPrimary};
   font-weight: bold;
 `;
 
@@ -62,7 +62,7 @@ const GameControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const Game2048: React.FC = () => {

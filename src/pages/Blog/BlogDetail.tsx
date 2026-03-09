@@ -4,7 +4,7 @@ import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } fro
 import styled from '@emotion/styled';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
 import { blogApi } from '../../services/api';
@@ -19,7 +19,7 @@ const Container = styled.div`
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
 
   @media (max-width: 768px) {
     padding: 0;
@@ -27,47 +27,50 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.9);
-  padding: ${globalStyles.spacing.xl};
+  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
+  padding: ${themeVars.spacing.xl};
   border-radius: 8px;
-  box-shadow: ${globalStyles.shadows.small};
+  box-shadow: ${themeVars.shadows.small};
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
   @media (max-width: 768px) {
     border-radius: 0;
-    padding: ${globalStyles.spacing.lg};
+    padding: ${themeVars.spacing.lg};
   }
 `;
 
 const BlogTag = styled(Tag)`
-  margin: ${globalStyles.spacing.xs};
+  margin: ${themeVars.spacing.xs};
+  color: ${themeVars.colors.primary};
+  border-color: ${withThemeAlpha(themeVars.colors.primary, 0.35)};
+  background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
 `;
 
 const BackButton = styled(Button)`
-  margin-bottom: ${globalStyles.spacing.lg};
+  margin-bottom: ${themeVars.spacing.lg};
 
   @media (max-width: 768px) {
-    margin: ${globalStyles.spacing.lg};
+    margin: ${themeVars.spacing.lg};
   }
 `;
 
 const BlogMeta = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.sm};
-  color: ${globalStyles.colors.lightText};
-  margin: ${globalStyles.spacing.md} 0;
+  gap: ${themeVars.spacing.sm};
+  color: ${themeVars.colors.lightText};
+  margin: ${themeVars.spacing.md} 0;
   flex-wrap: wrap;
 `;
 
 const MetaDivider = styled.span`
-  margin: 0 ${globalStyles.spacing.xs};
-  color: ${globalStyles.colors.border};
+  margin: 0 ${themeVars.spacing.xs};
+  color: ${themeVars.colors.border};
 `;
 
 const StyledMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${globalStyles.spacing.lg};
+  margin-top: ${themeVars.spacing.lg};
 `;
 
 const BlogDetail: React.FC = () => {
@@ -202,7 +205,7 @@ const BlogDetail: React.FC = () => {
 
         <Space wrap>
           {blog.tagNames.map((tag) => (
-            <BlogTag key={tag} color="blue">{tag}</BlogTag>
+            <BlogTag key={tag}>{tag}</BlogTag>
           ))}
         </Space>
 

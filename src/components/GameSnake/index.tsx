@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Modal } from 'antd';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 const GameContainer = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   outline: none;
   touch-action: none;
 `;
@@ -16,9 +16,9 @@ const GameBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(20, 1fr);
   gap: 1px;
-  background: ${globalStyles.colors.border};
+  background: ${themeVars.colors.border};
   border-radius: 8px;
-  padding: ${globalStyles.spacing.xs};
+  padding: ${themeVars.spacing.xs};
   aspect-ratio: 1;
 `;
 
@@ -28,21 +28,21 @@ const Cell = styled.div<{ $type: 'empty' | 'snake' | 'food' }>`
   background-color: ${props => {
     switch (props.$type) {
       case 'snake':
-        return globalStyles.colors.primary;
+        return themeVars.games.snake.snake;
       case 'food':
-        return '#F44336';
+        return themeVars.games.snake.food;
       default:
-        return globalStyles.colors.secondary;
+        return themeVars.games.snake.empty;
     }
   }};
   transition: background-color 0.1s ease;
 `;
 
 const Score = styled.div`
-  background: ${globalStyles.colors.border};
-  padding: ${globalStyles.spacing.sm} ${globalStyles.spacing.md};
+  background: ${themeVars.colors.border};
+  padding: ${themeVars.spacing.sm} ${themeVars.spacing.md};
   border-radius: 4px;
-  color: ${globalStyles.colors.text};
+  color: ${themeVars.colors.text};
   font-weight: bold;
 `;
 
@@ -50,14 +50,14 @@ const GameControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const TouchControls = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${globalStyles.spacing.sm};
-  margin-top: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.sm};
+  margin-top: ${themeVars.spacing.lg};
   max-width: 200px;
   margin-left: auto;
   margin-right: auto;

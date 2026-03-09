@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Card, Typography } from 'antd';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 
 const { Title } = Typography;
 
@@ -13,9 +13,9 @@ interface AboutSectionProps {
 }
 
 const StyledCard = styled(motion(Card))`
-  margin-bottom: ${globalStyles.spacing.lg};
+  margin-bottom: ${themeVars.spacing.lg};
   border-radius: 8px;
-  box-shadow: ${globalStyles.shadows.small};
+  box-shadow: ${themeVars.shadows.small};
 `;
 
 const cardVariants = {

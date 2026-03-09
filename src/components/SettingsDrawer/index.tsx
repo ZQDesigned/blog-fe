@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer, Typography, Space, Spin } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { BackgroundType } from '../../hooks/useBackgroundSettings';
 import LazyImage from '../LazyImage';
 
@@ -10,8 +10,8 @@ const { Title } = Typography;
 
 const PreviewContainer = styled.div`
   display: flex;
-  gap: ${globalStyles.spacing.md};
-  margin-top: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
+  margin-top: ${themeVars.spacing.md};
   flex-direction: column;
 `;
 
@@ -22,13 +22,13 @@ const PreviewCard = styled.div<{ $selected?: boolean }>`
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  border: 2px solid ${props => props.$selected ? globalStyles.colors.primary : 'transparent'};
+  border: 2px solid ${props => props.$selected ? themeVars.colors.primary : 'transparent'};
   transition: all 0.3s ease;
-  box-shadow: ${globalStyles.shadows.small};
+  box-shadow: ${themeVars.shadows.small};
 
   &:hover {
     transform: scale(1.02);
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 
   @media (max-width: 768px) {
@@ -37,11 +37,11 @@ const PreviewCard = styled.div<{ $selected?: boolean }>`
 `;
 
 const DefaultPreview = styled(PreviewCard)`
-  background: ${globalStyles.colors.secondary};
+  background: ${themeVars.colors.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   font-size: 16px;
 `;
 
@@ -53,7 +53,7 @@ const RefreshButton = styled.div`
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -65,7 +65,7 @@ const RefreshButton = styled.div`
   transition: all 0.3s ease;
 
   &:hover {
-    background: white;
+    background: ${themeVars.colors.background};
     transform: rotate(180deg);
   }
 `;
@@ -128,7 +128,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  background: globalStyles.colors.secondary 
+                  background: themeVars.colors.secondary 
                 }}>
                   <Spin />
                 </div>

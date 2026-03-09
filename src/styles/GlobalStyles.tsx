@@ -1,19 +1,30 @@
 import { Global, css } from '@emotion/react';
-import { globalStyles } from './theme';
 import { useStandaloneMode } from '../hooks/useStandaloneMode';
 
 const GlobalStyles = () => {
   const isStandalone = useStandaloneMode();
 
   const globalCss = css`
+    :root {
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      touch-action: manipulation;
       user-select: ${isStandalone ? 'auto' : 'none'};
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       min-height: 100vh;
       margin: 0;
@@ -21,15 +32,17 @@ const GlobalStyles = () => {
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: ${globalStyles.colors.text};
-      background-color: ${isStandalone ? '#ffffff' : globalStyles.colors.secondary};
-      line-height: 1.5;
+      font-family: var(--theme-font-family-base);
+      font-size: var(--theme-font-size-base);
+      line-height: var(--theme-line-height-base);
+      color: var(--theme-color-text-primary);
+      background-color: ${isStandalone
+        ? 'var(--theme-color-surface-base)'
+        : 'var(--theme-color-surface-app)'};
       overflow-x: hidden;
-      transition: all 0.3s;
+      transition: background-color var(--theme-motion-normal), color var(--theme-motion-normal);
     }
 
-    /* 自定义滚动条样式 */
     @media (max-width: 768px) {
       ::-webkit-scrollbar {
         width: 10px;
@@ -37,43 +50,40 @@ const GlobalStyles = () => {
       }
 
       ::-webkit-scrollbar-track {
-        background: ${globalStyles.colors.secondary};
-        border-radius: 4px;
+        background: var(--theme-color-scrollbar-track);
+        border-radius: var(--theme-radius-sm);
       }
 
       ::-webkit-scrollbar-thumb {
         background: linear-gradient(
           45deg,
-          ${globalStyles.colors.primary}40,
-          ${globalStyles.colors.primary}80
+          var(--theme-color-scrollbar-thumb-start),
+          var(--theme-color-scrollbar-thumb-end)
         );
-        border-radius: 4px;
-        border: 2px solid ${globalStyles.colors.secondary};
-        transition: all 0.3s ease;
+        border-radius: var(--theme-radius-sm);
+        border: 2px solid var(--theme-color-scrollbar-track);
+        transition: background var(--theme-motion-normal);
 
         &:hover {
           background: linear-gradient(
             45deg,
-            ${globalStyles.colors.primary}60,
-            ${globalStyles.colors.primary}
+            var(--theme-color-brand-primary),
+            var(--theme-color-brand-primary-hover)
           );
         }
       }
     }
 
-    /* PC 端滚动条样式 */
     @media (min-width: 769px) {
       ::-webkit-scrollbar {
         width: 0;
         height: 0;
       }
 
-      /* Firefox */
       * {
         scrollbar-width: none;
       }
 
-      /* IE */
       -ms-overflow-style: none;
     }
 
@@ -85,12 +95,12 @@ const GlobalStyles = () => {
     }
 
     a {
-      color: ${globalStyles.colors.primary};
+      color: var(--theme-color-brand-primary);
       text-decoration: none;
-      transition: color ${globalStyles.transitions.fast};
+      transition: color var(--theme-motion-fast);
 
       &:hover {
-        color: ${globalStyles.colors.primary}dd;
+        color: var(--theme-color-brand-primary-hover);
       }
     }
 
@@ -102,8 +112,9 @@ const GlobalStyles = () => {
     .page-transition-enter-active {
       opacity: 1;
       transform: translateY(0);
-      transition: ${isStandalone ? 'none' : `opacity ${globalStyles.transitions.default},
-                  transform ${globalStyles.transitions.default}`};
+      transition: ${isStandalone
+        ? 'none'
+        : 'opacity var(--theme-motion-normal), transform var(--theme-motion-normal)'};
     }
 
     .page-transition-exit {
@@ -114,41 +125,44 @@ const GlobalStyles = () => {
     .page-transition-exit-active {
       opacity: ${isStandalone ? 1 : 0};
       transform: ${isStandalone ? 'none' : 'translateY(-20px)'};
-      transition: ${isStandalone ? 'none' : `opacity ${globalStyles.transitions.default},
-                  transform ${globalStyles.transitions.default}`};
+      transition: ${isStandalone
+        ? 'none'
+        : 'opacity var(--theme-motion-normal), transform var(--theme-motion-normal)'};
     }
 
-    pre, code {
-      background-color: ${globalStyles.colors.secondary};
+    pre,
+    code {
+      background-color: var(--theme-color-surface-subtle);
     }
 
     blockquote {
-      background-color: ${globalStyles.colors.secondary};
-      border-left-color: ${globalStyles.colors.border};
+      background-color: var(--theme-color-surface-subtle);
+      border-left-color: var(--theme-color-border-default);
     }
 
     table {
-      th, td {
-        border-color: ${globalStyles.colors.border};
+      th,
+      td {
+        border-color: var(--theme-color-border-default);
       }
 
       th {
-        background-color: ${globalStyles.colors.secondary};
+        background-color: var(--theme-color-surface-subtle);
       }
     }
 
     .ant-modal {
       .ant-modal-content {
-        border-radius: 16px;
+        border-radius: var(--theme-radius-lg);
         overflow: hidden;
       }
 
       .ant-modal-header {
-        border-radius: 16px 16px 0 0;
+        border-radius: var(--theme-radius-lg) var(--theme-radius-lg) 0 0;
       }
 
       .ant-modal-footer {
-        border-radius: 0 0 16px 16px;
+        border-radius: 0 0 var(--theme-radius-lg) var(--theme-radius-lg);
       }
     }
 
@@ -158,6 +172,6 @@ const GlobalStyles = () => {
   `;
 
   return <Global styles={globalCss} />;
-}
+};
 
-export { GlobalStyles }; 
+export { GlobalStyles };

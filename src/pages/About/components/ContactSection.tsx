@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Space, Modal, Typography } from 'antd';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import * as Icons from '@ant-design/icons';
 
 const { Link } = Typography;
@@ -16,25 +16,25 @@ export interface ContactItemProps {
 }
 
 const ContactCard = styled(Card)`
-  margin-top: ${globalStyles.spacing.xl};
-  box-shadow: ${globalStyles.shadows.small};
+  margin-top: ${themeVars.spacing.xl};
+  box-shadow: ${themeVars.shadows.small};
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 `;
 
 const ContactItem = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.md};
-  padding: ${globalStyles.spacing.md} 0;
+  gap: ${themeVars.spacing.md};
+  padding: ${themeVars.spacing.md} 0;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
   }
 
   .anticon {

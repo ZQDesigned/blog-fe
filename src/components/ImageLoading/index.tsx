@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars } from '../../theme';
 
 interface ImageLoadingProps {
   size?: number;
@@ -17,7 +17,7 @@ const LoadingContainer = styled.div<{ $size: number }>`
   justify-content: center;
   overflow: hidden;
   border-radius: 50%;
-  background-color: ${globalStyles.colors.secondary};
+  background-color: ${themeVars.colors.secondary};
 `;
 
 const LoadingRing = styled(motion.div)<{ $size: number; $color: string }>`
@@ -39,7 +39,7 @@ const LoadingDot = styled(motion.div)<{ $size: number; $color: string }>`
 
 const ImageLoading: React.FC<ImageLoadingProps> = ({
   size = 40,
-  color = globalStyles.colors.primary,
+  color = themeVars.colors.primary,
 }) => {
   return (
     <LoadingContainer $size={size}>

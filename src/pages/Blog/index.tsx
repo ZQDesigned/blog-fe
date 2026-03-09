@@ -4,7 +4,7 @@ import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, Fol
 import styled from '@emotion/styled';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { useTitle } from '../../hooks/useTitle';
 import { blogApi, CategoryData, TagData } from '../../services/api';
 import { BlogData } from '../../types/types';
@@ -20,7 +20,7 @@ const Container = styled.div`
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -44,12 +44,12 @@ const ViewControls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${globalStyles.spacing.lg};
+  margin-bottom: ${themeVars.spacing.lg};
   position: relative;
   z-index: 0;
 
   @media (max-width: 768px) {
-    padding: ${globalStyles.spacing.lg};
+    padding: ${themeVars.spacing.lg};
     margin-bottom: 0;
     .view-mode-controls {
       display: none;
@@ -60,7 +60,7 @@ const ViewControls = styled.div`
 const BlogGrid = styled.div<{ isGrid: boolean }>`
   display: grid;
   grid-template-columns: ${props => props.isGrid ? 'repeat(auto-fill, minmax(300px, 1fr))' : '1fr'};
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
 
   @media (max-width: 768px) {
     gap: 0;
@@ -75,12 +75,12 @@ const BlogGrid = styled.div<{ isGrid: boolean }>`
 
 const StyledCard = styled(motion(Card))`
   cursor: pointer;
-  transition: all ${globalStyles.transitions.default};
-  box-shadow: ${globalStyles.shadows.small};
+  transition: all ${themeVars.transitions.default};
+  box-shadow: ${themeVars.shadows.small};
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 
   @media (max-width: 768px) {
@@ -94,26 +94,35 @@ const StyledCard = styled(motion(Card))`
   }
 `;
 
-const BlogTag = styled(Tag)`
-  margin: ${globalStyles.spacing.xs};
+const BlogTag = styled(Tag)<{ $active?: boolean }>`
+  margin: ${themeVars.spacing.xs};
   cursor: pointer;
   transition: all 0.3s ease;
+  color: ${({ $active }) => ($active ? themeVars.colors.primary : themeVars.colors.lightText)};
+  border-color: ${({ $active }) =>
+    $active
+      ? withThemeAlpha(themeVars.colors.primary, 0.35)
+      : withThemeAlpha(themeVars.colors.borderStrong, 0.35)};
+  background: ${({ $active }) =>
+    $active
+      ? withThemeAlpha(themeVars.colors.primary, 0.1)
+      : withThemeAlpha(themeVars.colors.border, 0.18)};
 `;
 
 const TagsContainer = styled.div`
-  margin: ${globalStyles.spacing.md} 0;
+  margin: ${themeVars.spacing.md} 0;
 `;
 
 const ReadMoreButton = styled(Button)`
-  margin-top: ${globalStyles.spacing.md};
+  margin-top: ${themeVars.spacing.md};
   padding: 0;
   height: auto;
   line-height: 1;
-  color: ${globalStyles.colors.primary};
+  color: ${themeVars.colors.primary};
   display: block;
   
   &:hover {
-    color: ${globalStyles.colors.primary}dd;
+    color: ${withThemeAlpha(themeVars.colors.primary, 0.8667)};
   }
 `;
 
@@ -124,7 +133,7 @@ const cardVariants = {
 };
 
 const PreviewMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${globalStyles.spacing.md};
+  margin-top: ${themeVars.spacing.md};
   max-height: 100px;
   overflow: hidden;
   position: relative;
@@ -136,12 +145,15 @@ const PreviewMarkdownRenderer = styled(MarkdownRenderer)`
     left: 0;
     right: 0;
     height: 40px;
-    background: linear-gradient(transparent, white);
+    background: linear-gradient(
+      ${withThemeAlpha(themeVars.colors.background, 0)},
+      ${themeVars.colors.background}
+    );
   }
 `;
 
 const ModalMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${globalStyles.spacing.md};
+  margin-top: ${themeVars.spacing.md};
   max-height: calc(60vh - 200px);
   overflow: hidden;
   position: relative;
@@ -153,7 +165,10 @@ const ModalMarkdownRenderer = styled(MarkdownRenderer)`
     left: 0;
     right: 0;
     height: 60px;
-    background: linear-gradient(transparent, white);
+    background: linear-gradient(
+      ${withThemeAlpha(themeVars.colors.background, 0)},
+      ${themeVars.colors.background}
+    );
     pointer-events: none;
   }
 `;
@@ -164,28 +179,28 @@ const ModalContent = styled.div`
 `;
 
 const ModalFooter = styled.div`
-  margin-top: ${globalStyles.spacing.md};
-  padding-top: ${globalStyles.spacing.md};
-  border-top: 1px solid ${globalStyles.colors.border};
+  margin-top: ${themeVars.spacing.md};
+  padding-top: ${themeVars.spacing.md};
+  border-top: 1px solid ${themeVars.colors.border};
 `;
 
 const FilterContainer = styled.div`
-  margin-bottom: ${globalStyles.spacing.lg};
+  margin-bottom: ${themeVars.spacing.lg};
   display: flex;
-  gap: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
   align-items: center;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    padding: 0 ${globalStyles.spacing.lg};
+    padding: 0 ${themeVars.spacing.lg};
   }
 `;
 
 const FilterLabel = styled.span`
-  color: ${globalStyles.colors.lightText};
+  color: ${themeVars.colors.lightText};
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.xs};
+  gap: ${themeVars.spacing.xs};
 `;
 
 const StyledSelect = styled(Select)`
@@ -195,9 +210,9 @@ const StyledSelect = styled(Select)`
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: ${globalStyles.spacing.xl};
-  padding: ${globalStyles.spacing.lg} 0;
-  background-color: #fff;
+  margin-top: ${themeVars.spacing.xl};
+  padding: ${themeVars.spacing.lg} 0;
+  background-color: ${themeVars.colors.background};
 
   @media (max-width: 768px) {
     margin-top: 0;
@@ -214,15 +229,15 @@ const LoadingContainer = styled.div`
 const BlogMeta = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.sm};
-  color: ${globalStyles.colors.lightText};
-  margin: ${globalStyles.spacing.sm} 0;
+  gap: ${themeVars.spacing.sm};
+  color: ${themeVars.colors.lightText};
+  margin: ${themeVars.spacing.sm} 0;
   flex-wrap: wrap;
 `;
 
 const MetaDivider = styled.span`
-  margin: 0 ${globalStyles.spacing.xs};
-  color: ${globalStyles.colors.border};
+  margin: 0 ${themeVars.spacing.xs};
+  color: ${themeVars.colors.border};
 `;
 
 const Blog: React.FC = () => {
@@ -439,7 +454,15 @@ const Blog: React.FC = () => {
                   >
                     <Title level={4}>{blog.title}</Title>
                     <BlogMeta>
-                      <Tag color="blue">{blog.categoryName}</Tag>
+                      <Tag
+                        style={{
+                          color: themeVars.colors.primary,
+                          borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
+                          background: withThemeAlpha(themeVars.colors.primary, 0.1),
+                        }}
+                      >
+                        {blog.categoryName}
+                      </Tag>
                       <Space>
                         <EyeOutlined /> {blog.viewCount} 次浏览
                       </Space>
@@ -454,7 +477,7 @@ const Blog: React.FC = () => {
                         {blog.tagNames.map((tag) => (
                           <BlogTag
                             key={tag}
-                            color={tags.some(t => t.name === tag) ? 'blue' : 'default'}
+                            $active={tags.some(t => t.name === tag)}
                             onClick={(e) => {
                               e.stopPropagation();
                               // @ts-ignore
@@ -499,10 +522,19 @@ const Blog: React.FC = () => {
         >
           {selectedBlog && (
             <ModalContent>
-              <Tag color="blue" style={{ marginBottom: globalStyles.spacing.sm }}>{selectedBlog.categoryName}</Tag>
+              <Tag
+                style={{
+                  marginBottom: themeVars.spacing.sm,
+                  color: themeVars.colors.primary,
+                  borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
+                  background: withThemeAlpha(themeVars.colors.primary, 0.1),
+                }}
+              >
+                {selectedBlog.categoryName}
+              </Tag>
               <Space>
                 {selectedBlog.tagNames.map((tag) => (
-                  <BlogTag key={tag} color="blue">{tag}</BlogTag>
+                  <BlogTag key={tag} $active>{tag}</BlogTag>
                 ))}
               </Space>
               <ModalMarkdownRenderer content={selectedBlog.content} />

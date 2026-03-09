@@ -5,7 +5,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import { Typography } from 'antd';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 const { Paragraph } = Typography;
 
@@ -18,8 +18,8 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   line-height: 1.8;
 
   h1, h2, h3, h4, h5, h6 {
-    margin-top: ${globalStyles.spacing.lg};
-    margin-bottom: ${globalStyles.spacing.md};
+    margin-top: ${themeVars.spacing.lg};
+    margin-bottom: ${themeVars.spacing.md};
     font-weight: 600;
   }
 
@@ -36,32 +36,32 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   }
 
   p {
-    margin-bottom: ${globalStyles.spacing.md};
+    margin-bottom: ${themeVars.spacing.md};
   }
 
   ul, ol {
-    margin-bottom: ${globalStyles.spacing.md};
-    padding-left: ${globalStyles.spacing.lg};
+    margin-bottom: ${themeVars.spacing.md};
+    padding-left: ${themeVars.spacing.lg};
   }
 
   li {
-    margin-bottom: ${globalStyles.spacing.xs};
+    margin-bottom: ${themeVars.spacing.xs};
   }
 
   code {
-    background-color: ${globalStyles.colors.secondary};
+    background-color: ${themeVars.colors.secondary};
     padding: 2px 4px;
     border-radius: 4px;
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
   }
 
   pre {
-    background-color: ${globalStyles.colors.secondary};
-    padding: ${globalStyles.spacing.md};
+    background-color: ${themeVars.colors.secondary};
+    padding: ${themeVars.spacing.md};
     border-radius: 8px;
     overflow-x: auto;
-    margin-bottom: ${globalStyles.spacing.md};
+    margin-bottom: ${themeVars.spacing.md};
 
     code {
       background-color: transparent;
@@ -70,12 +70,12 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   }
 
   blockquote {
-    margin: ${globalStyles.spacing.md} 0;
-    padding-left: ${globalStyles.spacing.md};
-    border-left: 4px solid ${globalStyles.colors.primary};
-    color: ${globalStyles.colors.lightText};
-    background-color: ${globalStyles.colors.secondary};
-    padding: ${globalStyles.spacing.md};
+    margin: ${themeVars.spacing.md} 0;
+    padding-left: ${themeVars.spacing.md};
+    border-left: 4px solid ${themeVars.colors.primary};
+    color: ${themeVars.colors.lightText};
+    background-color: ${themeVars.colors.secondary};
+    padding: ${themeVars.spacing.md};
     border-radius: 0 4px 4px 0;
   }
 
@@ -83,32 +83,32 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    margin: ${globalStyles.spacing.md} 0;
+    margin: ${themeVars.spacing.md} 0;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: ${globalStyles.spacing.md} 0;
-    background-color: #fff;
+    margin: ${themeVars.spacing.md} 0;
+    background-color: ${themeVars.colors.background};
 
     th, td {
-      border: 1px solid ${globalStyles.colors.border};
-      padding: ${globalStyles.spacing.sm};
+      border: 1px solid ${themeVars.colors.border};
+      padding: ${themeVars.spacing.sm};
     }
 
     th {
-      background-color: ${globalStyles.colors.secondary};
+      background-color: ${themeVars.colors.secondary};
     }
   }
 
   a {
-    color: ${globalStyles.colors.primary};
+    color: ${themeVars.colors.primary};
     text-decoration: none;
-    transition: color ${globalStyles.transitions.fast};
+    transition: color ${themeVars.transitions.fast};
 
     &:hover {
-      color: ${globalStyles.colors.primary}dd;
+      color: ${withThemeAlpha(themeVars.colors.primary, 0.8667)};
     }
   }
 `;

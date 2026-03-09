@@ -2,12 +2,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import { MainLayout } from './components/Layout/MainLayout';
 import { GlobalStyles } from './styles/GlobalStyles';
-import { customTheme } from './styles/theme';
 import { ROUTES } from './constants/routes';
 import React, { lazy, Suspense } from 'react';
 import AnimatedCursor from './components/AnimatedCursor';
 import PageLoading from './components/PageLoading';
 import { ToastProvider } from './components/Toast/ToastManager';
+import { ThemeProvider, useTheme } from './theme';
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/Home'));
@@ -17,9 +17,11 @@ const ProjectsPage = lazy(() => import('./pages/Projects'));
 const AboutPage = lazy(() => import('./pages/About'));
 const GamesPage = lazy(() => import('./pages/Games'));
 
-function App() {
+const AppShell: React.FC = () => {
+  const { antdTheme } = useTheme();
+
   return (
-    <ConfigProvider theme={customTheme}>
+    <ConfigProvider theme={antdTheme}>
       <AnimatedCursor />
       <ToastProvider>
         <BrowserRouter>
@@ -63,6 +65,14 @@ function App() {
         </BrowserRouter>
       </ToastProvider>
     </ConfigProvider>
+  );
+};
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppShell />
+    </ThemeProvider>
   );
 }
 

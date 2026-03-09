@@ -52,3 +52,5 @@ id_rsa*
 # Keep deployment scripts in git
 !deploy.sh
 !deploy.config.example.sh
+
+starry.html

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Result, Button } from 'antd';
 import { CONTACT_EMAIL, CONTACT_QQ } from '../../constants/contact';
+import { themeVars } from '../../theme';
 
 type GlobalErrorBoundaryProps = {
   children: React.ReactNode;
@@ -69,7 +70,7 @@ class GlobalErrorBoundary extends React.Component<
             flexDirection: 'column',
             width: '100vw',
             padding: 24,
-            backgroundColor: '#ffffff',
+            backgroundColor: themeVars.colors.background,
           }}
         >
           <Result
@@ -89,7 +90,7 @@ class GlobalErrorBoundary extends React.Component<
               style={{
                 marginTop: 16,
                 fontSize: 14,
-                color: '#595959',
+                color: themeVars.colors.lightText,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 4,
@@ -99,14 +100,14 @@ class GlobalErrorBoundary extends React.Component<
                 联系 QQ：
                 <a
                   href={`tencent://message/?uin=${contactQQ}&Site=&Menu=yes`}
-                  style={{ color: '#1677ff' }}
+                  style={{ color: themeVars.colors.primary }}
                 >
                   {contactQQ}
                 </a>
               </span>
               <span>
                 联系邮箱：
-                <a href={mailHref} style={{ color: '#1677ff' }}>
+                <a href={mailHref} style={{ color: themeVars.colors.primary }}>
                   {contactEmail}
                 </a>
               </span>
@@ -116,7 +117,7 @@ class GlobalErrorBoundary extends React.Component<
                 style={{
                   marginTop: 16,
                   fontSize: 12,
-                  color: '#8c8c8c',
+                  color: themeVars.colors.mutedText,
                   maxWidth: 420,
                   wordBreak: 'break-word',
                 }}

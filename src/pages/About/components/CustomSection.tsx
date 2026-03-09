@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Card, List } from 'antd';
 import styled from '@emotion/styled';
-import { globalStyles } from '../../../styles/theme';
+import { themeVars } from '../../../theme';
 import AboutSection from './AboutSection';
 import * as Icons from '@ant-design/icons';
 
@@ -24,13 +24,13 @@ interface CustomSectionProps {
 }
 
 const ItemCard = styled(Card)`
-  margin-bottom: ${globalStyles.spacing.sm};
+  margin-bottom: ${themeVars.spacing.sm};
   transition: all 0.3s ease;
   cursor: ${props => props.onClick ? 'pointer' : 'default'};
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 `;
 
@@ -39,13 +39,13 @@ const ItemImage = styled.img`
   height: 160px;
   object-fit: cover;
   border-radius: 4px;
-  margin-bottom: ${globalStyles.spacing.sm};
+  margin-bottom: ${themeVars.spacing.sm};
 `;
 
 const IconWrapper = styled.div`
   font-size: 24px;
-  color: ${globalStyles.colors.primary};
-  margin-right: ${globalStyles.spacing.sm};
+  color: ${themeVars.colors.primary};
+  margin-right: ${themeVars.spacing.sm};
   display: flex;
   align-items: center;
 `;
@@ -53,8 +53,8 @@ const IconWrapper = styled.div`
 const CardsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: ${globalStyles.spacing.md};
-  margin-top: ${globalStyles.spacing.md};
+  gap: ${themeVars.spacing.md};
+  margin-top: ${themeVars.spacing.md};
 `;
 
 const CustomSection: React.FC<CustomSectionProps> = ({ 

@@ -3,7 +3,7 @@ import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import { useTitle } from '../../hooks/useTitle';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { projectApi, Project } from '../../services/api';
@@ -18,7 +18,7 @@ const Container = styled.div`
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -31,18 +31,18 @@ const ContentWrapper = styled.div`
 const ProjectGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
 `;
 
 const StyledCard = styled(motion(Card))`
   cursor: pointer;
   height: 100%;
   transition: all 0.3s ease;
-  box-shadow: ${globalStyles.shadows.small};
+  box-shadow: ${themeVars.shadows.small};
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: ${globalStyles.shadows.medium};
+    box-shadow: ${themeVars.shadows.medium};
   }
 
   &.image-error {
@@ -53,29 +53,51 @@ const StyledCard = styled(motion(Card))`
 `;
 
 const ProjectTag = styled(Tag)`
-  margin: ${globalStyles.spacing.xs};
+  margin: ${themeVars.spacing.xs};
+  color: ${themeVars.colors.primary};
+  border-color: ${withThemeAlpha(themeVars.colors.primary, 0.35)};
+  background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
 `;
 
 const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused' }>`
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 0 ${globalStyles.spacing.sm};
+  padding: 0 ${themeVars.spacing.sm};
   border-radius: 12px;
+  border-color: ${({ $status }) => {
+    if ($status === 'developing') return themeVars.colors.info;
+    if ($status === 'maintaining') return themeVars.colors.success;
+    return themeVars.colors.borderStrong;
+  }};
+  color: ${({ $status }) => {
+    if ($status === 'developing') return themeVars.colors.info;
+    if ($status === 'maintaining') return themeVars.colors.success;
+    return themeVars.colors.lightText;
+  }};
+  background: ${({ $status }) => {
+    if ($status === 'developing') return withThemeAlpha(themeVars.colors.info, 0.12);
+    if ($status === 'maintaining') return withThemeAlpha(themeVars.colors.success, 0.12);
+    return withThemeAlpha(themeVars.colors.border, 0.2);
+  }};
 `;
 
 const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
   width: 100%;
   aspect-ratio: 16/9;
-  background: linear-gradient(45deg, ${globalStyles.colors.secondary}80, ${globalStyles.colors.secondary});
+  background: linear-gradient(
+    45deg,
+    ${withThemeAlpha(themeVars.colors.secondary, 0.5)},
+    ${themeVars.colors.secondary}
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: ${globalStyles.colors.lightText};
-  gap: ${globalStyles.spacing.sm};
+  color: ${themeVars.colors.lightText};
+  gap: ${themeVars.spacing.sm};
   border-radius: ${props => props.$isModal ? '8px' : '8px 8px 0 0'};
-  padding: ${globalStyles.spacing.lg};
+  padding: ${themeVars.spacing.lg};
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -87,7 +109,12 @@ const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      ${withThemeAlpha(themeVars.colors.onPrimary, 0.1)} 50%,
+      transparent 100%
+    );
     animation: shimmer 2s infinite;
   }
 
@@ -101,19 +128,19 @@ const ImageErrorContainer = styled.div<{ $isModal?: boolean }>`
   }
 
   .icon-wrapper {
-    background: rgba(255, 255, 255, 0.1);
+    background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.1)};
     border-radius: 50%;
-    padding: ${props => props.$isModal ? globalStyles.spacing.lg : globalStyles.spacing.md};
+    padding: ${props => props.$isModal ? themeVars.spacing.lg : themeVars.spacing.md};
     backdrop-filter: blur(4px);
-    margin-bottom: ${globalStyles.spacing.sm};
+    margin-bottom: ${themeVars.spacing.sm};
   }
 
   .error-text {
     font-size: ${props => props.$isModal ? '16px' : '14px'};
     text-align: center;
-    color: ${globalStyles.colors.lightText};
+    color: ${themeVars.colors.lightText};
     font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px ${withThemeAlpha(themeVars.colors.text, 0.1)};
   }
 
   .retry-text {
@@ -130,32 +157,19 @@ const LoadingContainer = styled.div`
 `;
 
 const ModalContent = styled.div`
-  padding: ${globalStyles.spacing.md};
+  padding: ${themeVars.spacing.md};
 `;
 
 const List = styled.ul`
   list-style: disc;
-  margin-left: ${globalStyles.spacing.lg};
-  margin-bottom: ${globalStyles.spacing.md};
+  margin-left: ${themeVars.spacing.lg};
+  margin-bottom: ${themeVars.spacing.md};
 `;
 
 const ListItem = styled.li`
-  margin-bottom: ${globalStyles.spacing.sm};
-  color: ${globalStyles.colors.text};
+  margin-bottom: ${themeVars.spacing.sm};
+  color: ${themeVars.colors.text};
 `;
-
-const getStatusColor = (status: 'developing' | 'maintaining' | 'paused') => {
-  switch (status) {
-    case 'developing':
-      return 'processing';
-    case 'maintaining':
-      return 'success';
-    case 'paused':
-      return 'default';
-    default:
-      return 'default';
-  }
-};
 
 const getStatusText = (status: 'developing' | 'maintaining' | 'paused') => {
   switch (status) {
@@ -233,7 +247,7 @@ const Projects: React.FC = () => {
     <Container>
       <ContentWrapper>
         {!isStandalone && (
-          <Title level={2} style={{ marginBottom: globalStyles.spacing.xl }}>
+          <Title level={2} style={{ marginBottom: themeVars.spacing.xl }}>
             个人项目展示
           </Title>
         )}
@@ -262,7 +276,6 @@ const Projects: React.FC = () => {
             >
               <StatusTag
                 $status={project.status}
-                color={getStatusColor(project.status)}
               >
                 {getStatusText(project.status)}
               </StatusTag>
@@ -270,7 +283,7 @@ const Projects: React.FC = () => {
               <Paragraph ellipsis={{ rows: 2 }}>{project.description}</Paragraph>
               <Space wrap>
                 {project.techStack.map((tech) => (
-                  <ProjectTag key={tech} color="blue">{tech}</ProjectTag>
+                  <ProjectTag key={tech}>{tech}</ProjectTag>
                 ))}
               </Space>
             </StyledCard>
@@ -297,7 +310,7 @@ const Projects: React.FC = () => {
                   style={{
                     width: '100%',
                     borderRadius: '8px',
-                    marginBottom: globalStyles.spacing.md,
+                    marginBottom: themeVars.spacing.md,
                     aspectRatio: '16/9',
                     objectFit: 'cover'
                   }}
@@ -321,9 +334,9 @@ const Projects: React.FC = () => {
                   <Title level={4}>技术栈</Title>
                   <Space size={[0, 8]} wrap>
                     {selectedProject.techStack.map((tech) => (
-                      <Tag key={tech} color="blue">
+                      <ProjectTag key={tech}>
                         {tech}
-                      </Tag>
+                      </ProjectTag>
                     ))}
                   </Space>
                 </div>

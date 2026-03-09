@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Card, Modal, Typography } from 'antd';
 import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
-import { globalStyles } from '../../styles/theme';
+import { themeVars, withThemeAlpha } from '../../theme';
 import Game2048 from '../../components/Game2048';
 import GameSnake from '../../components/GameSnake';
 import GameTetris from '../../components/GameTetris';
@@ -22,14 +22,14 @@ const { Title } = Typography;
 const GamesContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${globalStyles.spacing.xl};
+  padding: ${themeVars.spacing.xl};
 `;
 
 const GamesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: ${globalStyles.spacing.lg};
-  margin-top: ${globalStyles.spacing.lg};
+  gap: ${themeVars.spacing.lg};
+  margin-top: ${themeVars.spacing.lg};
 `;
 
 const GameCard = styled(motion(Card))`
@@ -41,8 +41,8 @@ const GameCard = styled(motion(Card))`
   }
 
   .ant-card-cover {
-    padding: ${globalStyles.spacing.md};
-    background: ${globalStyles.colors.secondary};
+    padding: ${themeVars.spacing.md};
+    background: ${themeVars.colors.secondary};
   }
 
   &.image-error {
@@ -61,14 +61,14 @@ const GameCard = styled(motion(Card))`
 
 const PageTitle = styled.h1`
   text-align: center;
-  margin-bottom: ${globalStyles.spacing.xl};
-  color: ${globalStyles.colors.text};
+  margin-bottom: ${themeVars.spacing.xl};
+  color: ${themeVars.colors.text};
 `;
 
 const GameTitle = styled.div`
   display: flex;
   align-items: center;
-  gap: ${globalStyles.spacing.sm};
+  gap: ${themeVars.spacing.sm};
   
   .game-emoji {
     font-size: 20px;
@@ -77,9 +77,9 @@ const GameTitle = styled.div`
 `;
 
 const CategoryTitle = styled(Title)`
-  margin-top: ${globalStyles.spacing.xl} !important;
-  margin-bottom: ${globalStyles.spacing.lg} !important;
-  color: ${globalStyles.colors.text};
+  margin-top: ${themeVars.spacing.xl} !important;
+  margin-bottom: ${themeVars.spacing.lg} !important;
+  color: ${themeVars.colors.text};
   
   &:first-of-type {
     margin-top: 0 !important;
@@ -89,14 +89,14 @@ const CategoryTitle = styled(Title)`
 const WebGameCard = styled(motion(Card))`
   cursor: pointer;
   transition: transform 0.2s ease;
-  background: ${globalStyles.colors.secondary};
+  background: ${themeVars.colors.secondary};
 
   &:hover {
     transform: translateY(-5px);
   }
 
   .ant-card-body {
-    padding: ${globalStyles.spacing.lg};
+    padding: ${themeVars.spacing.lg};
   }
 `;
 
@@ -194,7 +194,7 @@ const StyledModal = styled(Modal)`
 
     .ant-modal-header {
       border-radius: 0;
-      padding: ${globalStyles.spacing.md};
+      padding: ${themeVars.spacing.md};
     }
 
     .ant-modal-body {
@@ -205,8 +205,8 @@ const StyledModal = styled(Modal)`
     }
 
     .ant-modal-close {
-      top: ${globalStyles.spacing.md};
-      right: ${globalStyles.spacing.md};
+      top: ${themeVars.spacing.md};
+      right: ${themeVars.spacing.md};
     }
   }
 `;
@@ -357,7 +357,7 @@ const GamesPage: React.FC = () => {
           )
         }
         destroyOnClose
-        maskStyle={isMobile ? { background: 'rgba(0, 0, 0, 0.85)' } : undefined}
+        maskStyle={isMobile ? { background: withThemeAlpha(themeVars.colors.text, 0.85) } : undefined}
       >
         {selectedGameData?.component && <selectedGameData.component />}
       </StyledModal>

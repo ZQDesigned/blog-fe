@@ -3,6 +3,7 @@ import { Button, Result, Space, Tag, Typography } from 'antd';
 import { ReloadOutlined, PoweroffOutlined, CloudOutlined, MailOutlined } from '@ant-design/icons';
 import { checkApiStatus } from '../../services/apiStatus';
 import { CONTACT_EMAIL, CONTACT_QQ } from '../../constants/contact';
+import { themeVars, withThemeAlpha } from '../../theme';
 
 type ApiStatus = 'checking' | 'online' | 'offline';
 
@@ -81,11 +82,41 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
   const statusTag = useMemo(() => {
     switch (status) {
       case 'online':
-        return <Tag color="green">API 服务器在线</Tag>;
+        return (
+          <Tag
+            style={{
+              color: themeVars.colors.success,
+              borderColor: themeVars.colors.success,
+              background: withThemeAlpha(themeVars.colors.success, 0.12),
+            }}
+          >
+            API 服务器在线
+          </Tag>
+        );
       case 'offline':
-        return <Tag color="red">API 服务器不可用</Tag>;
+        return (
+          <Tag
+            style={{
+              color: themeVars.colors.error,
+              borderColor: themeVars.colors.error,
+              background: withThemeAlpha(themeVars.colors.error, 0.12),
+            }}
+          >
+            API 服务器不可用
+          </Tag>
+        );
       default:
-        return <Tag color="default">正在检查 API 服务器状态...</Tag>;
+        return (
+          <Tag
+            style={{
+              color: themeVars.colors.lightText,
+              borderColor: themeVars.colors.border,
+              background: withThemeAlpha(themeVars.colors.border, 0.2),
+            }}
+          >
+            正在检查 API 服务器状态...
+          </Tag>
+        );
     }
   }, [status]);
 
@@ -151,8 +182,8 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Space size="middle">
             {statusTag}
-            {status === 'online' ? <CloudOutlined style={{ color: '#52c41a' }} /> : null}
-            {status === 'offline' ? <PoweroffOutlined style={{ color: '#ff4d4f' }} /> : null}
+            {status === 'online' ? <CloudOutlined style={{ color: themeVars.colors.success }} /> : null}
+            {status === 'offline' ? <PoweroffOutlined style={{ color: themeVars.colors.error }} /> : null}
           </Space>
           {error instanceof Error ? (
             <Typography.Text type="secondary">
@@ -164,14 +195,14 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
               联系 QQ：
               <a
                 href={`tencent://message/?uin=${CONTACT_QQ}&Site=&Menu=yes`}
-                style={{ color: '#1677ff' }}
+                style={{ color: themeVars.colors.primary }}
               >
                 {CONTACT_QQ}
               </a>
             </Typography.Text>
             <Typography.Text>
               联系邮箱：
-              <a href={contactMailHref} style={{ color: '#1677ff' }}>
+              <a href={contactMailHref} style={{ color: themeVars.colors.primary }}>
                 {CONTACT_EMAIL}
               </a>
             </Typography.Text>
