@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { setupApiMocks } from './mocks';
 
 interface ThemeRuntimeProbe {
@@ -15,6 +16,21 @@ const disableMotionCss = `
   caret-color: transparent !important;
 }
 `;
+
+const installDisableMotionCss = async (page: Page) => {
+  await page.addInitScript((cssText: string) => {
+    const styleId = '__theme-visual-disable-motion__';
+    const existingStyle = document.getElementById(styleId);
+    if (existingStyle) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = cssText;
+    (document.head ?? document.documentElement).appendChild(style);
+  }, disableMotionCss);
+};
 
 const cases = [
   { name: 'home', path: '/' },
@@ -98,7 +114,7 @@ for (const viewport of viewports) {
     test(`${item.name} - ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await setupApiMocks(page);
-      await page.addStyleTag({ content: disableMotionCss });
+      await installDisableMotionCss(page);
 
       await page.goto(item.path, { waitUntil: 'networkidle' });
       await page.waitForTimeout(300);
