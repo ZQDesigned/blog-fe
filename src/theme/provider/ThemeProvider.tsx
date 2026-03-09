@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import type {
   ResolvedThemeMode,
   ThemeContextValue,
@@ -11,27 +17,21 @@ import {
   buildRuntimeTokens,
   createAntdTheme,
   getSystemThemePreference,
+  readStoredThemeMode,
   resolveThemeMode,
 } from '../runtime';
 
-const readStoredMode = (storageKey: string, fallback: ThemeMode): ThemeMode => {
-  if (typeof window === 'undefined') {
-    return fallback;
-  }
-
-  const stored = window.localStorage.getItem(storageKey);
-  if (stored === 'light' || stored === 'dark' || stored === 'system') {
-    return stored;
-  }
-
-  return fallback;
-};
+const useBrowserLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const themeConfig = useMemo(() => getThemeConfig(), []);
 
   const [mode, setModeState] = useState<ThemeMode>(() =>
-    readStoredMode(themeConfig.settings.storageKey, themeConfig.settings.defaultMode),
+    readStoredThemeMode(
+      themeConfig.settings.storageKey,
+      themeConfig.settings.defaultMode,
+    ),
   );
   const [systemPreference, setSystemPreference] = useState<ResolvedThemeMode>(() =>
     getSystemThemePreference(),
@@ -90,7 +90,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  useEffect(() => {
+  useBrowserLayoutEffect(() => {
     applyCssVariables(themeConfig, resolvedMode);
   }, [themeConfig, resolvedMode]);
 

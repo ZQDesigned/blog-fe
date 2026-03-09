@@ -10,6 +10,7 @@ export {
   createAntdTheme,
   createLegacyGlobalStyles,
   getSystemThemePreference,
+  initializeThemeRuntime,
   resolveThemeMode,
 } from './runtime';
 

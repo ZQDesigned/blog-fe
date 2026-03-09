@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { setupApiMocks } from './mocks';
 
+interface ThemeRuntimeProbe {
+  domContentLoaded: string;
+  firstRootMutation: string;
+}
+
 const disableMotionCss = `
 * {
   animation-duration: 0s !important;
@@ -25,6 +30,68 @@ const viewports = [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'mobile', width: 390, height: 844 },
 ] as const;
+
+test('theme css vars are ready before first paint', async ({ page }) => {
+  await setupApiMocks(page);
+
+  await page.addInitScript(() => {
+    const rootVarName = '--theme-font-family-base';
+    const probe: ThemeRuntimeProbe = {
+      domContentLoaded: '',
+      firstRootMutation: '',
+    };
+
+    const readRootVar = () =>
+      document.documentElement.style.getPropertyValue(rootVarName).trim();
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+        probe.domContentLoaded = readRootVar();
+
+        const rootElement = document.getElementById('root');
+        if (!rootElement) {
+          return;
+        }
+
+        const observer = new MutationObserver(() => {
+          probe.firstRootMutation = readRootVar();
+          observer.disconnect();
+        });
+
+        observer.observe(rootElement, {
+          childList: true,
+          subtree: true,
+        });
+      },
+      { once: true },
+    );
+
+    (
+      window as Window & {
+        __themeRuntimeProbe?: ThemeRuntimeProbe;
+      }
+    ).__themeRuntimeProbe = probe;
+  });
+
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  const probe = await page.evaluate(() => {
+    return (
+      (
+        window as Window & {
+          __themeRuntimeProbe?: ThemeRuntimeProbe;
+        }
+      ).__themeRuntimeProbe ?? {
+        domContentLoaded: '',
+        firstRootMutation: '',
+      }
+    );
+  });
+
+  expect(probe.domContentLoaded).not.toBe('');
+  expect(probe.firstRootMutation).not.toBe('');
+});
 
 for (const viewport of viewports) {
   for (const item of cases) {
