@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Space } from 'antd';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { HomeBanner as HomeBannerType } from '../../../types/types';
 import { themeVars, withThemeAlpha } from '../../../theme';
 import * as Icons from '@ant-design/icons';
@@ -112,10 +113,21 @@ interface HomeBannerProps {
 }
 
 const HomeBanner: React.FC<HomeBannerProps> = ({ data }) => {
+  const navigate = useNavigate();
+
   // 动态获取图标组件
   const getIcon = (iconName: string) => {
     const IconComponent = (Icons as any)[iconName];
     return IconComponent ? <IconComponent /> : null;
+  };
+
+  const handleButtonClick = (link: string) => {
+    if (/^(https?:)?\/\//.test(link) || /^(mailto|tel):/.test(link)) {
+      window.location.href = link;
+      return;
+    }
+
+    navigate(link);
   };
 
   return (
@@ -158,7 +170,7 @@ const HomeBanner: React.FC<HomeBannerProps> = ({ data }) => {
                   key={index}
                   type={button.type || 'default'}
                   icon={button.icon && getIcon(button.icon)}
-                  href={button.link}
+                  onClick={() => handleButtonClick(button.link)}
                   size="large"
                 >
                   {button.text}
