@@ -54,24 +54,40 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
   }
 `;
 
-const HEADER_TOP_ALPHA_WITH_WALLPAPER = 0.85;
+const HEADER_TOP_WALLPAPER_OPACITY = 0.15;
 
-const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolean }>`
-  background: ${props =>
-    props.$scrolled
-      ? themeVars.colors.background
-      : withThemeAlpha(
-          themeVars.colors.secondary,
-          props.$hasBackground ? HEADER_TOP_ALPHA_WITH_WALLPAPER : 1,
-        )};
+const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolean; $backgroundUrl?: string | null }>`
+  background: ${props => props.$scrolled ? themeVars.colors.background : themeVars.colors.secondary};
   box-shadow: ${props => props.$scrolled ? themeVars.shadows.small : 'none'};
   position: fixed;
   width: 100%;
   z-index: 1;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  isolation: isolate;
   padding: 0 ${themeVars.spacing.xl};
   transition: all 0.3s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: ${props =>
+      !props.$scrolled && props.$hasBackground && props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: ${props => (!props.$scrolled && props.$hasBackground ? HEADER_TOP_WALLPAPER_OPACITY : 0)};
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   @media (max-width: 768px) {
     padding: 0 ${themeVars.spacing.md};
@@ -676,7 +692,11 @@ export const MainLayout: React.FC = () => {
   return (
     <StyledLayout $backgroundUrl={hasWallpaperBackground ? backgroundUrl : null} $isStandalone={isStandalone}>
       {!isStandalone && (
-        <StyledHeader $scrolled={scrolled} $hasBackground={hasWallpaperBackground}>
+        <StyledHeader
+          $scrolled={scrolled}
+          $hasBackground={hasWallpaperBackground}
+          $backgroundUrl={hasWallpaperBackground ? backgroundUrl : null}
+        >
           <HeaderLeft>
             <StyledAvatar
               size={40}
