@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import { MainLayout } from './components/Layout/MainLayout';
-import { GlobalStyles } from './styles/GlobalStyles';
 import { ROUTES } from './constants/routes';
 import React, { lazy, Suspense } from 'react';
 import AnimatedCursor from './components/AnimatedCursor';
@@ -25,7 +24,6 @@ const AppShell: React.FC = () => {
       <AnimatedCursor />
       <ToastProvider>
         <BrowserRouter>
-          <GlobalStyles />
           <React.Suspense fallback={<PageLoading tip="页面加载中" />}>
             <Routes>
               <Route element={<MainLayout />}>

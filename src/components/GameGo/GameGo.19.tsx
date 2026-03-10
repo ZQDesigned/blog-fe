@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Button, Modal, Tooltip } from 'antd';
 import styled from '@emotion/styled';
-import { GlobalStyles } from '../../styles/GlobalStyles';
 import { themeVars, withThemeAlpha } from '../../theme';
 import { Board, Player, Position, AIDifficulty } from './types.19';
 import { getValidMoves, makeMove, calculateScore } from './utils.19';
@@ -291,7 +290,6 @@ const GameGo19: React.FC = () => {
 
   return (
     <GameContainer>
-      <GlobalStyles />
       <GameInfo>
         <InfoItem>黑棋: {scores.black}</InfoItem>
         <InfoItem>白棋: {scores.white}</InfoItem>

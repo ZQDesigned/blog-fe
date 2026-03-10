@@ -331,6 +331,22 @@ export const MainLayout: React.FC = () => {
   } = useBackgroundSettings();
   const isStandalone = useStandaloneMode();
 
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.dataset.standalone = String(isStandalone);
+  }, [isStandalone]);
+
+  useEffect(() => {
+    return () => {
+      if (typeof document !== 'undefined') {
+        delete document.documentElement.dataset.standalone;
+      }
+    };
+  }, []);
+
   // 获取页脚数据
   useEffect(() => {
     const loadFooterData = async () => {
