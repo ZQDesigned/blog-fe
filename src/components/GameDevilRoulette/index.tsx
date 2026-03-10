@@ -47,24 +47,24 @@ const ITEM_POOL: Item[] = [
 const AI_DELAY = 1000;
 
 const GameShell = styled.div`
-  background: radial-gradient(
-    circle at 20% 20%,
-    ${withThemeAlpha(themeVars.colors.primaryActive, 0.45)} 0,
-    ${themeVars.games.devilRoulette.shellBackground} 40%
+  background: linear-gradient(
+    180deg,
+    ${themeVars.colors.background} 0%,
+    ${themeVars.colors.secondary} 100%
   );
   border: 1px solid ${themeVars.colors.border};
   border-radius: 12px;
   padding: ${themeVars.spacing.lg};
   color: ${themeVars.colors.text};
   font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
-  box-shadow: 0 20px 60px ${withThemeAlpha(themeVars.colors.text, 0.3)};
+  box-shadow: ${themeVars.shadows.medium};
 `;
 
 const Section = styled.div`
   padding: ${themeVars.spacing.md};
   border-radius: 10px;
-  background: ${themeVars.games.devilRoulette.sectionBackground};
-  border: 1px solid ${themeVars.games.devilRoulette.sectionBorder};
+  background: ${themeVars.colors.background};
+  border: 1px solid ${themeVars.colors.border};
 `;
 
 const Header = styled.div`
@@ -193,8 +193,8 @@ const GunContainer = styled.div<{ $shake?: boolean }>`
 const LogPanel = styled(Section)`
   height: 200px;
   overflow: auto;
-  background: ${withThemeAlpha(themeVars.colors.text, 0.98)};
-  border: 1px solid ${withThemeAlpha(themeVars.colors.onPrimary, 0.04)};
+  background: ${themeVars.colors.background};
+  border: 1px solid ${themeVars.colors.border};
 `;
 
 const LogEntryRow = styled.div<{ $tone: LogEntry['tone'] }>`
