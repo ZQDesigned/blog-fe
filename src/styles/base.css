@@ -16,6 +16,12 @@
   user-select: none;
 }
 
+html[data-custom-cursor='on'],
+html[data-custom-cursor='on'] body,
+html[data-custom-cursor='on'] body * {
+  cursor: none !important;
+}
+
 html[data-standalone='true'] * {
   user-select: auto;
 }

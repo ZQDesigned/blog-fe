@@ -7,6 +7,7 @@ import AnimatedCursor from './components/AnimatedCursor';
 import PageLoading from './components/PageLoading';
 import { ToastProvider } from './components/Toast/ToastManager';
 import { ThemeProvider, useTheme } from './theme';
+import { CursorProvider } from './cursor';
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/Home'));
@@ -69,7 +70,9 @@ const AppShell: React.FC = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AppShell />
+      <CursorProvider>
+        <AppShell />
+      </CursorProvider>
     </ThemeProvider>
   );
 }
