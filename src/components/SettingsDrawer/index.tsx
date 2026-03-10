@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Typography, Space, Spin, Switch } from 'antd';
+import { Button, Drawer, Input, Typography, Space, Spin, Switch } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
@@ -97,6 +97,48 @@ const SettingHint = styled.p`
   line-height: 1.5;
 `;
 
+const PaletteGrid = styled.div`
+  display: grid;
+  gap: ${themeVars.spacing.sm};
+`;
+
+const PaletteItem = styled.div`
+  display: grid;
+  grid-template-columns: minmax(100px, 130px) 1fr 28px;
+  gap: ${themeVars.spacing.sm};
+  align-items: center;
+`;
+
+const PaletteLabel = styled.label`
+  color: ${themeVars.colors.text};
+  font-size: 12px;
+`;
+
+const PalettePreview = styled.span<{ $color: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: ${themeVars.borderRadius.small};
+  border: 1px solid ${themeVars.colors.border};
+  background: ${props => props.$color};
+`;
+
+const paletteFieldMeta = [
+  { key: 'dotBackground', label: '点背景' },
+  { key: 'dotBorder', label: '点描边' },
+  { key: 'ringBorder', label: '环描边' },
+  { key: 'ringHoverBorder', label: '环悬停描边' },
+  { key: 'ringActiveBorder', label: '环按下描边' },
+  { key: 'ringBackground', label: '环背景' },
+] as const;
+
+const isValidCssColor = (value: string): boolean => {
+  if (typeof window === 'undefined' || typeof window.CSS === 'undefined') {
+    return true;
+  }
+
+  return window.CSS.supports('color', value);
+};
+
 interface SettingsDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -120,6 +162,11 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
     enabled: cursorEnabled,
     setEnabled: setCursorEnabled,
     isSupported: isCursorSupported,
+    useCustomPalette,
+    setUseCustomPalette,
+    palette,
+    updatePalette,
+    resetPaletteToSystem,
   } = useCursor();
 
   return (
@@ -195,6 +242,44 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
               ? '桌面端使用全局 custom cursor，刷新后仍会保留当前设置。'
               : '当前设备或系统环境不支持 custom cursor，已自动回退系统鼠标。'}
           </SettingHint>
+          <SettingRow>
+            <SettingLabel>启用自定义指针色板</SettingLabel>
+            <Switch
+              checked={useCustomPalette}
+              disabled={!isCursorSupported}
+              onChange={setUseCustomPalette}
+            />
+          </SettingRow>
+          <SettingHint>
+            默认关闭，关闭时使用系统主题默认指针配色；开启后可单独配置各颜色项。
+          </SettingHint>
+          {useCustomPalette && (
+            <>
+              <PaletteGrid>
+                {paletteFieldMeta.map((item) => {
+                  const colorValue = palette[item.key];
+                  const colorValid = isValidCssColor(colorValue);
+
+                  return (
+                    <PaletteItem key={item.key}>
+                      <PaletteLabel>{item.label}</PaletteLabel>
+                      <Input
+                        size="small"
+                        value={colorValue}
+                        status={colorValid ? undefined : 'error'}
+                        onChange={(event) => updatePalette(item.key, event.target.value)}
+                        placeholder="支持 hex / rgb / rgba / hsl"
+                      />
+                      <PalettePreview $color={colorValid ? colorValue : 'transparent'} />
+                    </PaletteItem>
+                  );
+                })}
+              </PaletteGrid>
+              <Button size="small" onClick={resetPaletteToSystem}>
+                恢复系统默认
+              </Button>
+            </>
+          )}
         </SettingSection>
       </Space>
     </Drawer>
