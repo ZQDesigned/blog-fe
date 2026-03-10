@@ -94,6 +94,18 @@ export const themeVars = {
     fontSizeBase: cssVar('--theme-font-size-base', common.typography.fontSizeBase),
     lineHeightBase: cssVar('--theme-line-height-base', common.typography.lineHeightBase),
   },
+  cursor: {
+    dotSize: cssVar('--theme-cursor-dot-size', common.cursor.dotSize),
+    ringSize: cssVar('--theme-cursor-ring-size', common.cursor.ringSize),
+    ringBorderWidth: cssVar('--theme-cursor-ring-border-width', common.cursor.ringBorderWidth),
+    hoverScale: cssVar('--theme-cursor-hover-scale', String(common.cursor.hoverScale)),
+    activeScale: cssVar('--theme-cursor-active-scale', String(common.cursor.activeScale)),
+    dotActiveScale: cssVar('--theme-cursor-dot-active-scale', String(common.cursor.dotActiveScale)),
+    dotBackground: cssVar('--theme-component-cursor-dot-background', light.components.cursor.dotBackground),
+    ringBorder: cssVar('--theme-component-cursor-ring-border', light.components.cursor.ringBorder),
+    ringHoverBorder: cssVar('--theme-component-cursor-ring-hover-border', light.components.cursor.ringHoverBorder),
+    ringActiveBorder: cssVar('--theme-component-cursor-ring-active-border', light.components.cursor.ringActiveBorder),
+  },
   zIndex: {
     dropdown: 'var(--theme-zindex-dropdown)',
     modal: 'var(--theme-zindex-modal)',

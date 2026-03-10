@@ -41,6 +41,20 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         fontSizeBase: '16px',
         lineHeightBase: '1.5',
       },
+      cursor: {
+        dotSize: '8px',
+        ringSize: '30px',
+        ringBorderWidth: '2px',
+        hoverScale: 1.35,
+        activeScale: 0.85,
+        dotActiveScale: 1.25,
+        followEase: 0.2,
+        clickParticles: 8,
+        clickParticleMinDistance: 80,
+        clickParticleMaxDistance: 150,
+        clickParticleDurationMs: 900,
+        particleSize: '24px',
+      },
       zIndex: {
         dropdown: 1000,
         modal: 1000,
@@ -97,6 +111,12 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         },
         card: {
           backdrop: 'rgba(255, 255, 255, 0.9)',
+        },
+        cursor: {
+          dotBackground: 'rgba(24, 144, 255, 0.9)',
+          ringBorder: 'rgba(24, 144, 255, 0.45)',
+          ringHoverBorder: 'rgba(24, 144, 255, 0.75)',
+          ringActiveBorder: 'rgba(24, 144, 255, 0.95)',
         },
       },
       games: {
@@ -232,6 +252,12 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         },
         card: {
           backdrop: 'rgba(20, 20, 20, 0.85)',
+        },
+        cursor: {
+          dotBackground: 'rgba(74, 168, 255, 0.9)',
+          ringBorder: 'rgba(74, 168, 255, 0.5)',
+          ringHoverBorder: 'rgba(116, 185, 255, 0.8)',
+          ringActiveBorder: 'rgba(116, 185, 255, 0.95)',
         },
       },
       games: {

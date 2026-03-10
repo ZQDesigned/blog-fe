@@ -48,6 +48,21 @@ export interface ThemeTypographyTokens {
   lineHeightBase: string;
 }
 
+export interface ThemeCursorTokens {
+  dotSize: string;
+  ringSize: string;
+  ringBorderWidth: string;
+  hoverScale: number;
+  activeScale: number;
+  dotActiveScale: number;
+  followEase: number;
+  clickParticles: number;
+  clickParticleMinDistance: number;
+  clickParticleMaxDistance: number;
+  clickParticleDurationMs: number;
+  particleSize: string;
+}
+
 export interface ThemeZIndexTokens {
   dropdown: number;
   modal: number;
@@ -61,6 +76,7 @@ export interface ThemeCommonTokens {
   shadows: ThemeShadowTokens;
   radius: ThemeRadiusTokens;
   typography: ThemeTypographyTokens;
+  cursor: ThemeCursorTokens;
   zIndex: ThemeZIndexTokens;
 }
 
@@ -185,6 +201,12 @@ export interface ThemeComponentSemanticTokens {
   };
   card: {
     backdrop: string;
+  };
+  cursor: {
+    dotBackground: string;
+    ringBorder: string;
+    ringHoverBorder: string;
+    ringActiveBorder: string;
   };
 }
 
