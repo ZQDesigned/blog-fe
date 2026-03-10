@@ -6,7 +6,7 @@ const CURSOR_USE_CUSTOM_PALETTE_KEY = 'customCursorUseCustomPalette';
 const CURSOR_PALETTE_STORAGE_KEY = 'customCursorPalette';
 const CUSTOM_CURSOR_DATASET_KEY = 'customCursor';
 
-const CURSOR_PALETTE_VAR_MAP = {
+const CURSOR_PALETTE_BASE_VAR_MAP = {
   dotBackground: '--theme-component-cursor-dot-background',
   dotBorder: '--theme-component-cursor-dot-border',
   ringBorder: '--theme-component-cursor-ring-border',
@@ -15,7 +15,16 @@ const CURSOR_PALETTE_VAR_MAP = {
   ringBackground: '--theme-component-cursor-ring-background',
 } as const;
 
-type CursorPaletteKey = keyof typeof CURSOR_PALETTE_VAR_MAP;
+const CURSOR_PALETTE_OVERRIDE_VAR_MAP = {
+  dotBackground: '--theme-custom-cursor-dot-background',
+  dotBorder: '--theme-custom-cursor-dot-border',
+  ringBorder: '--theme-custom-cursor-ring-border',
+  ringHoverBorder: '--theme-custom-cursor-ring-hover-border',
+  ringActiveBorder: '--theme-custom-cursor-ring-active-border',
+  ringBackground: '--theme-custom-cursor-ring-background',
+} as const;
+
+type CursorPaletteKey = keyof typeof CURSOR_PALETTE_BASE_VAR_MAP;
 type CursorPalette = Record<CursorPaletteKey, string>;
 
 const EMPTY_PALETTE: CursorPalette = {
@@ -98,22 +107,22 @@ const getSystemPaletteFromCssVars = (): CursorPalette => {
   const computed = window.getComputedStyle(document.documentElement);
   return {
     dotBackground: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.dotBackground)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.dotBackground)
       .trim(),
     dotBorder: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.dotBorder)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.dotBorder)
       .trim(),
     ringBorder: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.ringBorder)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.ringBorder)
       .trim(),
     ringHoverBorder: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.ringHoverBorder)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.ringHoverBorder)
       .trim(),
     ringActiveBorder: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.ringActiveBorder)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.ringActiveBorder)
       .trim(),
     ringBackground: computed
-      .getPropertyValue(CURSOR_PALETTE_VAR_MAP.ringBackground)
+      .getPropertyValue(CURSOR_PALETTE_BASE_VAR_MAP.ringBackground)
       .trim(),
   };
 };
@@ -243,7 +252,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const hasUninitializedValue = (
-      Object.keys(CURSOR_PALETTE_VAR_MAP) as CursorPaletteKey[]
+      Object.keys(CURSOR_PALETTE_BASE_VAR_MAP) as CursorPaletteKey[]
     ).some((key) => !palette[key]);
 
     if (!hasUninitializedValue) {
@@ -255,7 +264,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const next = { ...current };
       let changed = false;
 
-      (Object.keys(CURSOR_PALETTE_VAR_MAP) as CursorPaletteKey[]).forEach((key) => {
+      (Object.keys(CURSOR_PALETTE_BASE_VAR_MAP) as CursorPaletteKey[]).forEach((key) => {
         if (!next[key] && systemPalette[key]) {
           next[key] = systemPalette[key];
           changed = true;
@@ -272,7 +281,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const rootElement = document.documentElement;
-    const paletteEntries = Object.entries(CURSOR_PALETTE_VAR_MAP) as Array<
+    const paletteEntries = Object.entries(CURSOR_PALETTE_OVERRIDE_VAR_MAP) as Array<
       [CursorPaletteKey, string]
     >;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Drawer, Input, Typography, Space, Spin, Switch } from 'antd';
+import { Button, ColorPicker, Drawer, Input, Typography, Space, Spin, Switch } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
@@ -120,6 +120,7 @@ const PalettePreview = styled.span<{ $color: string }>`
   border-radius: ${themeVars.borderRadius.small};
   border: 1px solid ${themeVars.colors.border};
   background: ${props => props.$color};
+  cursor: pointer;
 `;
 
 const paletteFieldMeta = [
@@ -137,6 +138,15 @@ const isValidCssColor = (value: string): boolean => {
   }
 
   return window.CSS.supports('color', value);
+};
+
+const getColorPickerValue = (value: string): string | undefined => {
+  const normalized = value.trim();
+  if (!normalized || !isValidCssColor(normalized)) {
+    return undefined;
+  }
+
+  return normalized;
 };
 
 interface SettingsDrawerProps {
@@ -270,7 +280,12 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                         onChange={(event) => updatePalette(item.key, event.target.value)}
                         placeholder="支持 hex / rgb / rgba / hsl"
                       />
-                      <PalettePreview $color={colorValid ? colorValue : 'transparent'} />
+                      <ColorPicker
+                        value={getColorPickerValue(colorValue)}
+                        onChange={(_, css) => updatePalette(item.key, css)}
+                      >
+                        <PalettePreview $color={colorValid ? colorValue : 'transparent'} />
+                      </ColorPicker>
                     </PaletteItem>
                   );
                 })}

@@ -40,8 +40,8 @@ const CursorDot = styled.div`
   width: var(--theme-cursor-dot-size);
   height: var(--theme-cursor-dot-size);
   border-radius: 50%;
-  background: var(--theme-component-cursor-dot-background);
-  border: 1px solid var(--theme-component-cursor-dot-border);
+  background: var(--theme-custom-cursor-dot-background, var(--theme-component-cursor-dot-background));
+  border: 1px solid var(--theme-custom-cursor-dot-border, var(--theme-component-cursor-dot-border));
   box-shadow: var(--theme-component-cursor-dot-shadow);
   opacity: 0;
   pointer-events: none;
@@ -58,8 +58,8 @@ const CursorRing = styled.div`
   width: var(--theme-cursor-ring-size);
   height: var(--theme-cursor-ring-size);
   border-radius: 50%;
-  border: var(--theme-cursor-ring-border-width) solid var(--theme-component-cursor-ring-border);
-  background: var(--theme-component-cursor-ring-background);
+  border: var(--theme-cursor-ring-border-width) solid var(--theme-custom-cursor-ring-border, var(--theme-component-cursor-ring-border));
+  background: var(--theme-custom-cursor-ring-background, var(--theme-component-cursor-ring-background));
   box-shadow: var(--theme-component-cursor-ring-shadow);
   opacity: 0;
   pointer-events: none;
@@ -287,10 +287,10 @@ const AnimatedCursor: React.FC = () => {
       ring.style.top = `${ringPosition.y}px`;
       ring.style.transform = `translate(-50%, -50%) scale(${ringScale})`;
       ring.style.borderColor = active
-        ? 'var(--theme-component-cursor-ring-active-border)'
+        ? 'var(--theme-custom-cursor-ring-active-border, var(--theme-component-cursor-ring-active-border))'
         : isInteractiveRef.current
-          ? 'var(--theme-component-cursor-ring-hover-border)'
-          : 'var(--theme-component-cursor-ring-border)';
+          ? 'var(--theme-custom-cursor-ring-hover-border, var(--theme-component-cursor-ring-hover-border))'
+          : 'var(--theme-custom-cursor-ring-border, var(--theme-component-cursor-ring-border))';
       ring.style.opacity = '1';
 
       rafIdRef.current = window.requestAnimationFrame(renderFrame);
