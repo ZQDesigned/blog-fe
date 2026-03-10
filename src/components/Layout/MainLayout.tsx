@@ -75,6 +75,7 @@ const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolea
     inset: 0;
     background-image: ${props =>
       !props.$scrolled && props.$hasBackground && props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
+    background-attachment: fixed;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -91,6 +92,10 @@ const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolea
 
   @media (max-width: 768px) {
     padding: 0 ${themeVars.spacing.md};
+
+    &::before {
+      background-attachment: scroll;
+    }
   }
 `;
 
