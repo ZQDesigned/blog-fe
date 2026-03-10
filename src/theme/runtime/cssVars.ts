@@ -97,9 +97,13 @@ const toCssVarRecord = (tokens: ThemeRuntimeTokens): Record<string, string> => {
     '--theme-component-menu-pill-border': tokens.components.menu.pillBorder,
     '--theme-component-card-backdrop': tokens.components.card.backdrop,
     '--theme-component-cursor-dot-background': tokens.components.cursor.dotBackground,
+    '--theme-component-cursor-dot-border': tokens.components.cursor.dotBorder,
+    '--theme-component-cursor-dot-shadow': tokens.components.cursor.dotShadow,
     '--theme-component-cursor-ring-border': tokens.components.cursor.ringBorder,
     '--theme-component-cursor-ring-hover-border': tokens.components.cursor.ringHoverBorder,
     '--theme-component-cursor-ring-active-border': tokens.components.cursor.ringActiveBorder,
+    '--theme-component-cursor-ring-background': tokens.components.cursor.ringBackground,
+    '--theme-component-cursor-ring-shadow': tokens.components.cursor.ringShadow,
 
     '--theme-game-2048-board-background': tokens.games.game2048.boardBackground,
     '--theme-game-2048-empty-cell': tokens.games.game2048.emptyCell,

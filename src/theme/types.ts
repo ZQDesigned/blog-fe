@@ -204,9 +204,13 @@ export interface ThemeComponentSemanticTokens {
   };
   cursor: {
     dotBackground: string;
+    dotBorder: string;
+    dotShadow: string;
     ringBorder: string;
     ringHoverBorder: string;
     ringActiveBorder: string;
+    ringBackground: string;
+    ringShadow: string;
   };
 }
 

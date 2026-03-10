@@ -41,6 +41,8 @@ const CursorDot = styled.div`
   height: var(--theme-cursor-dot-size);
   border-radius: 50%;
   background: var(--theme-component-cursor-dot-background);
+  border: 1px solid var(--theme-component-cursor-dot-border);
+  box-shadow: var(--theme-component-cursor-dot-shadow);
   opacity: 0;
   pointer-events: none;
   z-index: var(--theme-zindex-cursor);
@@ -57,6 +59,8 @@ const CursorRing = styled.div`
   height: var(--theme-cursor-ring-size);
   border-radius: 50%;
   border: var(--theme-cursor-ring-border-width) solid var(--theme-component-cursor-ring-border);
+  background: var(--theme-component-cursor-ring-background);
+  box-shadow: var(--theme-component-cursor-ring-shadow);
   opacity: 0;
   pointer-events: none;
   z-index: var(--theme-zindex-cursor);

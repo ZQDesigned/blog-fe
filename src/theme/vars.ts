@@ -102,9 +102,13 @@ export const themeVars = {
     activeScale: cssVar('--theme-cursor-active-scale', String(common.cursor.activeScale)),
     dotActiveScale: cssVar('--theme-cursor-dot-active-scale', String(common.cursor.dotActiveScale)),
     dotBackground: cssVar('--theme-component-cursor-dot-background', light.components.cursor.dotBackground),
+    dotBorder: cssVar('--theme-component-cursor-dot-border', light.components.cursor.dotBorder),
+    dotShadow: cssVar('--theme-component-cursor-dot-shadow', light.components.cursor.dotShadow),
     ringBorder: cssVar('--theme-component-cursor-ring-border', light.components.cursor.ringBorder),
     ringHoverBorder: cssVar('--theme-component-cursor-ring-hover-border', light.components.cursor.ringHoverBorder),
     ringActiveBorder: cssVar('--theme-component-cursor-ring-active-border', light.components.cursor.ringActiveBorder),
+    ringBackground: cssVar('--theme-component-cursor-ring-background', light.components.cursor.ringBackground),
+    ringShadow: cssVar('--theme-component-cursor-ring-shadow', light.components.cursor.ringShadow),
   },
   zIndex: {
     dropdown: 'var(--theme-zindex-dropdown)',
