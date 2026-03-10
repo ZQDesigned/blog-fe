@@ -32,6 +32,12 @@ const installDisableMotionCss = async (page: Page) => {
   }, disableMotionCss);
 };
 
+const disableCustomCursorForVisualTests = async (page: Page) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('customCursorEnabled', 'false');
+  });
+};
+
 const cases = [
   { name: 'home', path: '/' },
   { name: 'blog-list', path: '/blog' },
@@ -49,6 +55,7 @@ const viewports = [
 
 test('theme css vars are ready before first paint', async ({ page }) => {
   await setupApiMocks(page);
+  await disableCustomCursorForVisualTests(page);
 
   await page.addInitScript(() => {
     const rootVarName = '--theme-font-family-base';
@@ -114,6 +121,7 @@ for (const viewport of viewports) {
     test(`${item.name} - ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await setupApiMocks(page);
+      await disableCustomCursorForVisualTests(page);
       await installDisableMotionCss(page);
 
       await page.goto(item.path, { waitUntil: 'networkidle' });

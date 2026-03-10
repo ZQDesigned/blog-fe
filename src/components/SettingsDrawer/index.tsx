@@ -1,10 +1,11 @@
 import React from 'react';
-import { Drawer, Typography, Space, Spin } from 'antd';
+import { Drawer, Typography, Space, Spin, Switch } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
 import { BackgroundType } from '../../hooks/useBackgroundSettings';
 import LazyImage from '../LazyImage';
+import { useCursor } from '../../cursor';
 
 const { Title } = Typography;
 
@@ -70,6 +71,32 @@ const RefreshButton = styled.div`
   }
 `;
 
+const SettingSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${themeVars.spacing.sm};
+`;
+
+const SettingRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${themeVars.spacing.md};
+`;
+
+const SettingLabel = styled.span`
+  color: ${themeVars.colors.text};
+  font-size: 14px;
+  line-height: 1.4;
+`;
+
+const SettingHint = styled.p`
+  margin: 0;
+  color: ${themeVars.colors.lightText};
+  font-size: 12px;
+  line-height: 1.5;
+`;
+
 interface SettingsDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -89,6 +116,12 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
   onBackgroundTypeChange,
   onRefreshBackground,
 }) => {
+  const {
+    enabled: cursorEnabled,
+    setEnabled: setCursorEnabled,
+    isSupported: isCursorSupported,
+  } = useCursor();
+
   return (
     <Drawer
       title="页面设置"
@@ -146,6 +179,23 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             </ImagePreview>
           </PreviewContainer>
         </div>
+
+        <SettingSection>
+          <Title level={5}>鼠标样式</Title>
+          <SettingRow>
+            <SettingLabel>启用全局自定义鼠标</SettingLabel>
+            <Switch
+              checked={cursorEnabled}
+              disabled={!isCursorSupported}
+              onChange={setCursorEnabled}
+            />
+          </SettingRow>
+          <SettingHint>
+            {isCursorSupported
+              ? '桌面端使用全局 custom cursor，刷新后仍会保留当前设置。'
+              : '当前设备或系统环境不支持 custom cursor，已自动回退系统鼠标。'}
+          </SettingHint>
+        </SettingSection>
       </Space>
     </Drawer>
   );
