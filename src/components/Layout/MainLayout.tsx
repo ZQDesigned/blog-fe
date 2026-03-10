@@ -54,8 +54,16 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
   }
 `;
 
-const StyledHeader = styled(Header)<{ $scrolled: boolean }>`
-  background: ${props => props.$scrolled ? themeVars.colors.background : 'transparent'};
+const HEADER_TOP_ALPHA_WITH_WALLPAPER = 0.85;
+
+const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolean }>`
+  background: ${props =>
+    props.$scrolled
+      ? themeVars.colors.background
+      : withThemeAlpha(
+          themeVars.colors.secondary,
+          props.$hasBackground ? HEADER_TOP_ALPHA_WITH_WALLPAPER : 1,
+        )};
   box-shadow: ${props => props.$scrolled ? themeVars.shadows.small : 'none'};
   position: fixed;
   width: 100%;
@@ -330,6 +338,7 @@ export const MainLayout: React.FC = () => {
     refreshBackground
   } = useBackgroundSettings();
   const isStandalone = useStandaloneMode();
+  const hasWallpaperBackground = !isStandalone && backgroundType === 'anime' && Boolean(backgroundUrl);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -665,9 +674,9 @@ export const MainLayout: React.FC = () => {
   const buildTime = import.meta.env.VITE_BUILD_TIME || Date.now();
 
   return (
-    <StyledLayout $backgroundUrl={backgroundType === 'anime' ? backgroundUrl : null} $isStandalone={isStandalone}>
+    <StyledLayout $backgroundUrl={hasWallpaperBackground ? backgroundUrl : null} $isStandalone={isStandalone}>
       {!isStandalone && (
-        <StyledHeader $scrolled={scrolled}>
+        <StyledHeader $scrolled={scrolled} $hasBackground={hasWallpaperBackground}>
           <HeaderLeft>
             <StyledAvatar
               size={40}
