@@ -36,6 +36,7 @@ package-lock.json
 /build
 /dist
 generate-previews.html
+test-results
 
 # Coverage directory
 /coverage
