@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/updateBuildInfo.cjs --dev && vite --host",
+    "dev:prod-api": "node scripts/updateBuildInfo.cjs --dev --use-prod-api && vite --host",
     "build": "node scripts/updateBuildInfo.cjs && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

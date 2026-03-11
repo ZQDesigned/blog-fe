@@ -2,6 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+const DEFAULT_DEV_API_BASE_URL = 'http://localhost:8080';
+const DEFAULT_PROD_API_BASE_URL = 'https://api.blog.zqdesigned.city';
+
+const toBoolean = (value) => {
+  if (typeof value !== 'string') return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+};
+
 // 获取当前 Git Commit Hash
 function getGitHash(isDev = false) {
   if (isDev) {
@@ -15,11 +24,24 @@ function getGitHash(isDev = false) {
   }
 }
 
+function resolveApiBaseUrl(isDev, useProdApiInDev) {
+  const devApiBaseUrl = process.env.VITE_DEV_API_BASE_URL || DEFAULT_DEV_API_BASE_URL;
+  const prodApiBaseUrl = process.env.VITE_PROD_API_BASE_URL || DEFAULT_PROD_API_BASE_URL;
+
+  if (!isDev) {
+    return prodApiBaseUrl;
+  }
+
+  return useProdApiInDev ? prodApiBaseUrl : devApiBaseUrl;
+}
+
 // 读取并更新环境变量文件
 function updateEnvFile() {
   const envPath = path.resolve(process.cwd(), '.env');
   const envExamplePath = path.resolve(process.cwd(), '.env.example');
   const isDev = process.argv.includes('--dev');
+  const useProdApiInDev =
+    process.argv.includes('--use-prod-api') || toBoolean(process.env.VITE_USE_PROD_API_IN_DEV);
   
   try {
     // 读取现有的 .env 文件
@@ -36,7 +58,7 @@ function updateEnvFile() {
     // 更新或添加构建时间和 Git Hash
     const buildTime = isDev ? '' : Date.now().toString();
     const gitHash = getGitHash(isDev);
-    const apiBaseUrl = isDev ? 'http://localhost:8080' : 'https://api.blog.zqdesigned.city';
+    const apiBaseUrl = resolveApiBaseUrl(isDev, useProdApiInDev);
     
     const lines = envContent.split('\n');
     const newLines = lines.map(line => {
@@ -69,7 +91,8 @@ function updateEnvFile() {
       buildTime: isDev ? 'development' : new Date(Number(buildTime)).toISOString(),
       gitHash,
       apiBaseUrl,
-      environment: isDev ? 'development' : 'production'
+      environment: isDev ? 'development' : 'production',
+      apiSource: isDev ? (useProdApiInDev ? 'production' : 'development') : 'production',
     });
   } catch (error) {
     console.error('Error updating build info:', error);
