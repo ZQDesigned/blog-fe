@@ -64,13 +64,20 @@ class GlobalErrorBoundary extends React.Component<
       return (
         <div
           style={{
+            position: 'fixed',
+            inset: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            width: '100vw',
+            width: '100%',
+            minHeight: '100vh',
+            height: '100dvh',
+            boxSizing: 'border-box',
+            overflow: 'auto',
             padding: 24,
             backgroundColor: themeVars.colors.background,
+            zIndex: 2147483647,
           }}
         >
           <Result
