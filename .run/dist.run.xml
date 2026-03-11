@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="dist" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="cd dist &amp;&amp; npx serve" />
+    <option name="SCRIPT_TEXT" value="cd dist &amp;&amp; bunx serve" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
