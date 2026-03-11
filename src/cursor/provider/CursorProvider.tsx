@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CursorContext } from './CursorContext';
+import { CursorContext, type CursorStyle } from './CursorContext';
 
 const CURSOR_STORAGE_KEY = 'customCursorEnabled';
+const CURSOR_STYLE_STORAGE_KEY = 'customCursorStyle';
 const CURSOR_USE_CUSTOM_PALETTE_KEY = 'customCursorUseCustomPalette';
 const CURSOR_PALETTE_STORAGE_KEY = 'customCursorPalette';
 const CUSTOM_CURSOR_DATASET_KEY = 'customCursor';
@@ -36,6 +37,8 @@ const EMPTY_PALETTE: CursorPalette = {
   ringBackground: '',
 };
 
+const CURSOR_STYLE_SET: ReadonlySet<CursorStyle> = new Set(['orb', 'diamondSword']);
+
 const readStoredCursorEnabled = (): boolean => {
   if (typeof window === 'undefined') {
     return true;
@@ -47,6 +50,21 @@ const readStoredCursorEnabled = (): boolean => {
   }
 
   return stored === 'true';
+};
+
+const readStoredCursorStyle = (): CursorStyle => {
+  if (typeof window === 'undefined') {
+    return 'orb';
+  }
+
+  const stored = window.localStorage.getItem(CURSOR_STYLE_STORAGE_KEY);
+  if (!stored) {
+    return 'orb';
+  }
+
+  return CURSOR_STYLE_SET.has(stored as CursorStyle)
+    ? (stored as CursorStyle)
+    : 'orb';
 };
 
 const readStoredUseCustomPalette = (): boolean => {
@@ -156,11 +174,16 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [enabled, setEnabledState] = useState<boolean>(() => readStoredCursorEnabled());
   const [isSupported, setIsSupported] = useState<boolean>(() => getCursorSupport());
   const [active, setActive] = useState<boolean>(false);
+  const [style, setStyleState] = useState<CursorStyle>(() => readStoredCursorStyle());
   const [useCustomPalette, setUseCustomPaletteState] = useState<boolean>(() => readStoredUseCustomPalette());
   const [palette, setPalette] = useState<CursorPalette>(() => readStoredPalette());
 
   const setEnabled = useCallback((next: boolean) => {
     setEnabledState(next);
+  }, []);
+
+  const setStyle = useCallback((next: CursorStyle) => {
+    setStyleState(next);
   }, []);
 
   const setUseCustomPalette = useCallback((next: boolean) => {
@@ -223,6 +246,14 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     window.localStorage.setItem(CURSOR_STORAGE_KEY, String(enabled));
   }, [enabled]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(CURSOR_STYLE_STORAGE_KEY, style);
+  }, [style]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -319,16 +350,62 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const rootElement = document.documentElement;
-    if (cursorEnabled) {
+    const applyCursorLock = () => {
+      const bodyElement = document.body;
       rootElement.dataset[CUSTOM_CURSOR_DATASET_KEY] = 'on';
-    } else {
+      rootElement.style.setProperty('cursor', 'none', 'important');
+      if (bodyElement) {
+        bodyElement.style.setProperty('cursor', 'none', 'important');
+      }
+    };
+
+    const clearCursorLock = () => {
+      const bodyElement = document.body;
       delete rootElement.dataset[CUSTOM_CURSOR_DATASET_KEY];
+      rootElement.style.removeProperty('cursor');
+      if (bodyElement) {
+        bodyElement.style.removeProperty('cursor');
+      }
+    };
+
+    if (!cursorEnabled) {
+      clearCursorLock();
+      return clearCursorLock;
     }
 
-    return () => {
-      if (typeof document !== 'undefined') {
-        delete document.documentElement.dataset[CUSTOM_CURSOR_DATASET_KEY];
+    const ensureCursorLock = () => {
+      const bodyElement = document.body;
+      const rootLocked =
+        rootElement.dataset[CUSTOM_CURSOR_DATASET_KEY] === 'on' &&
+        rootElement.style.getPropertyValue('cursor') === 'none' &&
+        rootElement.style.getPropertyPriority('cursor') === 'important';
+      const bodyLocked = !bodyElement
+        || (
+          bodyElement.style.getPropertyValue('cursor') === 'none'
+          && bodyElement.style.getPropertyPriority('cursor') === 'important'
+        );
+
+      if (!rootLocked || !bodyLocked) {
+        applyCursorLock();
       }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        ensureCursorLock();
+      }
+    };
+
+    applyCursorLock();
+    window.addEventListener('pointermove', ensureCursorLock, { passive: true });
+    window.addEventListener('focus', ensureCursorLock);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('pointermove', ensureCursorLock);
+      window.removeEventListener('focus', ensureCursorLock);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearCursorLock();
     };
   }, [cursorEnabled]);
 
@@ -374,9 +451,11 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       enabled,
       active,
       isSupported,
+      style,
       useCustomPalette,
       palette,
       setEnabled,
+      setStyle,
       setUseCustomPalette,
       updatePalette,
       resetPaletteToSystem,
@@ -385,9 +464,11 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       enabled,
       active,
       isSupported,
+      style,
       useCustomPalette,
       palette,
       setEnabled,
+      setStyle,
       setUseCustomPalette,
       updatePalette,
       resetPaletteToSystem,

@@ -1,9 +1,12 @@
 import React from 'react';
 
+export type CursorStyle = 'orb' | 'diamondSword';
+
 export interface CursorContextValue {
   enabled: boolean;
   active: boolean;
   isSupported: boolean;
+  style: CursorStyle;
   useCustomPalette: boolean;
   palette: {
     dotBackground: string;
@@ -14,6 +17,7 @@ export interface CursorContextValue {
     ringBackground: string;
   };
   setEnabled: (next: boolean) => void;
+  setStyle: (next: CursorStyle) => void;
   setUseCustomPalette: (next: boolean) => void;
   updatePalette: (
     key: 'dotBackground' | 'dotBorder' | 'ringBorder' | 'ringHoverBorder' | 'ringActiveBorder' | 'ringBackground',

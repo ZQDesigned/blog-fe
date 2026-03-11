@@ -18,7 +18,9 @@
 
 html[data-custom-cursor='on'],
 html[data-custom-cursor='on'] body,
-html[data-custom-cursor='on'] body * {
+html[data-custom-cursor='on'] body *,
+html[data-custom-cursor='on'] body *::before,
+html[data-custom-cursor='on'] body *::after {
   cursor: none !important;
 }
 

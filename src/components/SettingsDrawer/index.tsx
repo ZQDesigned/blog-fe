@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ColorPicker, Drawer, Input, Typography, Space, Spin, Switch } from 'antd';
+import { Button, ColorPicker, Drawer, Input, Typography, Space, Spin, Switch, Radio } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
@@ -132,6 +132,11 @@ const paletteFieldMeta = [
   { key: 'ringBackground', label: '环背景' },
 ] as const;
 
+const cursorStyleOptions = [
+  { label: '圆点环', value: 'orb' },
+  { label: '钻石剑', value: 'diamondSword' },
+];
+
 const isValidCssColor = (value: string): boolean => {
   if (typeof window === 'undefined' || typeof window.CSS === 'undefined') {
     return true;
@@ -172,6 +177,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
     enabled: cursorEnabled,
     setEnabled: setCursorEnabled,
     isSupported: isCursorSupported,
+    style: cursorStyle,
+    setStyle: setCursorStyle,
     useCustomPalette,
     setUseCustomPalette,
     palette,
@@ -253,17 +260,32 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
               : '当前设备或系统环境不支持 custom cursor，已自动回退系统鼠标。'}
           </SettingHint>
           <SettingRow>
+            <SettingLabel>指针图案</SettingLabel>
+            <Radio.Group
+              size="small"
+              optionType="button"
+              buttonStyle="solid"
+              disabled={!isCursorSupported}
+              value={cursorStyle}
+              options={cursorStyleOptions}
+              onChange={(event) => setCursorStyle(event.target.value as 'orb' | 'diamondSword')}
+            />
+          </SettingRow>
+          <SettingHint>
+            钻石剑样式为固定像素配色（与原版图样一致），不使用下方色板覆盖。
+          </SettingHint>
+          <SettingRow>
             <SettingLabel>启用自定义指针色板</SettingLabel>
             <Switch
               checked={useCustomPalette}
-              disabled={!isCursorSupported}
+              disabled={!isCursorSupported || cursorStyle === 'diamondSword'}
               onChange={setUseCustomPalette}
             />
           </SettingRow>
           <SettingHint>
-            默认关闭，关闭时使用系统主题默认指针配色；开启后可单独配置各颜色项。
+            默认关闭，关闭时使用系统主题默认指针配色；开启后可单独配置各颜色项（仅圆点环样式生效）。
           </SettingHint>
-          {useCustomPalette && (
+          {useCustomPalette && cursorStyle === 'orb' && (
             <>
               <PaletteGrid>
                 {paletteFieldMeta.map((item) => {
