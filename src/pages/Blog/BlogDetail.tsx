@@ -9,8 +9,6 @@ import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
 import { blogApi } from '../../services/api';
 import { BlogData } from '../../types/types';
-import GameModal from '../../components/GameModal';
-import { useGameEasterEgg } from '../../hooks/useGameEasterEgg';
 import DataErrorFallback from '../../components/DataErrorFallback';
 
 const { Title } = Typography;
@@ -77,7 +75,6 @@ const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
 
   const [blog, setBlog] = useState<BlogData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,8 +208,6 @@ const BlogDetail: React.FC = () => {
 
         <StyledMarkdownRenderer content={blog.content} />
       </ContentWrapper>
-
-      <GameModal open={showGameModal} onClose={handleCloseGameModal} />
     </Container>
   );
 };

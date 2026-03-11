@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Avatar, Spin, Typography } from 'antd';
 import {
   HomeOutlined,
@@ -25,8 +25,6 @@ import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { getFooterProfile } from '../../services/api';
 import { FooterProfile } from '../../types/types';
 import * as Icons from '@ant-design/icons';
-
-const GameModal = React.lazy(() => import('../GameModal'));
 
 const { Header, Content} = Layout;
 const { Paragraph } = Typography;
@@ -320,14 +318,6 @@ const BuildInfo = styled.div`
   align-items: flex-start;
   justify-content: flex-start;
 `;
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-`;
-
 const IcpContainer = styled.div`
   display: flex;
   align-items: center;
@@ -345,7 +335,7 @@ const IcpContainer = styled.div`
 export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { showGameModal, handleCloseGameModal } = useGameEasterEgg();
+  useGameEasterEgg();
   const { showToast } = useToast();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [footerLinks, setFooterLinks] = useState<FooterProfile['links']>([]);
@@ -834,13 +824,6 @@ export const MainLayout: React.FC = () => {
           onRefreshBackground={refreshBackground}
         />
       )}
-      <Suspense fallback={
-        <LoadingContainer>
-          <Spin size="large" tip="游戏加载中..." />
-        </LoadingContainer>
-      }>
-        {showGameModal && <GameModal open={showGameModal} onClose={handleCloseGameModal} />}
-      </Suspense>
     </StyledLayout>
   );
 };
