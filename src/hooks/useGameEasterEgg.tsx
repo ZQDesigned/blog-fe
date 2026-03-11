@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Space, notification } from 'antd';
 import { ReadOutlined } from '@ant-design/icons';
 import { useStandaloneMode } from './useStandaloneMode';
@@ -12,11 +11,20 @@ const GAME_SHOWN_TIME_KEY = 'game_shown_time';
 const PAGE_REFRESH_KEY = 'page_refresh_time';
 const LAST_COUNTED_ARTICLE_PATH_KEY = 'last_counted_article_path';
 const LAST_COUNTED_ARTICLE_TIME_KEY = 'last_counted_article_time';
+const GAME_EASTER_EGG_NOTIFICATION_KEY = 'game-easter-egg-notification';
 
 export const useGameEasterEgg = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isStandalone = useStandaloneMode();
+  const notificationTimerRef = useRef<number | null>(null);
+
+  const clearPendingNotification = useCallback(() => {
+    if (notificationTimerRef.current !== null) {
+      window.clearTimeout(notificationTimerRef.current);
+      notificationTimerRef.current = null;
+    }
+  }, []);
 
   // 在组件挂载时检查是否需要重置计数器
   useEffect(() => {
@@ -35,6 +43,8 @@ export const useGameEasterEgg = () => {
   }, [isStandalone]);
 
   useEffect(() => {
+    clearPendingNotification();
+
     if (isStandalone) return;
 
     // 只在博客详情页面计数
@@ -69,8 +79,10 @@ export const useGameEasterEgg = () => {
       localStorage.setItem(GAME_SHOWN_TIME_KEY, currentTime.toString());
       localStorage.setItem(ARTICLE_READ_COUNT_KEY, '0'); // 重置计数
       // 延迟3秒显示，给用户一些阅读时间
-      setTimeout(() => {
+      notificationTimerRef.current = window.setTimeout(() => {
+        notificationTimerRef.current = null;
         notification.info({
+          key: GAME_EASTER_EGG_NOTIFICATION_KEY,
           message: '要不要休息一下？',
           description: '看了这么多文章，要不要玩个小游戏放松一下？',
           icon: <ReadOutlined style={{ color: themeVars.colors.primary }} />,
@@ -82,13 +94,17 @@ export const useGameEasterEgg = () => {
                 type="link"
                 size="small"
                 onClick={() => {
-                  notification.destroy();
+                  notification.destroy(GAME_EASTER_EGG_NOTIFICATION_KEY);
                   navigate(ROUTES.GAMES);
                 }}
               >
                 好啊，玩玩看
               </Button>
-              <Button type="link" size="small" onClick={() => notification.destroy()}>
+              <Button
+                type="link"
+                size="small"
+                onClick={() => notification.destroy(GAME_EASTER_EGG_NOTIFICATION_KEY)}
+              >
                 继续阅读
               </Button>
             </Space>
@@ -96,5 +112,16 @@ export const useGameEasterEgg = () => {
         });
       }, 3000);
     }
-  }, [location.pathname, isStandalone, navigate]);
+
+    return () => {
+      clearPendingNotification();
+    };
+  }, [clearPendingNotification, location.pathname, isStandalone, navigate]);
+
+  useEffect(() => {
+    return () => {
+      clearPendingNotification();
+      notification.destroy(GAME_EASTER_EGG_NOTIFICATION_KEY);
+    };
+  }, [clearPendingNotification]);
 };
