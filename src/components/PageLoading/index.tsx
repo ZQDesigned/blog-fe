@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants, type TargetAndTransition } from 'framer-motion';
 import { themeVars } from '../../theme';
 
 const LoadingContainer = styled(motion.div)`
@@ -40,7 +40,7 @@ const LOADING_EMOJIS = [
   '🌈', '🌙', '☀️', '⚡️', '🍀', '🌸', '🌺', '🌼', '🌻'
 ];
 
-const container = {
+const container: Variants = {
   show: {
     transition: {
       staggerChildren: 0.1,
@@ -48,42 +48,37 @@ const container = {
   },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.8,
-      ease: "easeOut",
+      ease: 'easeOut',
     },
   },
 };
 
-const createEmojiAnimation = (index: number) => ({
-  animate: {
-    y: [-10, 10],
-    rotate: [-10, 10],
-    transition: {
-      y: {
-        repeat: Infinity,
-        repeatType: "reverse",
-        duration: 1,
-        ease: "easeInOut",
-        // 设置动画延迟，创造波浪效果
-        delay: index * 0.2,
-        // 设置偏移，使动画看起来更自然
-        offset: index * 0.2,
-      },
-      rotate: {
-        repeat: Infinity,
-        repeatType: "reverse",
-        duration: 1,
-        ease: "easeInOut",
-        // 设置动画延迟，与上下移动同步
-        delay: index * 0.2,
-        offset: index * 0.2,
-      },
+const createEmojiAnimation = (index: number): TargetAndTransition => ({
+  y: [-10, 10],
+  rotate: [-10, 10],
+  transition: {
+    y: {
+      repeat: Infinity,
+      repeatType: 'reverse',
+      duration: 1,
+      ease: 'easeInOut',
+      // 设置动画延迟，创造波浪效果
+      delay: index * 0.2,
+    },
+    rotate: {
+      repeat: Infinity,
+      repeatType: 'reverse',
+      duration: 1,
+      ease: 'easeInOut',
+      // 设置动画延迟，与上下移动同步
+      delay: index * 0.2,
     },
   },
 });
@@ -130,7 +125,7 @@ const PageLoading: React.FC<PageLoadingProps> = ({ tip = "加载中" }) => {
               <EmojiWrapper
                 key={index}
                 initial={{ y: 0, rotate: 0 }}
-                animate={createEmojiAnimation(index).animate}
+                animate={createEmojiAnimation(index)}
               >
                 {emoji}
               </EmojiWrapper>

@@ -118,7 +118,7 @@ const menuAnimation = {
   animate: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: 0.8 },
   transition: { duration: 0.2 }
-};
+} as const;
 
 const mobileMenuAnimation = {
   initial: { y: '100%', opacity: 0 },
@@ -126,7 +126,7 @@ const mobileMenuAnimation = {
     y: 0,
     opacity: 1,
     transition: {
-      y: { type: 'spring', damping: 25, stiffness: 300 },
+      y: { type: 'spring' as const, damping: 25, stiffness: 300 },
       opacity: { duration: 0.2 }
     }
   },
@@ -134,11 +134,11 @@ const mobileMenuAnimation = {
     y: '100%',
     opacity: 0,
     transition: {
-      y: { type: 'spring', damping: 35, stiffness: 400 },
+      y: { type: 'spring' as const, damping: 35, stiffness: 400 },
       opacity: { duration: 0.2 }
     }
   }
-};
+} as const;
 
 const overlayAnimation = {
   initial: { opacity: 0 },
@@ -146,17 +146,17 @@ const overlayAnimation = {
     opacity: 1,
     transition: {
       duration: 0.2,
-      ease: 'easeOut'
+      ease: 'easeOut' as const
     }
   },
   exit: {
     opacity: 0,
     transition: {
       duration: 0.2,
-      ease: 'easeIn'
+      ease: 'easeIn' as const
     }
   }
-};
+} as const;
 
 const MenuHandle = styled.div`
   width: 36px;
