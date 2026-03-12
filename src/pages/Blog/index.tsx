@@ -77,6 +77,13 @@ const StyledCard = styled(motion(Card))`
   cursor: pointer;
   transition: all ${themeVars.transitions.default};
   box-shadow: ${themeVars.shadows.small};
+  height: 100%;
+
+  .ant-card-body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
   
   &:hover {
     transform: translateY(-4px);
@@ -110,7 +117,8 @@ const BlogTag = styled(Tag)<{ $active?: boolean }>`
 `;
 
 const TagsContainer = styled.div`
-  margin: ${themeVars.spacing.md} 0;
+  margin-top: auto;
+  padding-top: ${themeVars.spacing.md};
 `;
 
 const ReadMoreButton = styled(Button)`
@@ -134,6 +142,7 @@ const cardVariants = {
 
 const PreviewMarkdownRenderer = styled(MarkdownRenderer)`
   margin-top: ${themeVars.spacing.md};
+  flex: 1 1 auto;
   max-height: 100px;
   overflow: hidden;
   position: relative;
