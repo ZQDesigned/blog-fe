@@ -7,6 +7,7 @@ import { HomeBanner as HomeBannerType } from '../../../types/types';
 import { themeVars, withThemeAlpha } from '../../../theme';
 import * as Icons from '@ant-design/icons';
 import { getFullResourceUrl } from '../../../utils/request';
+import { requestExternalNavigation } from '../../../utils/externalNavigation';
 
 const BannerContainer = styled.div<{ $backgroundImage?: string }>`
   width: 100%;
@@ -143,7 +144,7 @@ const HomeBanner: React.FC<HomeBannerProps> = ({ data }) => {
 
   const handleButtonClick = (link: string) => {
     if (/^(https?:)?\/\//.test(link) || /^(mailto|tel):/.test(link)) {
-      window.location.href = link;
+      requestExternalNavigation(link, { mode: 'same-tab', target: '_self' });
       return;
     }
 
