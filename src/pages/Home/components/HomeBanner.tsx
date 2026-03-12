@@ -10,20 +10,40 @@ import { getFullResourceUrl } from '../../../utils/request';
 
 const BannerContainer = styled.div<{ $backgroundImage?: string }>`
   width: 100%;
-  min-height: 600px;
+  min-height: 960px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: ${themeVars.spacing.xl};
-  background: ${props => props.$backgroundImage 
-    ? `url(${getFullResourceUrl(props.$backgroundImage)})`
-    : themeVars.colors.secondary};
-  background-size: cover;
-  background-position: center;
-  color: ${props => props.$backgroundImage ? themeVars.colors.text : themeVars.colors.text};
+  background: ${themeVars.colors.secondary};
+  color: ${themeVars.colors.text};
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: ${props =>
+      props.$backgroundImage ? `url(${getFullResourceUrl(props.$backgroundImage)})` : 'none'};
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: ${props => (props.$backgroundImage ? 1 : 0)};
+    filter: saturate(1.08) contrast(1.08) brightness(0.98);
+    transform: scale(1.02);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   @media (max-width: 768px) {
-    min-height: 400px;
+    min-height: 640px;
     padding: ${themeVars.spacing.lg};
   }
 `;
