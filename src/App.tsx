@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, FloatButton } from 'antd';
 import { MainLayout } from './components/Layout/MainLayout';
 import { ROUTES } from './constants/routes';
-import React, { lazy, Suspense, useState } from 'react';
-import AnimatedCursor from './components/AnimatedCursor';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import PageLoading from './components/PageLoading';
 import { ToastProvider } from './components/Toast/ToastManager';
 import { ThemeProvider, useTheme } from './theme';
@@ -17,6 +16,7 @@ const BlogDetailPage = lazy(() => import('./pages/Blog/BlogDetail'));
 const ProjectsPage = lazy(() => import('./pages/Projects'));
 const AboutPage = lazy(() => import('./pages/About'));
 const GamesPage = lazy(() => import('./pages/Games'));
+const AnimatedCursor = lazy(() => import('./components/AnimatedCursor'));
 
 const DevErrorTrigger: React.FC = () => {
   const [shouldThrow, setShouldThrow] = useState(false);
@@ -42,10 +42,39 @@ const DevErrorTrigger: React.FC = () => {
 
 const AppShell: React.FC = () => {
   const { antdTheme } = useTheme();
+  const [shouldLoadAnimatedCursor, setShouldLoadAnimatedCursor] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if ('requestIdleCallback' in window) {
+      const idleCallbackId = window.requestIdleCallback(() => {
+        setShouldLoadAnimatedCursor(true);
+      });
+
+      return () => {
+        window.cancelIdleCallback(idleCallbackId);
+      };
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setShouldLoadAnimatedCursor(true);
+    }, 1);
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <ConfigProvider theme={antdTheme}>
-      <AnimatedCursor />
+      {shouldLoadAnimatedCursor && (
+        <Suspense fallback={null}>
+          <AnimatedCursor />
+        </Suspense>
+      )}
       <DevErrorTrigger />
       <ToastProvider>
         <BrowserRouter>

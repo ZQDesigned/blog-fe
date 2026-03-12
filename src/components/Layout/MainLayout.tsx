@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Layout, Menu, Avatar, Spin, Typography } from 'antd';
 import {
   HomeOutlined,
@@ -15,12 +15,9 @@ import styled from '@emotion/styled';
 import {NAV_ITEMS, ROUTES} from '../../constants/routes';
 import { themeVars, withThemeAlpha } from '../../theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
-import ContextMenu from '../ContextMenu';
 import { formatDate } from '../../utils/dateUtils';
 import { useToast } from '../../hooks/useToast.ts';
 import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
-import SettingsDrawer from '../SettingsDrawer';
-import FloatSidebar from '../FloatSidebar';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { getFooterProfile } from '../../services/api';
 import { FooterProfile } from '../../types/types';
@@ -28,6 +25,9 @@ import * as Icons from '@ant-design/icons';
 
 const { Header, Content} = Layout;
 const { Paragraph } = Typography;
+const ContextMenu = lazy(() => import('../ContextMenu'));
+const SettingsDrawer = lazy(() => import('../SettingsDrawer'));
+const FloatSidebar = lazy(() => import('../FloatSidebar'));
 
 const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandalone?: boolean }>`
   min-height: 100vh;
@@ -341,6 +341,7 @@ export const MainLayout: React.FC = () => {
   const [footerLinks, setFooterLinks] = useState<FooterProfile['links']>([]);
   const [loadingFooter, setLoadingFooter] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [shouldLoadDeferredUi, setShouldLoadDeferredUi] = useState(false);
   const {
     backgroundType,
     backgroundUrl,
@@ -357,6 +358,30 @@ export const MainLayout: React.FC = () => {
     }
 
     document.documentElement.dataset.standalone = String(isStandalone);
+  }, [isStandalone]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || isStandalone) {
+      return;
+    }
+
+    if ('requestIdleCallback' in window) {
+      const idleCallbackId = window.requestIdleCallback(() => {
+        setShouldLoadDeferredUi(true);
+      });
+
+      return () => {
+        window.cancelIdleCallback(idleCallbackId);
+      };
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setShouldLoadDeferredUi(true);
+    }, 1);
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
   }, [isStandalone]);
 
   useEffect(() => {
@@ -713,7 +738,11 @@ export const MainLayout: React.FC = () => {
       )}
       <StyledContent $isStandalone={isStandalone}>
         <Outlet />
-        {!isStandalone && <FloatSidebar />}
+        {!isStandalone && shouldLoadDeferredUi && (
+          <Suspense fallback={null}>
+            <FloatSidebar />
+          </Suspense>
+        )}
       </StyledContent>
       {!isStandalone && (
         <FooterContainer>
@@ -812,17 +841,25 @@ export const MainLayout: React.FC = () => {
           </FooterBottom>
         </FooterContainer>
       )}
-      {!isStandalone && <ContextMenu items={contextMenuItems} />}
+      {!isStandalone && shouldLoadDeferredUi && (
+        <Suspense fallback={null}>
+          <ContextMenu items={contextMenuItems} />
+        </Suspense>
+      )}
       {!isStandalone && (
-        <SettingsDrawer
-          open={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          backgroundType={backgroundType}
-          backgroundUrl={backgroundUrl}
-          isLoading={isLoading}
-          onBackgroundTypeChange={setBackgroundType}
-          onRefreshBackground={refreshBackground}
-        />
+        <Suspense fallback={null}>
+          {settingsOpen && (
+            <SettingsDrawer
+              open={settingsOpen}
+              onClose={() => setSettingsOpen(false)}
+              backgroundType={backgroundType}
+              backgroundUrl={backgroundUrl}
+              isLoading={isLoading}
+              onBackgroundTypeChange={setBackgroundType}
+              onRefreshBackground={refreshBackground}
+            />
+          )}
+        </Suspense>
       )}
     </StyledLayout>
   );
