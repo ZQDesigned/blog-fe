@@ -127,7 +127,9 @@ const ReadMoreButton = styled(Button)`
   height: auto;
   line-height: 1;
   color: ${themeVars.colors.primary};
-  display: block;
+  display: inline-flex;
+  align-self: flex-start;
+  justify-content: flex-start;
   
   &:hover {
     color: ${withThemeAlpha(themeVars.colors.primary, 0.8667)};
