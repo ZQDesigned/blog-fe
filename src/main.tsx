@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { MotionConfig } from 'framer-motion'
+import isPropValid from '@emotion/is-prop-valid'
 import App from './App.tsx'
 import './styles/base.css'
 import 'lxgw-wenkai-webfont/lxgwwenkai-regular.css'
@@ -17,7 +19,9 @@ initializeThemeRuntime();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Index>
-      <App />
+      <MotionConfig isValidProp={isPropValid}>
+        <App />
+      </MotionConfig>
     </Index>
   </StrictMode>,
 )

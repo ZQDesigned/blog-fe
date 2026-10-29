@@ -121,6 +121,19 @@ h1, h2, h3, h4, h5, h6 {
 
 button, input, textarea, select { font: inherit; }
 
+/* Keep the pre-upgrade button icon baseline instead of AntD's new flex spacer. */
+.ant-btn.ant-btn .ant-btn-icon {
+  display: block;
+}
+
+.ant-btn.ant-btn .ant-btn-icon .anticon {
+  vertical-align: -0.125em;
+}
+
+.ant-btn.ant-btn .ant-btn-icon .anticon::before {
+  content: none;
+}
+
 :focus-visible {
   outline: 2px solid var(--theme-color-brand-primary);
   outline-offset: 5px;

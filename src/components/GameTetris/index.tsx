@@ -147,7 +147,7 @@ const GameTetris: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const gameLoopRef = useRef<number>();
+  const gameLoopRef = useRef<number | undefined>(undefined);
 
   const createNewPiece = useCallback(() => {
     const shapes = Object.entries(TETROMINOES);

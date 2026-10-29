@@ -206,8 +206,8 @@ const AnimatedCursor: React.FC = () => {
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
   const swordRef = useRef<HTMLDivElement | null>(null);
-  const rafIdRef = useRef<number>();
-  const clearParticlesTimerRef = useRef<number>();
+  const rafIdRef = useRef<number | undefined>(undefined);
+  const clearParticlesTimerRef = useRef<number | undefined>(undefined);
   const targetPositionRef = useRef<Position>({ x: 0, y: 0 });
   const ringPositionRef = useRef<Position>({ x: 0, y: 0 });
   const hasPointerRef = useRef(false);

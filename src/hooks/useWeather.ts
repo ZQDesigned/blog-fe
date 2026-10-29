@@ -198,7 +198,7 @@ export const useWeather = () => {
                 setWeather(parsedWeather);
                 setError('使用缓存的天气数据');
               } else {
-                throw new Error('缓存的天气数据无效');
+                throw Object.assign(new Error('缓存的天气数据无效'), { cause: err });
               }
             }
           } catch (e) {
@@ -221,4 +221,4 @@ export const useWeather = () => {
   }, [location]);
 
   return { weather, loading, error };
-}; 
+};

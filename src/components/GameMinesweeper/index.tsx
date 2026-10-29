@@ -159,7 +159,7 @@ const GameMinesweeper: React.FC = () => {
   const [flagsCount, setFlagsCount] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number | undefined>(undefined);
   const firstMoveRef = useRef(true);
 
   const initializeBoard = useCallback(() => {

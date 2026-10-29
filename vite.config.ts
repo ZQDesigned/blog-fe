@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    // Preserve the browser targets used before the Vite 8 upgrade.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
@@ -18,7 +20,7 @@ export default defineConfig({
         comments: false,
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: 'assets/[hash].js',
         chunkFileNames: 'assets/[hash].js',

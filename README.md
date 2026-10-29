@@ -45,7 +45,7 @@
 
 ## 技术栈
 
-- React 18
+- React 19
 - TypeScript
 - Vite
 - React Router
@@ -59,8 +59,8 @@
 
 ### 1. 开发环境要求
 
-- Node.js 20+（建议 LTS）
-- Bun 1.3+
+- Node.js 20.19+、22.13+ 或 24+（建议使用 Node.js 24 LTS）
+- Bun 1.4.3（与 `package.json` 中的 `packageManager` 和 `engines.bun` 保持一致）
 - 推荐使用现代浏览器（Chrome / Edge / Safari 最新版）
 
 ### 2. 本地启动
