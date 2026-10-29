@@ -3,7 +3,7 @@ import { Typography, Card, List } from 'antd';
 import styled from '@emotion/styled';
 import { themeVars } from '../../../theme';
 import AboutSection from './AboutSection';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
 
 const { Paragraph, Text } = Typography;
 
@@ -24,6 +24,7 @@ interface CustomSectionProps {
 }
 
 const ItemCard = styled(Card)`
+  min-width: 0;
   margin-bottom: ${themeVars.spacing.sm};
   transition: all 0.3s ease;
   cursor: ${props => props.onClick ? 'pointer' : 'default'};
@@ -52,7 +53,7 @@ const IconWrapper = styled.div`
 
 const CardsContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
   gap: ${themeVars.spacing.md};
   margin-top: ${themeVars.spacing.md};
 `;
@@ -64,12 +65,6 @@ const CustomSection: React.FC<CustomSectionProps> = ({
   items,
   delay = 0
 }) => {
-  const getIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
   return (
     <AboutSection title={title} delay={delay}>
       <Paragraph>{content}</Paragraph>
@@ -81,7 +76,7 @@ const CustomSection: React.FC<CustomSectionProps> = ({
           renderItem={item => (
             <List.Item>
               <List.Item.Meta
-                avatar={item.icon && <IconWrapper>{getIcon(item.icon)}</IconWrapper>}
+                avatar={item.icon && <IconWrapper><DynamicIcon name={item.icon} /></IconWrapper>}
                 title={item.title}
                 description={item.description}
               />
@@ -109,4 +104,4 @@ const CustomSection: React.FC<CustomSectionProps> = ({
   );
 };
 
-export default CustomSection; 
+export default CustomSection;

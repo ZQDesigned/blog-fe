@@ -43,6 +43,7 @@ export interface ThemeRadiusTokens {
 
 export interface ThemeTypographyTokens {
   fontFamilyBase: string;
+  fontFamilyHeading: string;
   fontFamilyMono: string;
   fontSizeBase: string;
   lineHeightBase: string;

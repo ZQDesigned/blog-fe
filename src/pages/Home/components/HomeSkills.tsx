@@ -1,133 +1,28 @@
-import React from 'react';
-import { Typography, Progress, Tooltip } from 'antd';
+import { Progress, Tooltip } from 'antd';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
-import { HomeSkills as HomeSkillsType } from '../../../types/types';
+import type { HomeSkills as HomeSkillsType } from '../../../types/types';
 import { themeVars } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
+import { ContentGrid, GardenSection, SectionHeading } from '../../../components/Editorial';
 
-const { Title, Paragraph } = Typography;
-
-const SectionContainer = styled.div`
-  padding: ${themeVars.spacing.xl} 0;
-  background: ${themeVars.colors.background};
+const Category = styled.div`
+  h3 { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; margin: 0 0 24px; color: ${themeVars.colors.primary}; }
+  .skill { margin-bottom: 20px; }
+  .skill-label { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .skill-label .anticon { color: ${themeVars.colors.primary}; }
+  .ant-progress { display: block; line-height: 1; }
 `;
 
-const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${themeVars.spacing.lg};
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: ${themeVars.spacing.xl};
-`;
-
-const SectionTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.md} !important;
-`;
-
-const SectionDescription = styled(Paragraph)`
-  font-size: 1.2em;
-  color: ${themeVars.colors.lightText};
-  max-width: 600px;
-  margin: 0 auto !important;
-`;
-
-const SkillsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: ${themeVars.spacing.xl};
-`;
-
-const CategoryContainer = styled(motion.div)`
-  background: ${themeVars.colors.background};
-  padding: ${themeVars.spacing.lg};
-  border-radius: ${themeVars.borderRadius.medium};
-  box-shadow: ${themeVars.shadows.small};
-  transition: all ${themeVars.transitions.default};
-
-  &:hover {
-    box-shadow: ${themeVars.shadows.medium};
-    transform: translateY(-2px);
-  }
-`;
-
-const CategoryTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.lg} !important;
-  text-align: center;
-`;
-
-const SkillItem = styled.div`
-  margin-bottom: ${themeVars.spacing.md};
-`;
-
-const SkillHeader = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: ${themeVars.spacing.sm};
-`;
-
-const IconWrapper = styled.div`
-  margin-right: ${themeVars.spacing.sm};
-  font-size: 1.2em;
-  color: ${themeVars.colors.primary};
-`;
-
-interface HomeSkillsProps {
-  data: HomeSkillsType;
+export default function HomeSkills({ data }: { data: HomeSkillsType }) {
+  return <GardenSection>
+    <SectionHeading><h2>{data.title}</h2><p>{data.description}</p></SectionHeading>
+    <ContentGrid>{data.categories.map((category, index) => <Category key={index}>
+      <h3>{category.name}</h3>
+      {category.items.map((skill, skillIndex) => <div className="skill" key={skillIndex}>
+        <div className="skill-label"><DynamicIcon name={skill.icon} /><span>{skill.name}</span></div>
+        <Tooltip title={skill.description}><Progress percent={Math.max(0, Math.min(100, skill.level * 20))}
+          strokeColor={themeVars.colors.primary} size="small" showInfo={false} /></Tooltip>
+      </div>)}
+    </Category>)}</ContentGrid>
+  </GardenSection>;
 }
-
-const HomeSkills: React.FC<HomeSkillsProps> = ({ data }) => {
-  const getIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  return (
-    <SectionContainer>
-      <Content>
-        <Header>
-          <SectionTitle level={2}>{data.title}</SectionTitle>
-          <SectionDescription>{data.description}</SectionDescription>
-        </Header>
-
-        <SkillsGrid>
-          {data.categories.map((category, categoryIndex) => (
-            <CategoryContainer
-              key={categoryIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
-            >
-              <CategoryTitle level={3}>{category.name}</CategoryTitle>
-              {category.items.map((skill, skillIndex) => (
-                <SkillItem key={skillIndex}>
-                  <SkillHeader>
-                    {skill.icon && (
-                      <IconWrapper>{getIcon(skill.icon)}</IconWrapper>
-                    )}
-                    <Title level={5} style={{ margin: 0 }}>
-                      {skill.name}
-                    </Title>
-                  </SkillHeader>
-                  <Tooltip title={skill.description}>
-                    <Progress
-                      percent={skill.level * 20}
-                      strokeColor={themeVars.colors.primary}
-                      showInfo={false}
-                    />
-                  </Tooltip>
-                </SkillItem>
-              ))}
-            </CategoryContainer>
-          ))}
-        </SkillsGrid>
-      </Content>
-    </SectionContainer>
-  );
-};
-
-export default HomeSkills; 

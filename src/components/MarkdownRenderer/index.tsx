@@ -3,24 +3,30 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { Typography } from 'antd';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
-
-const { Paragraph } = Typography;
 
 interface MarkdownContainerProps {
   className?: string;
 }
 
 const MarkdownContainer = styled.div<MarkdownContainerProps>`
-  font-size: 16px;
-  line-height: 1.8;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 18px;
+  line-height: 1.95;
+  overflow-wrap: anywhere;
+  user-select: text;
+  & * { user-select: text; }
+  > :first-child { margin-top: 0; }
+  @media (max-width: 640px) { font-size: 16px; }
 
   h1, h2, h3, h4, h5, h6 {
-    margin-top: ${themeVars.spacing.lg};
-    margin-bottom: ${themeVars.spacing.md};
-    font-weight: 600;
+    margin-top: 1.8em;
+    margin-bottom: 0.65em;
+    font-family: ${themeVars.typography.fontFamilyHeading};
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   h1 {
@@ -36,7 +42,7 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   }
 
   p {
-    margin-bottom: ${themeVars.spacing.md};
+    margin-bottom: 1.25em;
   }
 
   ul, ol {
@@ -52,7 +58,8 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
     background-color: ${themeVars.colors.secondary};
     padding: 2px 4px;
     border-radius: 4px;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-family: ${themeVars.typography.fontFamilyMono};
+    font-size: 0.85em;
     color: ${themeVars.colors.primary};
   }
 
@@ -61,6 +68,10 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
     padding: ${themeVars.spacing.md};
     border-radius: 8px;
     overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
+    line-height: 1.8;
+    overflow-wrap: normal;
     margin-bottom: ${themeVars.spacing.md};
 
     code {
@@ -72,11 +83,14 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   blockquote {
     margin: ${themeVars.spacing.md} 0;
     padding-left: ${themeVars.spacing.md};
-    border-left: 4px solid ${themeVars.colors.primary};
+    border-left: 2px solid ${themeVars.colors.primary};
     color: ${themeVars.colors.lightText};
-    background-color: ${themeVars.colors.secondary};
+    background-color: transparent;
     padding: ${themeVars.spacing.md};
     border-radius: 0 4px 4px 0;
+    font-family: ${themeVars.typography.fontFamilyHeading};
+    font-size: 1.1em;
+    p:last-child { margin-bottom: 0; }
   }
 
   img {
@@ -87,7 +101,10 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   }
 
   table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
     margin: ${themeVars.spacing.md} 0;
     background-color: ${themeVars.colors.background};
@@ -95,6 +112,7 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
     th, td {
       border: 1px solid ${themeVars.colors.border};
       padding: ${themeVars.spacing.sm};
+      min-width: 100px;
     }
 
     th {
@@ -104,7 +122,8 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
 
   a {
     color: ${themeVars.colors.primary};
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 4px;
     transition: color ${themeVars.transitions.fast};
 
     &:hover {
@@ -124,13 +143,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
-        components={{
-          p: ({ children }) => (
-            <Paragraph>
-              {children}
-            </Paragraph>
-          ),
-        }}
       >
         {content}
       </ReactMarkdown>

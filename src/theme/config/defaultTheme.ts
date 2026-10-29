@@ -1,5 +1,8 @@
 import type { ThemeConfigCenter } from '../types';
 
+const bodyFont = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+const headingFont = '"LXGW WenKai", "Noto Sans SC", serif';
+
 export const defaultThemeConfig: ThemeConfigCenter = {
   meta: {
     version: '1.0.0',
@@ -25,9 +28,9 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         slow: '0.5s ease',
       },
       shadows: {
-        sm: '0 2px 8px rgba(0, 0, 0, 0.15)',
-        md: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        lg: '0 8px 24px rgba(0, 0, 0, 0.15)',
+        sm: '0 2px 10px rgba(48, 59, 52, 0.04)',
+        md: '0 8px 24px rgba(48, 59, 52, 0.07)',
+        lg: '0 16px 48px rgba(48, 59, 52, 0.12)',
       },
       radius: {
         sm: '4px',
@@ -36,10 +39,11 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         circle: '50%',
       },
       typography: {
-        fontFamilyBase: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        fontFamilyBase: bodyFont,
+        fontFamilyHeading: headingFont,
         fontFamilyMono: '"JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace',
         fontSizeBase: '16px',
-        lineHeightBase: '1.5',
+        lineHeightBase: '1.75',
       },
       cursor: {
         dotSize: '8px',
@@ -65,26 +69,26 @@ export const defaultThemeConfig: ThemeConfigCenter = {
     light: {
       semantic: {
         brand: {
-          primary: '#1890ff',
-          primaryHover: '#1677ff',
-          primaryActive: '#0958d9',
+          primary: '#5b715c',
+          primaryHover: '#435a45',
+          primaryActive: '#344836',
           onPrimary: '#ffffff',
         },
         text: {
-          primary: '#333333',
-          secondary: '#666666',
-          muted: '#8c8c8c',
+          primary: '#303b34',
+          secondary: '#626b61',
+          muted: '#767d72',
           inverse: '#ffffff',
         },
         surface: {
-          app: '#f0f7ff',
-          base: '#ffffff',
-          raised: '#ffffff',
-          subtle: '#f0f7ff',
+          app: '#f8f6f0',
+          base: '#f8f6f0',
+          raised: '#fffdf8',
+          subtle: '#eeeee5',
         },
         border: {
-          default: '#e8e8e8',
-          strong: '#d9d9d9',
+          default: '#dcdfd3',
+          strong: '#b7bfb0',
           inverse: 'rgba(255, 255, 255, 0.2)',
         },
         status: {
@@ -95,13 +99,13 @@ export const defaultThemeConfig: ThemeConfigCenter = {
         },
         overlay: {
           mask: 'rgba(0, 0, 0, 0.45)',
-          glass: 'rgba(255, 255, 255, 0.9)',
-          glassStrong: 'rgba(255, 255, 255, 0.3)',
+          glass: 'rgba(248, 246, 240, 0.97)',
+          glassStrong: 'rgba(248, 246, 240, 0.88)',
         },
         scrollbar: {
-          track: '#f0f7ff',
-          thumbStart: 'rgba(24, 144, 255, 0.25)',
-          thumbEnd: 'rgba(24, 144, 255, 0.5)',
+          track: '#eeeee5',
+          thumbStart: 'rgba(91, 113, 92, 0.25)',
+          thumbEnd: 'rgba(91, 113, 92, 0.5)',
         },
       },
       components: {
@@ -110,7 +114,7 @@ export const defaultThemeConfig: ThemeConfigCenter = {
           pillBorder: 'rgba(0, 0, 0, 0.1)',
         },
         card: {
-          backdrop: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(248, 246, 240, 0.97)',
         },
         cursor: {
           dotBackground: 'rgba(15, 23, 42, 0.92)',
@@ -357,20 +361,36 @@ export const defaultThemeConfig: ThemeConfigCenter = {
     antd: {
       light: {
         token: {
-          colorPrimary: '#1890ff',
-          colorBgContainer: '#ffffff',
-          colorTextBase: '#333333',
-          borderRadius: 4,
-          colorBorder: '#e8e8e8',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          colorPrimary: '#5b715c',
+          colorLink: '#5b715c',
+          colorLinkHover: '#435a45',
+          colorLinkActive: '#344836',
+          colorBgContainer: '#fffdf8',
+          colorTextBase: '#303b34',
+          colorTextSecondary: '#626b61',
+          colorBgLayout: '#f8f6f0',
+          borderRadius: 6,
+          colorBorder: '#dcdfd3',
+          fontFamily: bodyFont,
+          controlHeight: 40,
         },
         components: {
           Button: {
-            borderRadius: 4,
-            controlHeight: 36,
+            borderRadius: 5,
+            controlHeight: 40,
+            primaryShadow: 'none',
           },
           Card: {
             borderRadius: 8,
+          },
+          Typography: {
+            fontFamily: bodyFont,
+            fontFamilyCode: '"JetBrains Mono", monospace',
+          },
+          Layout: {
+            bodyBg: '#f8f6f0',
+            headerBg: '#f8f6f0',
+            footerBg: '#f8f6f0',
           },
         },
       },

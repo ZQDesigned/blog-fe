@@ -1,208 +1,86 @@
-import React from 'react';
-import { Button, Space } from 'antd';
+import { useState } from 'react';
+import { Button } from 'antd';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { HomeBanner as HomeBannerType } from '../../../types/types';
-import { themeVars, withThemeAlpha } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import type { HomeBanner as HomeBannerType } from '../../../types/types';
+import { themeVars } from '../../../theme';
 import { getFullResourceUrl } from '../../../utils/request';
 import { requestExternalNavigation } from '../../../utils/externalNavigation';
+import DynamicIcon from '../../../components/DynamicIcon';
 
-const BannerContainer = styled.div<{ $backgroundImage?: string }>`
-  width: 100%;
-  min-height: 960px;
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: flex;
+const Banner = styled.section`
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 56px clamp(20px, 4vw, 56px);
+  min-height: 660px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   align-items: center;
-  justify-content: center;
-  padding: ${themeVars.spacing.xl};
-  background: ${themeVars.colors.secondary};
-  color: ${themeVars.colors.text};
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: ${props =>
-      props.$backgroundImage ? `url(${getFullResourceUrl(props.$backgroundImage)})` : 'none'};
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: ${props => (props.$backgroundImage ? 1 : 0)};
-    filter: saturate(1.08) contrast(1.08) brightness(0.98);
-    transform: scale(1.02);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-
+  gap: clamp(24px, 4vw, 64px);
+  overflow-wrap: anywhere;
   @media (max-width: 768px) {
-    min-height: 640px;
-    padding: ${themeVars.spacing.lg};
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-top: 40px;
+    gap: 28px;
   }
 `;
 
-const Content = styled(motion.div)`
-  max-width: 800px;
-  text-align: center;
-  padding: ${themeVars.spacing.xl};
-  border-radius: ${themeVars.borderRadius.large};
-  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.3)};
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 8px 32px 0 ${withThemeAlpha(themeVars.colors.primaryActive, 0.15)};
-  border: 1px solid ${withThemeAlpha(themeVars.colors.onPrimary, 0.18)};
-  
-  @supports not (backdrop-filter: blur(20px)) {
-    background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
+const Introduction = styled.div`
+  min-width: 0;
+  h1 {
+    font-family: ${themeVars.typography.fontFamilyHeading};
+    font-size: clamp(36px, 4.6vw, 64px);
+    font-weight: 400;
+    line-height: 1.35;
+    margin: 0 0 24px;
+    white-space: pre-line;
+    text-wrap: balance;
   }
+  h2 { font-size: 17px; font-weight: 600; line-height: 1.8; margin: 0 0 12px; }
+  .description { color: ${themeVars.colors.lightText}; line-height: 1.95; margin-bottom: 32px; white-space: pre-line; }
 `;
 
-const Title = styled(motion.h1)`
-  font-size: 3em;
-  margin-bottom: ${themeVars.spacing.md};
-  color: ${themeVars.colors.text};
-  font-weight: 600;
-  text-shadow: 0 2px 4px ${withThemeAlpha(themeVars.colors.text, 0.1)};
-
-  @media (max-width: 768px) {
-    font-size: 2em;
-  }
+const Actions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  .ant-btn { height: auto; min-height: 44px; padding: 10px 20px; max-width: 100%; }
+  .ant-btn > span { white-space: normal; overflow-wrap: anywhere; }
 `;
 
-const Subtitle = styled(motion.h2)`
-  font-size: 1.5em;
-  margin-bottom: ${themeVars.spacing.lg};
-  color: ${themeVars.colors.text};
-  opacity: 0.9;
-  font-weight: 500;
-  text-shadow: 0 1px 2px ${withThemeAlpha(themeVars.colors.text, 0.1)};
-
-  @media (max-width: 768px) {
-    font-size: 1.2em;
-  }
+const Artwork = styled.figure`
+  min-width: 0;
+  margin: 0;
+  img { display: block; width: 100%; aspect-ratio: 1.1; object-fit: cover; border-radius: 4px; }
+  @media (max-width: 768px) { img { aspect-ratio: 1.4; } }
 `;
 
-const Description = styled(motion.p)`
-  font-size: 1.2em;
-  margin-bottom: ${themeVars.spacing.xl};
-  color: ${themeVars.colors.text};
-  opacity: 0.85;
-  line-height: 1.6;
-  text-shadow: 0 1px 1px ${withThemeAlpha(themeVars.colors.text, 0.05)};
-
-  @media (max-width: 768px) {
-    font-size: 1em;
-  }
-`;
-
-const ButtonContainer = styled(motion.div)`
-  .ant-btn {
-    backdrop-filter: blur(8px);
-    border: 1px solid ${withThemeAlpha(themeVars.colors.onPrimary, 0.3)};
-    transition: all 0.3s ease;
-    
-    &:not(.ant-btn-primary) {
-      background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.5)};
-      
-      &:hover {
-        background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.8)};
-        transform: translateY(-2px);
-      }
-    }
-    
-    &.ant-btn-primary {
-      background: ${themeVars.colors.primaryAcc};
-      
-      &:hover {
-        background: ${themeVars.colors.primary};
-        transform: translateY(-2px);
-      }
-    }
-  }
-`;
-
-interface HomeBannerProps {
-  data: HomeBannerType;
-}
-
-const HomeBanner: React.FC<HomeBannerProps> = ({ data }) => {
+export default function HomeBanner({ data }: { data: HomeBannerType }) {
   const navigate = useNavigate();
+  const [failedSource, setFailedSource] = useState<string | null>(null);
+  const suppliedSource = data.banner.backgroundImage ? getFullResourceUrl(data.banner.backgroundImage) : '';
+  const imageSource = suppliedSource && suppliedSource !== failedSource
+    ? suppliedSource : '/images/garden-illustration.webp';
 
-  // 动态获取图标组件
-  const getIcon = (iconName: string) => {
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  const handleButtonClick = (link: string) => {
-    if (/^(https?:)?\/\//.test(link) || /^(mailto|tel):/.test(link)) {
+  const goTo = (link: string) => {
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(link)) {
       requestExternalNavigation(link, { mode: 'same-tab', target: '_self' });
-      return;
-    }
-
-    navigate(link);
+    } else { navigate(link); }
   };
 
-  return (
-    <BannerContainer $backgroundImage={data.banner.backgroundImage}>
-      <Content
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <Title
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {data.title}
-        </Title>
-        <Subtitle
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          {data.banner.subtitle}
-        </Subtitle>
-        <Description
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          {data.description}
-        </Description>
-        {data.banner.buttons && (
-          <ButtonContainer
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            <Space size="large">
-              {data.banner.buttons.map((button, index) => (
-                <Button
-                  key={index}
-                  type={button.type || 'default'}
-                  icon={button.icon && getIcon(button.icon)}
-                  onClick={() => handleButtonClick(button.link)}
-                  size="large"
-                >
-                  {button.text}
-                </Button>
-              ))}
-            </Space>
-          </ButtonContainer>
-        )}
-      </Content>
-    </BannerContainer>
-  );
-};
-
-export default HomeBanner;
+  return <Banner>
+    <Introduction>
+      <h1>{data.title}</h1>
+      {data.banner.subtitle && <h2>{data.banner.subtitle}</h2>}
+      {data.description && <p className="description">{data.description}</p>}
+      <Actions>{data.banner.buttons?.map((button, index) =>
+        <Button key={index} type={button.type || 'default'} icon={<DynamicIcon name={button.icon} />}
+          onClick={() => goTo(button.link)}>{button.text}</Button>)}</Actions>
+    </Introduction>
+    <Artwork>
+      <img src={imageSource} alt="" aria-hidden="true" fetchPriority="high"
+        onError={() => setFailedSource(suppliedSource)} />
+    </Artwork>
+  </Banner>;
+}

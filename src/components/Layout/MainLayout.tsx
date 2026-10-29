@@ -10,10 +10,10 @@ import {
   ArrowRightOutlined,
   BugOutlined
 } from '@ant-design/icons';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import {NAV_ITEMS, ROUTES} from '../../constants/routes';
-import { themeVars, withThemeAlpha } from '../../theme';
+import { themeVars } from '../../theme';
 import { useGameEasterEgg } from '../../hooks/useGameEasterEgg.tsx';
 import { formatDate } from '../../utils/dateUtils';
 import { useToast } from '../../hooks/useToast.ts';
@@ -52,48 +52,22 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
   }
 `;
 
-const HEADER_TOP_WALLPAPER_OPACITY = 0.15;
-
 const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolean; $backgroundUrl?: string | null }>`
-  background: ${props => props.$scrolled ? themeVars.colors.background : themeVars.colors.secondary};
-  box-shadow: ${props => props.$scrolled ? themeVars.shadows.small : 'none'};
+  background: ${themeVars.colors.overlayGlass};
+  border-bottom: 1px solid ${themeVars.colors.border};
   position: fixed;
   width: 100%;
-  z-index: 1;
+  height: 76px;
+  z-index: 100;
   display: flex;
   align-items: center;
-  overflow: hidden;
-  isolation: isolate;
-  padding: 0 ${themeVars.spacing.xl};
-  transition: all 0.3s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: ${props =>
-      !props.$scrolled && props.$hasBackground && props.$backgroundUrl ? `url(${props.$backgroundUrl})` : 'none'};
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: ${props => (!props.$scrolled && props.$hasBackground ? HEADER_TOP_WALLPAPER_OPACITY : 0)};
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-
+  gap: 24px;
+  padding: 0 max(24px, calc((100vw - 1120px) / 2));
+  backdrop-filter: blur(12px);
   @media (max-width: 768px) {
-    padding: 0 ${themeVars.spacing.md};
-
-    &::before {
-      background-attachment: scroll;
-    }
+    height: 68px;
+    padding: 0 16px;
+    gap: 12px;
   }
 `;
 
@@ -101,6 +75,26 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${themeVars.spacing.md};
+  flex-shrink: 0;
+`;
+
+const Wordmark = styled(Link)`
+  font-family: ${themeVars.typography.fontFamilyHeading};
+  color: ${themeVars.colors.text};
+  font-size: 25px;
+  white-space: nowrap;
+  @media (max-width: 640px) { font-size: 20px; }
+`;
+
+const SettingsButton = styled.button`
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  flex-shrink: 0;
+  cursor: pointer;
+  @media (max-width: 480px) { width: 26px; .ant-avatar { width: 26px; height: 26px; } }
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -112,22 +106,25 @@ const StyledAvatar = styled(Avatar)`
   }
 `;
 
-const StyledContent = styled(Content)<{ $isStandalone?: boolean }>`
-  padding: ${props => props.$isStandalone ? 0 : themeVars.spacing.xl};
-  margin-top: ${props => props.$isStandalone ? 0 : '64px'};
-  background: ${themeVars.colors.secondary};
+const StyledContent = styled(Content)<{ $isStandalone?: boolean; $hasWallpaper?: boolean }>`
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  margin-top: ${props => props.$isStandalone ? 0 : '76px'};
+  background: ${props => props.$hasWallpaper ? themeVars.colors.overlayGlassStrong : themeVars.colors.appBackground};
   min-height: ${props => props.$isStandalone ? '100vh' : 'calc(100vh - 64px - 70px)'};
   width: 100%;
 
   @media (max-width: 768px) {
-    padding: 0;
+    margin-top: ${props => props.$isStandalone ? 0 : '68px'};
   }
 `;
 
 const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
   flex: 1;
   border-bottom: none;
-  justify-content: center;
+  min-width: 0;
+  justify-content: flex-end;
   background: transparent;
   
   &.ant-menu {
@@ -135,35 +132,22 @@ const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
   }
 
   .ant-menu-item {
-    border-radius: 20px !important;
-    margin: 0 8px !important;
-    padding: 0 16px !important;
-    height: 36px !important;
-    line-height: 36px !important;
-    background: ${props =>
-      props.$scrolled
-        ? withThemeAlpha(themeVars.colors.text, 0.05)
-        : withThemeAlpha(themeVars.colors.onPrimary, 0.1)} !important;
-    border: 1px solid ${props =>
-      props.$scrolled
-        ? withThemeAlpha(themeVars.colors.text, 0.1)
-        : withThemeAlpha(themeVars.colors.onPrimary, 0.2)} !important;
-    transition: all 0.3s ease !important;
-    backdrop-filter: blur(10px);
+    border-radius: 0;
+    margin: 0 8px;
+    padding: 0 8px;
+    height: 42px;
+    line-height: 42px;
+    background: transparent;
+    border-bottom: 2px solid transparent;
     
     &:hover {
-      background: ${themeVars.colors.primary} !important;
-      border-color: ${themeVars.colors.primary} !important;
-      color: ${themeVars.colors.onPrimary} !important;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px ${withThemeAlpha(themeVars.colors.text, 0.15)};
+      color: ${themeVars.colors.primary};
     }
     
     &.ant-menu-item-selected {
-      background: ${themeVars.colors.primary} !important;
-      border-color: ${themeVars.colors.primary} !important;
-      color: ${themeVars.colors.onPrimary} !important;
-      box-shadow: 0 2px 8px ${withThemeAlpha(themeVars.colors.text, 0.1)};
+      background: transparent;
+      border-bottom-color: ${themeVars.colors.primary};
+      color: ${themeVars.colors.primary};
     }
     
     &::after {
@@ -173,9 +157,9 @@ const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
 
   @media (max-width: 768px) {
     .ant-menu-item {
-      margin: 0 4px !important;
-      padding: 0 12px !important;
-      font-size: 14px !important;
+      margin: 0 2px;
+      padding: 0 5px;
+      font-size: 13px;
     }
   }
 `;
@@ -208,6 +192,9 @@ const BadgesGroup = styled.div`
 const FooterContainer = styled.div`
   background: ${themeVars.colors.background};
   padding: ${themeVars.spacing.xl} 0 0;
+  position: relative;
+  border-top: 1px solid ${themeVars.colors.border};
+  overflow-wrap: anywhere;
 `;
 
 const FooterContent = styled.div`
@@ -215,7 +202,7 @@ const FooterContent = styled.div`
   margin: 0 auto;
   padding: 0 ${themeVars.spacing.xl};
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
   gap: ${themeVars.spacing.xl};
 
   @media (max-width: 768px) {
@@ -227,6 +214,7 @@ const FooterContent = styled.div`
 `;
 
 const FooterColumn = styled.div`
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: ${themeVars.spacing.md};
@@ -718,15 +706,11 @@ export const MainLayout: React.FC = () => {
           $backgroundUrl={hasWallpaperBackground ? backgroundUrl : null}
         >
           <HeaderLeft>
-            <StyledAvatar
-              size={40}
-              src="https://www.loliapi.com/acg/pp/"
-              onClick={() => setSettingsOpen(true)}
-            />
+            <Wordmark to="/">ZQDesigned</Wordmark>
           </HeaderLeft>
           <StyledMenu
             mode="horizontal"
-            selectedKeys={[location.pathname]}
+            selectedKeys={[location.pathname.startsWith('/blog') ? '/blog' : location.pathname]}
             $scrolled={scrolled}
             items={NAV_ITEMS.map((item) => ({
               key: item.path,
@@ -734,9 +718,15 @@ export const MainLayout: React.FC = () => {
               onClick: () => handleMenuClick(item.path),
             }))}
           />
+          <SettingsButton aria-label="打开个性化设置" onClick={() => setSettingsOpen(true)}>
+            <StyledAvatar
+              size={30}
+              src="https://www.loliapi.com/acg/pp/"
+            />
+          </SettingsButton>
         </StyledHeader>
       )}
-      <StyledContent $isStandalone={isStandalone}>
+      <StyledContent $isStandalone={isStandalone} $hasWallpaper={hasWallpaperBackground}>
         <Outlet />
         {!isStandalone && shouldLoadDeferredUi && (
           <Suspense fallback={null}>
@@ -817,7 +807,7 @@ export const MainLayout: React.FC = () => {
             </FooterMiddleRow>
             <FooterColumn>
               <FooterTitle>更多</FooterTitle>
-              <BuildInfo>
+              <BuildInfo data-build-info>
                 <span>构建于：{formatDate(Number(buildTime))}</span>
                 <span>版本：{import.meta.env.VITE_GIT_HASH || 'unknown'}</span>
               </BuildInfo>

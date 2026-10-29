@@ -15,6 +15,8 @@ import CustomSection from './components/CustomSection';
 
 
 const Container = styled.div`
+  min-width: 0;
+  overflow-wrap: anywhere;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -26,6 +28,7 @@ const Container = styled.div`
 
 const ContentWrapper = styled.div`
   width: 100%;
+  min-width: 0;
 `;
 
 const LoadingContainer = styled.div`

@@ -13,6 +13,9 @@ interface AboutSectionProps {
 }
 
 const StyledCard = styled(motion(Card))`
+  min-width: 0;
+  .ant-card-body { padding: clamp(16px, 3vw, 24px); }
+  h3.ant-typography { font-family: ${themeVars.typography.fontFamilyHeading}; font-weight: 400; font-size: 28px; }
   margin-bottom: ${themeVars.spacing.lg};
   border-radius: 8px;
   box-shadow: ${themeVars.shadows.small};
@@ -41,4 +44,4 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   );
 };
 
-export default AboutSection; 
+export default AboutSection;

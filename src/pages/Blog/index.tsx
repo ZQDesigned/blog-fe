@@ -1,262 +1,107 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Typography, Space, Tag, Radio, Modal, Button, Select, Pagination } from 'antd';
-import { EyeOutlined, AppstoreOutlined, UnorderedListOutlined, TagsOutlined, FolderOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Space, Tag, Radio, Modal, Button, Select, Pagination, Empty } from 'antd';
+import { ArrowRightOutlined, AppstoreOutlined, UnorderedListOutlined, EyeOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { themeVars, withThemeAlpha } from '../../theme';
+import { themeVars } from '../../theme';
 import { useTitle } from '../../hooks/useTitle';
-import { blogApi, CategoryData, TagData } from '../../services/api';
-import { BlogData } from '../../types/types';
+import { blogApi } from '../../services/api';
+import type { CategoryData, TagData } from '../../services/api';
+import type { BlogData } from '../../types/types';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
-import { useStandaloneMode } from "../../hooks/useStandaloneMode.ts";
+import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { useDedupeRequest } from '../../hooks/useDedupeRequest';
 import PageLoading from '../../components/PageLoading';
 import DataErrorFallback from '../../components/DataErrorFallback';
-
-const { Title } = Typography;
+import { EditorialTitle, Eyebrow } from '../../components/Editorial';
 
 const Container = styled.div`
-  max-width: 1200px;
-  width: 100%;
+  width: min(100%, 1200px);
+  min-width: 0;
   margin: 0 auto;
-  padding: ${themeVars.spacing.lg};
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  @media (max-width: 768px) {
-    padding: 0;
-  }
+  padding: clamp(32px, 5vw, 72px) clamp(20px, 4vw, 56px);
+  overflow-wrap: anywhere;
 `;
-
-const ContentWrapper = styled.div`
-  width: 100%;
-  
-  @media (max-width: 768px) {
-    > .ant-card {
-      border-radius: 0;
-    }
-  }
+const Heading = styled.header`
+  position: relative;
+  padding: 16px 220px 48px 0;
+  min-height: 215px;
+  > p:last-of-type { color: ${themeVars.colors.lightText}; line-height: 1.9; }
+  img { position: absolute; right: 0; top: 0; width: 185px; height: 175px; object-fit: cover; opacity: 0.9; }
+  @media (max-width: 640px) { padding-right: 0; min-height: 0; img { display: none; } }
 `;
-
-const ViewControls = styled.div`
+const Controls = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${themeVars.spacing.lg};
-  position: relative;
-  z-index: 0;
-
-  @media (max-width: 768px) {
-    padding: ${themeVars.spacing.lg};
-    margin-bottom: 0;
-    .view-mode-controls {
-      display: none;
-    }
-  }
-`;
-
-const BlogGrid = styled.div<{ isGrid: boolean }>`
-  display: grid;
-  grid-template-columns: ${props => props.isGrid ? 'repeat(auto-fill, minmax(300px, 1fr))' : '1fr'};
-  gap: ${themeVars.spacing.lg};
-
-  @media (max-width: 768px) {
-    gap: 0;
-
-    > * {
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-    }
-  }
-`;
-
-const StyledCard = styled(motion(Card))`
-  cursor: pointer;
-  transition: all ${themeVars.transitions.default};
-  box-shadow: ${themeVars.shadows.small};
-  height: 100%;
-
-  .ant-card-body {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: ${themeVars.shadows.medium};
-  }
-
-  @media (max-width: 768px) {
-    border-radius: 0;
-    box-shadow: none;
-    
-    &:hover {
-      transform: none;
-      box-shadow: none;
-    }
-  }
-`;
-
-const BlogTag = styled(Tag)<{ $active?: boolean }>`
-  margin: ${themeVars.spacing.xs};
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: ${({ $active }) => ($active ? themeVars.colors.primary : themeVars.colors.lightText)};
-  border-color: ${({ $active }) =>
-    $active
-      ? withThemeAlpha(themeVars.colors.primary, 0.35)
-      : withThemeAlpha(themeVars.colors.borderStrong, 0.35)};
-  background: ${({ $active }) =>
-    $active
-      ? withThemeAlpha(themeVars.colors.primary, 0.1)
-      : withThemeAlpha(themeVars.colors.border, 0.18)};
-`;
-
-const TagsContainer = styled.div`
-  margin-top: auto;
-  padding-top: ${themeVars.spacing.md};
-`;
-
-const ReadMoreButton = styled(Button)`
-  margin-top: ${themeVars.spacing.md};
-  padding: 0;
-  height: auto;
-  line-height: 1;
-  color: ${themeVars.colors.primary};
-  display: inline-flex;
-  align-self: flex-start;
-  justify-content: flex-start;
-  
-  &:hover {
-    color: ${withThemeAlpha(themeVars.colors.primary, 0.8667)};
-  }
-`;
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-};
-
-const PreviewMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${themeVars.spacing.md};
-  flex: 1 1 auto;
-  max-height: 100px;
-  overflow: hidden;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(
-      ${withThemeAlpha(themeVars.colors.background, 0)},
-      ${themeVars.colors.background}
-    );
-  }
-`;
-
-const ModalMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${themeVars.spacing.md};
-  max-height: calc(60vh - 200px);
-  overflow: hidden;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(
-      ${withThemeAlpha(themeVars.colors.background, 0)},
-      ${themeVars.colors.background}
-    );
-    pointer-events: none;
-  }
-`;
-
-const ModalContent = styled.div`
-  max-height: 60vh;
-  overflow: hidden;
-`;
-
-const ModalFooter = styled.div`
-  margin-top: ${themeVars.spacing.md};
-  padding-top: ${themeVars.spacing.md};
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  padding: 20px 0;
   border-top: 1px solid ${themeVars.colors.border};
-`;
-
-const FilterContainer = styled.div`
-  margin-bottom: ${themeVars.spacing.lg};
-  display: flex;
-  gap: ${themeVars.spacing.md};
-  align-items: center;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    padding: 0 ${themeVars.spacing.lg};
+  border-bottom: 1px solid ${themeVars.colors.border};
+  .filters { display: flex; flex-wrap: wrap; gap: 12px; min-width: 0; flex: 1; }
+  .ant-select { width: 180px; max-width: 100%; }
+  @media (max-width: 640px) {
+    .filters { width: 100%; }
+    .ant-select { flex: 1; min-width: 120px; }
+    .view-mode-controls { width: 100%; }
   }
 `;
-
-const FilterLabel = styled.span`
-  color: ${themeVars.colors.lightText};
-  display: flex;
-  align-items: center;
-  gap: ${themeVars.spacing.xs};
+const BlogGrid = styled.div<{ $isGrid: boolean }>`
+  display: grid;
+  grid-template-columns: ${p => p.$isGrid ? 'repeat(auto-fit, minmax(min(100%, 310px), 1fr))' : 'minmax(0, 1fr)'};
+  gap: ${p => p.$isGrid ? '0 32px' : '0'};
 `;
-
-const StyledSelect = styled(Select)`
-  min-width: 200px;
+const Entry = styled.article<{ $isGrid: boolean }>`
+  display: grid;
+  grid-template-columns: ${p => p.$isGrid ? 'minmax(0, 1fr)' : '130px minmax(0, 1fr)'};
+  gap: 20px 32px;
+  min-width: 0;
+  padding: 32px 0;
+  border-bottom: 1px solid ${themeVars.colors.border};
+  .date { color: ${themeVars.colors.lightText}; font-size: 13px; padding-top: 6px; }
+  .entry-body { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+  h2 { font-size: 25px; font-family: ${themeVars.typography.fontFamilyHeading}; font-weight: 400; line-height: 1.5; margin-bottom: 10px; width: 100%; }
+  .title-button { display: block; text-align: left; background: none; border: none; color: inherit; padding: 0; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
+  .title-button:hover { color: ${themeVars.colors.primary}; }
+  .meta { color: ${themeVars.colors.lightText}; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; font-size: 12px; margin-bottom: 14px; }
+  .summary { max-height: 100px; overflow: hidden; color: ${themeVars.colors.lightText}; font-size: 15px; width: 100%; }
+  .summary p { margin-bottom: 0; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 18px 0 10px; }
+  @media (max-width: 640px) { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 24px 0; }
 `;
-
-const PaginationContainer = styled.div`
+const BlogTag = styled(Tag)`
+  color: ${themeVars.colors.primary};
+  background: transparent;
+  border-color: ${themeVars.colors.border};
+  white-space: normal;
+  overflow-wrap: anywhere;
+  margin-inline-end: 0;
+  cursor: pointer;
+`;
+const ReadMore = styled(Button)`
+  padding: 0;
+  margin-top: auto;
+  height: auto;
+  font-size: 13px;
+`;
+const PaginationBar = styled.div`
+  padding: 32px 0;
   display: flex;
   justify-content: center;
-  margin-top: ${themeVars.spacing.xl};
-  padding: ${themeVars.spacing.lg} 0;
-  background-color: ${themeVars.colors.background};
-
-  @media (max-width: 768px) {
-    margin-top: 0;
-  }
+`;
+const PreviewBody = styled.div`
+  max-height: 55vh;
+  overflow: auto;
+  margin: 24px 0;
 `;
 
-const LoadingContainer = styled.div`
-  min-height: calc(100vh - 200px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const BlogMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${themeVars.spacing.sm};
-  color: ${themeVars.colors.lightText};
-  margin: ${themeVars.spacing.sm} 0;
-  flex-wrap: wrap;
-`;
-
-const MetaDivider = styled.span`
-  margin: 0 ${themeVars.spacing.xs};
-  color: ${themeVars.colors.border};
-`;
-
-const Blog: React.FC = () => {
+export default function Blog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const isStandaloneMode = useStandaloneMode();
-
+  const standalone = useStandaloneMode();
+  const dedupe = useDedupeRequest();
   const [selectedBlog, setSelectedBlog] = useState<BlogData | null>(null);
   const [blogs, setBlogs] = useState<BlogData[]>([]);
   const [total, setTotal] = useState(0);
@@ -264,306 +109,94 @@ const Blog: React.FC = () => {
   const [error, setError] = useState<Error | null>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [tags, setTags] = useState<TagData[]>([]);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
-
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
-
-  const [filterParams, setFilterParams] = useState({
-    category: searchParams.get('category') || undefined,
-    tag: searchParams.get('tag') || undefined,
-  });
-
-  const dedupe = useDedupeRequest();
-
+  const requestSequence = useRef(0);
+  const category = searchParams.get('category') || undefined;
+  const tag = searchParams.get('tag') || undefined;
   useTitle('博客', { restoreOnUnmount: true });
 
   useEffect(() => {
-    const loadMetadata = async () => {
-      try {
-        const [categoriesData, tagsData] = await Promise.all([
-          dedupe('categories', () => blogApi.getCategories()),
-          dedupe('tags', () => blogApi.getTags())
-        ]);
-        setCategories(categoriesData);
-        setTags(tagsData);
-      } catch (error) {
-        console.error('Failed to load metadata:', error);
-      }
-    };
-    loadMetadata();
+    let active = true;
+    Promise.all([dedupe('categories', () => blogApi.getCategories()), dedupe('tags', () => blogApi.getTags())])
+      .then(([nextCategories, nextTags]) => {
+        if (active) { setCategories(nextCategories); setTags(nextTags); }
+      }).catch(err => console.error('Failed to load metadata:', err));
+    return () => { active = false; };
   }, [dedupe]);
 
   const loadBlogs = useCallback(async () => {
+    const sequence = ++requestSequence.current;
     setError(null);
     setLoading(true);
     try {
-      const data = await dedupe(
-        `blogs-${JSON.stringify({ ...filterParams, page: currentPage, pageSize })}`,
-        () => blogApi.getList({
-          page: currentPage.toString(),
-          pageSize: pageSize.toString(),
-          keyword: '',
-          ...filterParams
-        })
-      );
+      const params = { category, tag, page: currentPage.toString(), pageSize: pageSize.toString(), keyword: '' };
+      const data = await dedupe(`blogs-${JSON.stringify(params)}`, () => blogApi.getList(params));
+      if (sequence !== requestSequence.current) return;
       setBlogs(data.content);
       setTotal(data.total);
-    } catch (err) {
-      console.error('Failed to load blogs:', err);
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filterParams, currentPage, pageSize, dedupe]);
+    } catch (err) { if (sequence === requestSequence.current) setError(err as Error); }
+    finally { if (sequence === requestSequence.current) setLoading(false); }
+  }, [category, tag, currentPage, pageSize, dedupe]);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    
-    const mode = params.get('mode');
-    
-    params.forEach((_, key) => params.delete(key));
-    
-    if (mode) {
-      params.set('mode', mode);
-    }
-    
-    Object.entries(filterParams).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      }
-    });
-    
-    setSearchParams(params);
-    setCurrentPage(1);
-  }, [filterParams, setSearchParams, location.search]);
-
-  useEffect(() => {
-    loadBlogs();
+    void loadBlogs();
+    return () => { requestSequence.current += 1; };
   }, [loadBlogs]);
 
-  const handleCategoryChange = useCallback((value: string | undefined) => {
-    setFilterParams(prev => ({ ...prev, category: value }));
-  }, []);
-
-  const handleTagChange = useCallback((value: string | undefined) => {
-    setFilterParams(prev => ({ ...prev, tag: value }));
-  }, []);
-
-  const handlePageChange = useCallback((page: number, size?: number) => {
-    setCurrentPage(page);
-    if (size) {
-      setPageSize(size);
-    }
-  }, []);
-
-  const handleViewModeChange = useCallback((mode: 'list' | 'grid') => {
-    setViewMode(mode);
-  }, []);
-
-  const handleBlogClick = useCallback((blog: BlogData) => {
-    if (isStandaloneMode) {
-      handleNavigateToBlog(blog);
-    } else {
-      setSelectedBlog(blog);
-    }
-  }, [isStandaloneMode]);
-
-  const handleReadMore = (e: React.MouseEvent, blog: BlogData) => {
-    e.stopPropagation();
-    handleNavigateToBlog(blog);
+  const setFilter = (key: 'category' | 'tag', value?: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set(key, value); else next.delete(key);
+    setCurrentPage(1);
+    setSearchParams(next);
   };
+  const readArticle = (blog: BlogData) => navigate(`/blog/${blog.id}${location.search}`);
 
-  const handleNavigateToBlog = (blog: BlogData) => {
-    const params = new URLSearchParams(location.search);
-    const mode = params.get('mode');
-    const blogPath = `/blog/${blog.id}${mode ? `?mode=${mode}` : ''}`;
-    navigate(blogPath);
-  };
-
-  if (error) {
-    return (
-      <DataErrorFallback
-        context="博客列表"
-        error={error}
-        onRetry={loadBlogs}
-      />
-    );
-  }
-
-  return (
-    <Container>
-      <ContentWrapper>
-        <ViewControls>
-          <Title level={2}>博客文章</Title>
-          <div className="view-mode-controls">
-            <Radio.Group
-              value={viewMode}
-              onChange={(e) => handleViewModeChange(e.target.value as 'list' | 'grid')}
-            >
-              <Radio.Button value="grid">
-                <AppstoreOutlined /> 网格视图
-              </Radio.Button>
-              <Radio.Button value="list">
-                <UnorderedListOutlined /> 列表视图
-              </Radio.Button>
-            </Radio.Group>
-          </div>
-        </ViewControls>
-
-        <FilterContainer>
-          <FilterLabel>
-            <FolderOutlined /> 按分类筛选：
-          </FilterLabel>
-          <StyledSelect
-            allowClear
-            placeholder="选择分类"
-            value={filterParams.category}
-            // @ts-ignore
-            onChange={handleCategoryChange}
-            options={categories.map(category => ({
-              label: `${category.name} (${category.articleCount})`,
-              value: category.name
-            }))}
-            style={{ minWidth: 150 }}
-          />
-
-          <FilterLabel>
-            <TagsOutlined /> 按标签筛选：
-          </FilterLabel>
-          <StyledSelect
-            mode="multiple"
-            allowClear
-            placeholder="选择标签"
-            value={filterParams.tag ? filterParams.tag.split(',') : []}
-            // @ts-ignore
-            onChange={(values) => handleTagChange(values.join(','))}
-            options={tags.map(tag => ({
-              label: `${tag.name} (${tag.articleCount})`,
-              value: tag.name
-            }))}
-          />
-        </FilterContainer>
-
-        {loading ? (
-          <LoadingContainer>
-            <PageLoading tip="正在加载博客列表" />
-          </LoadingContainer>
-        ) : (
-          <>
-            <BlogGrid isGrid={viewMode === 'grid'}>
-              <AnimatePresence initial={false}>
-                {blogs.map((blog) => (
-                  <StyledCard
-                    key={blog.id}
-                    onClick={() => handleBlogClick(blog)}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <Title level={4}>{blog.title}</Title>
-                    <BlogMeta>
-                      <Tag
-                        style={{
-                          color: themeVars.colors.primary,
-                          borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
-                          background: withThemeAlpha(themeVars.colors.primary, 0.1),
-                        }}
-                      >
-                        {blog.categoryName}
-                      </Tag>
-                      <Space>
-                        <EyeOutlined /> {blog.viewCount} 次浏览
-                      </Space>
-                      <MetaDivider>•</MetaDivider>
-                      <Space>
-                        <ClockCircleOutlined /> {blog.createTime}
-                      </Space>
-                    </BlogMeta>
-                    <PreviewMarkdownRenderer content={blog.summary} />
-                    <TagsContainer>
-                      <Space>
-                        {blog.tagNames.map((tag) => (
-                          <BlogTag
-                            key={tag}
-                            $active={tags.some(t => t.name === tag)}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // @ts-ignore
-                              handleTagChange([tag]);
-                            }}
-                          >
-                            {tag}
-                          </BlogTag>
-                        ))}
-                      </Space>
-                    </TagsContainer>
-                    <ReadMoreButton
-                      type="link"
-                      icon={<EyeOutlined />}
-                      onClick={(e) => handleReadMore(e, blog)}
-                    >
-                      阅读全文
-                    </ReadMoreButton>
-                  </StyledCard>
-                ))}
-              </AnimatePresence>
-            </BlogGrid>
-
-            <PaginationContainer>
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={total}
-                onChange={handlePageChange}
-                showSizeChanger={false}
-              />
-            </PaginationContainer>
-          </>
-        )}
-
-        <Modal
-          title={selectedBlog?.title}
-          open={!!selectedBlog}
-          onCancel={() => setSelectedBlog(null)}
-          footer={null}
-          width={800}
-        >
-          {selectedBlog && (
-            <ModalContent>
-              <Tag
-                style={{
-                  marginBottom: themeVars.spacing.sm,
-                  color: themeVars.colors.primary,
-                  borderColor: withThemeAlpha(themeVars.colors.primary, 0.35),
-                  background: withThemeAlpha(themeVars.colors.primary, 0.1),
-                }}
-              >
-                {selectedBlog.categoryName}
-              </Tag>
-              <Space>
-                {selectedBlog.tagNames.map((tag) => (
-                  <BlogTag key={tag} $active>{tag}</BlogTag>
-                ))}
-              </Space>
-              <ModalMarkdownRenderer content={selectedBlog.content} />
-              <ModalFooter>
-                <ReadMoreButton
-                  type="link"
-                  icon={<EyeOutlined />}
-                  onClick={(e) => handleReadMore(e, selectedBlog)}
-                >
-                  阅读全文
-                </ReadMoreButton>
-              </ModalFooter>
-            </ModalContent>
-          )}
-        </Modal>
-      </ContentWrapper>
-    </Container>
-  );
-};
-
-export default Blog;
+  return <Container>
+    <Heading>
+      <EditorialTitle>写下的，都是生长。</EditorialTitle>
+      <p>一些技术探索，也有日常里的灵感与片刻。</p>
+      <img src="/images/garden-illustration.webp" alt="" aria-hidden="true" />
+    </Heading>
+    <Controls>
+      <div className="filters">
+        <Select<string> aria-label="按分类筛选" allowClear placeholder="全部分类" value={category}
+          onChange={value => setFilter('category', value)} options={categories.map(item => ({ label: `${item.name} (${item.articleCount})`, value: item.name }))} />
+        <Select<string[]> aria-label="按标签筛选" mode="multiple" allowClear placeholder="全部标签" value={tag ? tag.split(',') : []}
+          onChange={values => setFilter('tag', values.join(','))} maxTagCount="responsive"
+          options={tags.map(item => ({ label: `${item.name} (${item.articleCount})`, value: item.name }))} />
+      </div>
+      <Radio.Group className="view-mode-controls" value={viewMode} onChange={e => setViewMode(e.target.value)} size="small" aria-label="文章展示方式">
+        <Radio.Button value="list"><UnorderedListOutlined /> 列表视图</Radio.Button>
+        <Radio.Button value="grid"><AppstoreOutlined /> 网格视图</Radio.Button>
+      </Radio.Group>
+    </Controls>
+    {error ? <DataErrorFallback context="博客列表" error={error} onRetry={loadBlogs} />
+      : loading ? <PageLoading tip="正在加载博客列表" />
+        : blogs.length === 0 ? <Empty description="暂时没有匹配的文章" style={{ margin: '64px 0' }} />
+          : <>
+            <BlogGrid $isGrid={viewMode === 'grid'}>{blogs.map(blog => <Entry key={blog.id} $isGrid={viewMode === 'grid'}>
+              <time className="date">{blog.createTime.split(' ')[0]}</time>
+              <div className="entry-body">
+                <h2><button className="title-button" onClick={() => standalone ? readArticle(blog) : setSelectedBlog(blog)}>{blog.title}</button></h2>
+                <div className="meta"><span>{blog.categoryName}</span><span><EyeOutlined /> {blog.viewCount} 次浏览</span></div>
+                <MarkdownRenderer className="summary" content={blog.summary} />
+                <div className="tags">{blog.tagNames.map(name => <BlogTag key={name} role="button" tabIndex={0}
+                  onClick={() => setFilter('tag', name)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFilter('tag', name); } }}>{name}</BlogTag>)}</div>
+                <ReadMore type="link" onClick={() => readArticle(blog)}>阅读全文 <ArrowRightOutlined /></ReadMore>
+              </div>
+            </Entry>)}</BlogGrid>
+            <PaginationBar><Pagination current={currentPage} pageSize={pageSize} total={total}
+              onChange={(page, size) => { setCurrentPage(page); setPageSize(size); }} showSizeChanger={false} /></PaginationBar>
+          </>}
+    <Modal title={selectedBlog?.title} open={!!selectedBlog} onCancel={() => setSelectedBlog(null)} footer={null} width={800}>
+      {selectedBlog && <>
+        <Eyebrow>{selectedBlog.categoryName}</Eyebrow>
+        <Space wrap>{selectedBlog.tagNames.map(name => <BlogTag key={name}>{name}</BlogTag>)}</Space>
+        <PreviewBody><MarkdownRenderer content={selectedBlog.content} /></PreviewBody>
+        <ReadMore type="link" onClick={() => readArticle(selectedBlog)}>阅读全文 <ArrowRightOutlined /></ReadMore>
+      </>}
+    </Modal>
+  </Container>;
+}

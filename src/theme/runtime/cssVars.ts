@@ -13,6 +13,7 @@ const withAlpha = (color: string, alpha: number): string => {
 const toCssVarRecord = (tokens: ThemeRuntimeTokens): Record<string, string> => {
   const cssVars: Record<string, string> = {
     '--theme-font-family-base': tokens.typography.fontFamilyBase,
+    '--theme-font-family-heading': tokens.typography.fontFamilyHeading,
     '--theme-font-family-mono': tokens.typography.fontFamilyMono,
     '--theme-font-size-base': tokens.typography.fontSizeBase,
     '--theme-line-height-base': tokens.typography.lineHeightBase,

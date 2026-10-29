@@ -32,6 +32,7 @@ const DevErrorTrigger: React.FC = () => {
 
   return (
     <FloatButton
+      className="dev-error-trigger"
       type="primary"
       icon={<BugOutlined />}
       tooltip="Dev: Trigger Global Error"

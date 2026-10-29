@@ -52,18 +52,19 @@ const Home: React.FC = () => {
   }, [loadHomeContent]);
 
   // 渲染内容区块
-  const renderSection = (section: HomeContentItem) => {
+  const renderSection = (section: HomeContentItem, index: number) => {
+    const key = `${section.type}-${index}`;
     switch (section.type) {
       case 'banner':
-        return <HomeBanner key="banner" data={section} />;
+        return <HomeBanner key={key} data={section} />;
       case 'features':
-        return <HomeFeatures key="features" data={section} />;
+        return <HomeFeatures key={key} data={section} />;
       case 'skills':
-        return <HomeSkills key="skills" data={section} />;
+        return <HomeSkills key={key} data={section} />;
       case 'timeline':
-        return <HomeTimeline key="timeline" data={section} />;
+        return <HomeTimeline key={key} data={section} />;
       case 'contact':
-        return <HomeContact key="contact" data={section} />;
+        return <HomeContact key={key} data={section} />;
       default:
         return null;
     }
@@ -93,7 +94,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      {homeData.sections.map((section) => renderSection(section))}
+      {homeData.sections.map(renderSection)}
     </>
   );
 };

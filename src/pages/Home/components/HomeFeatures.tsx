@@ -1,103 +1,30 @@
-import React from 'react';
-import { Card, Typography } from 'antd';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
-import { HomeFeature } from '../../../types/types';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import type { HomeFeature } from '../../../types/types';
 import { themeVars } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
+import { ContentGrid, GardenSection, SectionHeading } from '../../../components/Editorial';
 
-const { Title, Paragraph } = Typography;
-
-const SectionContainer = styled.div`
-  padding: ${themeVars.spacing.xl} 0;
-  background: ${themeVars.colors.background};
+const Feature = styled.article`
+  border-top: 1px solid ${themeVars.colors.border};
+  padding: 24px 0;
+  .feature-icon { display: block; color: ${themeVars.colors.primary}; font-size: 26px; min-height: 36px; margin-bottom: 20px; }
+  h3 { font-family: ${themeVars.typography.fontFamilyHeading}; font-weight: 400; font-size: 26px; margin-bottom: 12px; }
+  p { color: ${themeVars.colors.lightText}; line-height: 1.9; white-space: pre-line; }
+  a { display: block; color: inherit; }
+  a:hover h3 { color: ${themeVars.colors.primary}; }
+  .entry-arrow { margin-top: 20px; color: ${themeVars.colors.primary}; }
 `;
 
-const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${themeVars.spacing.lg};
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: ${themeVars.spacing.xl};
-`;
-
-const SectionTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.md} !important;
-`;
-
-const SectionDescription = styled(Paragraph)`
-  font-size: 1.2em;
-  color: ${themeVars.colors.lightText};
-  max-width: 600px;
-  margin: 0 auto !important;
-`;
-
-const FeaturesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: ${themeVars.spacing.lg};
-  margin-top: ${themeVars.spacing.xl};
-`;
-
-const FeatureCard = styled(motion(Card))`
-  height: 100%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: ${themeVars.shadows.medium};
-  }
-`;
-
-const IconWrapper = styled.div`
-  font-size: 2em;
-  color: ${themeVars.colors.primary};
-  margin-bottom: ${themeVars.spacing.md};
-`;
-
-interface HomeFeaturesProps {
-  data: HomeFeature;
+export default function HomeFeatures({ data }: { data: HomeFeature }) {
+  return <GardenSection>
+    <SectionHeading><h2>{data.title}</h2><p>{data.description}</p></SectionHeading>
+    <ContentGrid>{data.items.map((item, index) => {
+      const body = <><span className="feature-icon"><DynamicIcon name={item.icon} /></span>
+        <h3>{item.title}</h3><p>{item.description}</p></>;
+      return <Feature key={index}>{item.link
+        ? <a href={item.link} target="_blank" rel="noopener noreferrer">{body}<ArrowRightOutlined className="entry-arrow" /></a>
+        : body}</Feature>;
+    })}</ContentGrid>
+  </GardenSection>;
 }
-
-const HomeFeatures: React.FC<HomeFeaturesProps> = ({ data }) => {
-  // 动态获取图标组件
-  const getIcon = (iconName: string) => {
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  return (
-    <SectionContainer>
-      <Content>
-        <Header>
-          <SectionTitle level={2}>{data.title}</SectionTitle>
-          <SectionDescription>{data.description}</SectionDescription>
-        </Header>
-
-        <FeaturesGrid>
-          {data.items.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              onClick={() => feature.link && window.open(feature.link, '_blank')}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <IconWrapper>
-                {getIcon(feature.icon)}
-              </IconWrapper>
-              <Title level={4}>{feature.title}</Title>
-              <Paragraph>{feature.description}</Paragraph>
-            </FeatureCard>
-          ))}
-        </FeaturesGrid>
-      </Content>
-    </SectionContainer>
-  );
-};
-
-export default HomeFeatures; 

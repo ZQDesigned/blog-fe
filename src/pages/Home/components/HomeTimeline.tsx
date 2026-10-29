@@ -1,100 +1,26 @@
-import React from 'react';
-import { Typography, Timeline } from 'antd';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
-import { HomeTimeline as HomeTimelineType } from '../../../types/types';
+import type { HomeTimeline as HomeTimelineType } from '../../../types/types';
 import { themeVars } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
+import { GardenSection, SectionHeading } from '../../../components/Editorial';
 
-const { Title, Paragraph } = Typography;
-
-const SectionContainer = styled.div`
-  padding: ${themeVars.spacing.xl} 0;
-  background: ${themeVars.colors.background};
+const Entries = styled.ol`
+  list-style: none;
+  li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 32px; padding: 28px 0; border-top: 1px solid ${themeVars.colors.border}; }
+  time { color: ${themeVars.colors.lightText}; font-size: 14px; }
+  h3 { display: flex; align-items: baseline; gap: 12px; font-family: ${themeVars.typography.fontFamilyHeading}; font-weight: 400; font-size: 26px; margin-bottom: 10px; }
+  p { color: ${themeVars.colors.lightText}; white-space: pre-line; }
+  @media (max-width: 640px) { li { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
 `;
 
-const Content = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 ${themeVars.spacing.lg};
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: ${themeVars.spacing.xl};
-`;
-
-const SectionTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.md} !important;
-`;
-
-const SectionDescription = styled(Paragraph)`
-  font-size: 1.2em;
-  color: ${themeVars.colors.lightText};
-  max-width: 600px;
-  margin: 0 auto !important;
-`;
-
-const TimelineContainer = styled(motion.div)`
-  margin-top: ${themeVars.spacing.xl};
-`;
-
-const TimelineTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.xs} !important;
-`;
-
-const TimelineDate = styled(Paragraph)`
-  color: ${themeVars.colors.lightText};
-  margin-bottom: ${themeVars.spacing.sm} !important;
-`;
-
-interface HomeTimelineProps {
-  data: HomeTimelineType;
+export default function HomeTimeline({ data }: { data: HomeTimelineType }) {
+  return <GardenSection>
+    <SectionHeading><h2>{data.title}</h2><p>{data.description}</p></SectionHeading>
+    <Entries>{data.timelineItems.map((item, index) => <li key={index}>
+      <time>{item.date}</time><div>
+        <h3><span style={{ color: item.color || themeVars.colors.primary }}><DynamicIcon name={item.icon} /></span>{item.title}</h3>
+        <p>{item.description}</p>
+      </div>
+    </li>)}</Entries>
+  </GardenSection>;
 }
-
-const HomeTimeline: React.FC<HomeTimelineProps> = ({ data }) => {
-  const getIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  return (
-    <SectionContainer>
-      <Content>
-        <Header>
-          <SectionTitle level={2}>{data.title}</SectionTitle>
-          <SectionDescription>{data.description}</SectionDescription>
-        </Header>
-
-        <TimelineContainer
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <Timeline
-            mode="alternate"
-            items={data.timelineItems.map((item, index) => ({
-              color: item.color || themeVars.colors.primary,
-              dot: item.icon && getIcon(item.icon),
-              children: (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <TimelineTitle level={4}>{item.title}</TimelineTitle>
-                  <TimelineDate>{item.date}</TimelineDate>
-                  <Paragraph>{item.description}</Paragraph>
-                </motion.div>
-              ),
-            }))}
-          />
-        </TimelineContainer>
-      </Content>
-    </SectionContainer>
-  );
-};
-
-export default HomeTimeline; 

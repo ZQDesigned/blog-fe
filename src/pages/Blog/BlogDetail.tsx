@@ -1,56 +1,45 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Typography, Space, Tag, Button, Skeleton } from 'antd';
+import { Space, Tag, Button, Skeleton } from 'antd';
 import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { themeVars, withThemeAlpha } from '../../theme';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 import { useTitle } from '../../hooks/useTitle';
 import { blogApi } from '../../services/api';
 import { BlogData } from '../../types/types';
 import DataErrorFallback from '../../components/DataErrorFallback';
-
-const { Title } = Typography;
+import { EditorialTitle, Eyebrow } from '../../components/Editorial';
 
 const Container = styled.div`
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
-  padding: ${themeVars.spacing.lg};
-
-  @media (max-width: 768px) {
-    padding: 0;
-  }
+  min-width: 0;
+  padding: clamp(32px, 5vw, 64px) clamp(20px, 4vw, 56px) 80px;
+  overflow-wrap: anywhere;
 `;
 
-const ContentWrapper = styled(motion.div)`
-  background: ${withThemeAlpha(themeVars.colors.onPrimary, 0.9)};
-  padding: ${themeVars.spacing.xl};
-  border-radius: 8px;
-  box-shadow: ${themeVars.shadows.small};
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  @media (max-width: 768px) {
-    border-radius: 0;
-    padding: ${themeVars.spacing.lg};
-  }
+const ContentWrapper = styled.article`
+  min-width: 0;
+  max-width: 760px;
+  .title-clause { display: inline-block; max-width: 100%; vertical-align: top; }
+  .ant-space { max-width: 100%; }
+  .ant-space-item { min-width: 0; overflow-wrap: anywhere; }
 `;
 
 const BlogTag = styled(Tag)`
   margin: ${themeVars.spacing.xs};
   color: ${themeVars.colors.primary};
   border-color: ${withThemeAlpha(themeVars.colors.primary, 0.35)};
-  background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
+  background: transparent;
+  white-space: normal;
+  overflow-wrap: anywhere;
 `;
 
 const BackButton = styled(Button)`
-  margin-bottom: ${themeVars.spacing.lg};
-
-  @media (max-width: 768px) {
-    margin: ${themeVars.spacing.lg};
-  }
+  margin-bottom: 48px;
+  padding: 0;
 `;
 
 const BlogMeta = styled.div`
@@ -58,7 +47,9 @@ const BlogMeta = styled.div`
   align-items: center;
   gap: ${themeVars.spacing.sm};
   color: ${themeVars.colors.lightText};
-  margin: ${themeVars.spacing.md} 0;
+  margin: 24px 0;
+  font-size: 12px;
+  line-height: 1.9;
   flex-wrap: wrap;
 `;
 
@@ -68,7 +59,9 @@ const MetaDivider = styled.span`
 `;
 
 const StyledMarkdownRenderer = styled(MarkdownRenderer)`
-  margin-top: ${themeVars.spacing.lg};
+  margin-top: 40px;
+  padding-top: 36px;
+  border-top: 1px solid ${themeVars.colors.border};
 `;
 
 const BlogDetail: React.FC = () => {
@@ -178,13 +171,10 @@ const BlogDetail: React.FC = () => {
         返回博客列表
       </BackButton>
 
-      <ContentWrapper
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="blog-detail-content"
-      >
-        <Title level={2}>{blog.title}</Title>
+      <ContentWrapper className="blog-detail-content">
+        <Eyebrow>{blog.categoryName}</Eyebrow>
+        <EditorialTitle aria-label={blog.title}>{blog.title.split(/(?<=：)/u).map((clause, index) =>
+          <span className="title-clause" key={index}>{clause}</span>)}</EditorialTitle>
 
         <BlogMeta>
           <Space>

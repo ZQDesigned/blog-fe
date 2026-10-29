@@ -89,6 +89,7 @@ export const themeVars = {
     circle: cssVar('--theme-radius-circle', common.radius.circle),
   },
   typography: {
+    fontFamilyHeading: cssVar('--theme-font-family-heading', common.typography.fontFamilyHeading),
     fontFamilyBase: cssVar('--theme-font-family-base', common.typography.fontFamilyBase),
     fontFamilyMono: cssVar('--theme-font-family-mono', common.typography.fontFamilyMono),
     fontSizeBase: cssVar('--theme-font-size-base', common.typography.fontSizeBase),

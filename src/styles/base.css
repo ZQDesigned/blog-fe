@@ -114,6 +114,31 @@ a:hover {
   color: var(--theme-color-brand-primary-hover);
 }
 
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+button, input, textarea, select { font: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--theme-color-brand-primary);
+  outline-offset: 5px;
+}
+
+.blog-detail-content, .blog-detail-content * {
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .page-transition-enter {
   opacity: 0;
   transform: translateY(20px);

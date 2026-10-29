@@ -1,115 +1,29 @@
-import React from 'react';
-import { Typography, Card } from 'antd';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
-import { HomeContact as HomeContactType } from '../../../types/types';
+import { Typography } from 'antd';
+import { ArrowUpOutlined } from '@ant-design/icons';
+import type { HomeContact as HomeContactType } from '../../../types/types';
 import { themeVars } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
+import { ContentGrid, GardenSection, SectionHeading } from '../../../components/Editorial';
 
-const { Title, Paragraph } = Typography;
-
-const SectionContainer = styled.div`
-  padding: ${themeVars.spacing.xl} 0;
-  background: ${themeVars.colors.background};
+const Contact = styled.div`
+  padding: 20px 0;
+  border-top: 1px solid ${themeVars.colors.border};
+  .label { display: flex; align-items: center; gap: 10px; color: ${themeVars.colors.primary}; font-size: 13px; margin-bottom: 12px; }
+  .value { font-size: 16px; overflow-wrap: anywhere; }
+  a { display: block; color: ${themeVars.colors.text}; }
+  a:hover { color: ${themeVars.colors.primary}; }
+  .outbound { float: right; transform: rotate(45deg); }
 `;
 
-const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${themeVars.spacing.lg};
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: ${themeVars.spacing.xl};
-`;
-
-const SectionTitle = styled(Title)`
-  margin-bottom: ${themeVars.spacing.md} !important;
-`;
-
-const SectionDescription = styled(Paragraph)`
-  font-size: 1.2em;
-  color: ${themeVars.colors.lightText};
-  max-width: 600px;
-  margin: 0 auto !important;
-`;
-
-const ContactGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: ${themeVars.spacing.lg};
-  margin-top: ${themeVars.spacing.xl};
-`;
-
-const ContactCard = styled(motion(Card))`
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: ${themeVars.shadows.medium};
-  }
-`;
-
-const IconWrapper = styled.div`
-  font-size: 2.5em;
-  color: ${themeVars.colors.primary};
-  margin-bottom: ${themeVars.spacing.md};
-`;
-
-const ContactType = styled(Title)`
-  margin-bottom: ${themeVars.spacing.sm} !important;
-`;
-
-const ContactValue = styled(Paragraph)`
-  color: ${themeVars.colors.lightText};
-  margin-bottom: 0 !important;
-`;
-
-interface HomeContactProps {
-  data: HomeContactType;
+export default function HomeContact({ data }: { data: HomeContactType }) {
+  return <GardenSection>
+    <SectionHeading><h2>{data.title}</h2><p>{data.description}</p></SectionHeading>
+    <ContentGrid>{data.contactItems.map((item, index) => <Contact key={index}>
+      <div className="label"><DynamicIcon name={item.icon} />{item.type}</div>
+      {item.link ? <a className="value" href={item.link} target="_blank" rel="noopener noreferrer">
+        {item.value}<ArrowUpOutlined className="outbound" /></a>
+        : <Typography.Text className="value" copyable>{item.value}</Typography.Text>}
+    </Contact>)}</ContentGrid>
+  </GardenSection>;
 }
-
-const HomeContact: React.FC<HomeContactProps> = ({ data }) => {
-  const getIcon = (iconName: string) => {
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
-  };
-
-  const handleClick = (link?: string) => {
-    if (link) {
-      window.open(link, '_blank');
-    }
-  };
-
-  return (
-    <SectionContainer>
-      <Content>
-        <Header>
-          <SectionTitle level={2}>{data.title}</SectionTitle>
-          <SectionDescription>{data.description}</SectionDescription>
-        </Header>
-
-        <ContactGrid>
-          {data.contactItems.map((item, index) => (
-            <ContactCard
-              key={index}
-              onClick={() => handleClick(item.link)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <IconWrapper>{getIcon(item.icon)}</IconWrapper>
-              <ContactType level={4}>{item.type}</ContactType>
-              <ContactValue copyable={!item.link}>{item.value}</ContactValue>
-            </ContactCard>
-          ))}
-        </ContactGrid>
-      </Content>
-    </SectionContainer>
-  );
-};
-
-export default HomeContact; 
