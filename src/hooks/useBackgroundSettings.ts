@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export type BackgroundType = 'default' | 'anime';
 
@@ -21,7 +21,7 @@ export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchNewBackground = async () => {
+  const fetchNewBackground = useCallback(async () => {
     setIsLoading(true);
     try {
       // 使用时间戳作为参数来避免缓存
@@ -34,7 +34,7 @@ export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // 当背景类型改变时的处理
   useEffect(() => {
@@ -42,7 +42,7 @@ export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
     if (backgroundType === 'anime' && !backgroundUrl) {
       fetchNewBackground();
     }
-  }, [backgroundType]);
+  }, [backgroundType, backgroundUrl, fetchNewBackground]);
 
   const refreshBackground = async () => {
     if (backgroundType === 'anime') {

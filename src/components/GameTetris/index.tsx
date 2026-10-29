@@ -155,7 +155,7 @@ const GameTetris: React.FC = () => {
     return { shape, color };
   }, []);
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setBoard(Array(BOARD_HEIGHT).fill(0).map(() => Array(BOARD_WIDTH).fill({ value: 0, color: '' })));
     setScore(0);
     setGameOver(false);
@@ -170,7 +170,7 @@ const GameTetris: React.FC = () => {
     if (containerRef.current) {
       containerRef.current.focus();
     }
-  };
+  }, [createNewPiece]);
 
   const isCollision = useCallback((shape: number[][], x: number, y: number) => {
     for (let row = 0; row < shape.length; row++) {
@@ -345,7 +345,7 @@ const GameTetris: React.FC = () => {
 
   useEffect(() => {
     resetGame();
-  }, []);
+  }, [resetGame]);
 
   useEffect(() => {
     if (!gameOver && !isPaused) {
@@ -457,7 +457,7 @@ const GameTetris: React.FC = () => {
         onCancel={() => setGameOver(false)}
         okText="再来一局"
         cancelText="关闭"
-        maskClosable={false}
+        mask={{ closable: false }}
         closable={true}
       >
         <p>游戏结束了！最终得分：{score}</p>

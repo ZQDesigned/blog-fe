@@ -2,7 +2,7 @@ import { useRef, useCallback } from 'react';
 
 interface RequestCache {
   [key: string]: {
-    promise: Promise<any>;
+    promise: Promise<unknown>;
     timestamp: number;
   }
 }
@@ -24,7 +24,7 @@ export function useDedupeRequest() {
       cache[key] &&
       now - cache[key].timestamp < CACHE_TIME
     ) {
-      return cache[key].promise;
+      return cache[key].promise as Promise<T>;
     }
 
     // 取消之前的请求（如果存在）
@@ -54,4 +54,4 @@ export function useDedupeRequest() {
   }, []);
 
   return dedupe;
-} 
+}

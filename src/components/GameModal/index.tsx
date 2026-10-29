@@ -84,9 +84,11 @@ const GameModal: React.FC<GameModalProps> = ({ open, onClose }) => {
       footer={null}
       width={isMobile ? '100%' : 600}
       style={isMobile ? { top: 0, margin: 0, maxWidth: '100%', height: '100vh' } : {}}
-      bodyStyle={isMobile ? { height: 'calc(100vh - 55px)', padding: 0 } : {}}
       title={`休息一下，来玩${gameTitle}吧！`}
-      maskStyle={isMobile ? { background: withThemeAlpha(themeVars.colors.text, 0.85) } : {}}
+      styles={{
+        body: isMobile ? { height: 'calc(100vh - 55px)', padding: 0 } : {},
+        mask: isMobile ? { background: withThemeAlpha(themeVars.colors.text, 0.85) } : {},
+      }}
     >
       <Suspense fallback={<PageLoading tip="游戏加载中" />}>
         <SelectedGame />

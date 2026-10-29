@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from '@emotion/styled';
+import { shouldForwardProp } from '../../utils/styled';
 import { Button, Modal, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { themeVars, withThemeAlpha } from '../../theme';
@@ -104,7 +105,7 @@ const TouchControls = styled.div`
   }
 `;
 
-const ModeButton = styled(Button)<{ $active: boolean }>`
+const ModeButton = styled(Button, { shouldForwardProp })<{ $active: boolean }>`
   flex: 1;
   max-width: 120px;
   background-color: ${props => props.$active ? themeVars.colors.primary : undefined};
@@ -305,7 +306,7 @@ const GameMinesweeper: React.FC = () => {
 
       return newBoard;
     });
-  }, [gameOver, hasWon, flagMode, placeMines, revealCell, checkWinCondition]);
+  }, [gameOver, hasWon, flagMode, flagsCount, placeMines, revealCell, checkWinCondition]);
 
   const resetGame = useCallback(() => {
     setBoard(initializeBoard());
@@ -406,7 +407,7 @@ const GameMinesweeper: React.FC = () => {
         onCancel={() => setGameOver(false)}
         okText="再来一局"
         cancelText="关闭"
-        maskClosable={false}
+        mask={{ closable: false }}
         closable={true}
       >
         <p>

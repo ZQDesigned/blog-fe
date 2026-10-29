@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Typography, Space, Tag, Modal, Button, Tooltip } from 'antd';
 import { GithubOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
+import { shouldForwardProp } from '../../utils/styled';
 import { motion } from 'framer-motion';
 import { themeVars, withThemeAlpha } from '../../theme';
 import { useTitle } from '../../hooks/useTitle';
@@ -34,7 +35,7 @@ const ProjectGrid = styled.div`
   gap: ${themeVars.spacing.lg};
 `;
 
-const StyledCard = styled(motion(Card))`
+const StyledCard = styled(motion.create(Card))`
   cursor: pointer;
   height: 100%;
   transition: all 0.3s ease;
@@ -59,7 +60,7 @@ const ProjectTag = styled(Tag)`
   background: ${withThemeAlpha(themeVars.colors.primary, 0.1)};
 `;
 
-const StatusTag = styled(Tag)<{ $status: 'developing' | 'maintaining' | 'paused' }>`
+const StatusTag = styled(Tag, { shouldForwardProp })<{ $status: 'developing' | 'maintaining' | 'paused' }>`
   position: absolute;
   top: 12px;
   right: 12px;
@@ -305,6 +306,7 @@ const Projects: React.FC = () => {
                 <LazyImage
                   src={getFullResourceUrl(selectedProject.imageUrl)}
                   alt={selectedProject.title}
+                  loading="eager"
                   onError={() => handleImageError(selectedProject.id)}
                   loadingSize={60}
                   style={{
@@ -317,7 +319,7 @@ const Projects: React.FC = () => {
                 />
               )}
 
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                 <div>
                   <Title level={4}>项目描述</Title>
                   <Paragraph>{selectedProject.description}</Paragraph>

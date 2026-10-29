@@ -136,7 +136,7 @@ const Game2048: React.FC = () => {
     return newGrid;
   };
 
-  const moveGrid = (direction: 'up' | 'down' | 'left' | 'right') => {
+  const moveGrid = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
     let newGrid = grid.map(row => [...row]);
     let moved = false;
     let newScore = score;
@@ -215,7 +215,7 @@ const Game2048: React.FC = () => {
       setGrid(addNewTile(newGrid));
       setScore(newScore);
     }
-  };
+  }, [grid, score]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     e.preventDefault(); // 防止页面滚动
@@ -233,7 +233,7 @@ const Game2048: React.FC = () => {
         moveGrid('right');
         break;
     }
-  }, [grid]);
+  }, [moveGrid]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
@@ -277,7 +277,7 @@ const Game2048: React.FC = () => {
     if (containerRef.current) {
       containerRef.current.focus();
     }
-  }, []);
+  }, [initializeGrid]);
 
   useEffect(() => {
     if (initialized.current && checkGameOver(grid)) {
@@ -329,7 +329,7 @@ const Game2048: React.FC = () => {
         onCancel={handleModalClose}
         okText="再来一局"
         cancelText={hasWon ? "继续游戏" : "关闭"}
-        maskClosable={false}
+        mask={{ closable: false }}
         closable={true}
       >
         <p>

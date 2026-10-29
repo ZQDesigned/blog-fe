@@ -102,7 +102,7 @@ const Disk = styled.div<{ $size: number; $color: string; $total: number }>`
   }
 `;
 
-const DifficultySelect = styled(Select)`
+const DifficultySelect = styled(Select<number>)`
   width: 120px;
 `;
 
@@ -209,8 +209,8 @@ const GameHanoi: React.FC = () => {
 
   // 初始化游戏
   useEffect(() => {
-    initGame(state.disksCount);
-  }, []);
+    initGame(3);
+  }, [initGame]);
 
   return (
     <GameContainer>
@@ -222,7 +222,6 @@ const GameHanoi: React.FC = () => {
         <div>
           <DifficultySelect
             value={state.disksCount}
-            // @ts-expect-error Select 组件的 onChange 类型不匹配
             onChange={handleDifficultyChange}
             options={[
               { value: 3, label: '简单 (3)' },

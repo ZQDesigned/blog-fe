@@ -18,7 +18,8 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   overflow-wrap: anywhere;
   user-select: text;
   & * { user-select: text; }
-  > :first-child { margin-top: 0; }
+  /* The first content element, ignoring Emotion's injected style tags. */
+  > :not(style):not(:not(style) ~ *) { margin-top: 0; }
   @media (max-width: 640px) { font-size: 16px; }
 
   h1, h2, h3, h4, h5, h6 {

@@ -11,12 +11,15 @@ export const getFullResourceUrl = (path: string): string => {
   return `${BASE_URL}${path}`;
 };
 
-interface RequestOptions extends RequestInit {
+type RequestBody = BodyInit | Record<string, unknown> | unknown[];
+
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  body?: RequestBody | null;
   params?: Record<string, string>;
   signal?: AbortSignal;
 }
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   code: number;
   msg: string;
   data: T;
@@ -24,7 +27,7 @@ interface ApiResponse<T = any> {
 
 export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   try {
-    const { params, signal, ...restOptions } = options;
+    const { params, signal, body, ...restOptions } = options;
 
     // 处理查询参数
     const url = new URL(endpoint, BASE_URL);
@@ -46,19 +49,15 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     };
 
     // 合并配置
-    const finalOptions = {
+    const finalOptions: RequestInit = {
       ...defaultOptions,
       ...restOptions,
+      body: body && typeof body === 'object' ? JSON.stringify(body) : body,
       headers: {
         ...defaultOptions.headers,
         ...restOptions.headers,
       },
     };
-
-    // 如果是 POST/PUT/DELETE 请求，自动转换 body
-    if (finalOptions.body && typeof finalOptions.body === 'object') {
-      finalOptions.body = JSON.stringify(finalOptions.body);
-    }
 
     const response = await fetch(url.toString(), finalOptions);
 
@@ -89,10 +88,10 @@ export const http = {
   get: <T>(endpoint: string, params?: Record<string, string>, signal?: AbortSignal) =>
     request<T>(endpoint, { method: 'GET', params, signal }),
 
-  post: <T>(endpoint: string, data?: any, signal?: AbortSignal) =>
+  post: <T>(endpoint: string, data?: RequestBody | null, signal?: AbortSignal) =>
     request<T>(endpoint, { method: 'POST', body: data, signal }),
 
-  put: <T>(endpoint: string, data?: any, signal?: AbortSignal) =>
+  put: <T>(endpoint: string, data?: RequestBody | null, signal?: AbortSignal) =>
     request<T>(endpoint, { method: 'PUT', body: data, signal }),
 
   delete: <T>(endpoint: string, signal?: AbortSignal) =>

@@ -32,12 +32,12 @@ const getQWeatherErrorMessage = (code: string): string => {
   return QWeatherErrorCodes[code] || '未知错误';
 };
 
-const validateWeatherData = (data: any): boolean => {
-  return data 
-    && typeof data.temp === 'string'
-    && typeof data.humidity === 'string'
-    && typeof data.text === 'string'
-    && typeof data.windDir === 'string';
+const validateWeatherData = (data: unknown): boolean => {
+  return typeof data === 'object' && data !== null
+    && 'temp' in data && typeof data.temp === 'string'
+    && 'humidity' in data && typeof data.humidity === 'string'
+    && 'text' in data && typeof data.text === 'string'
+    && 'windDir' in data && typeof data.windDir === 'string';
 };
 
 export const useWeather = () => {

@@ -26,7 +26,6 @@ class GlobalErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // 将错误信息输出到控制台，便于排查
-    // eslint-disable-next-line no-console
     console.error('应用运行时出现未捕获错误:', error, errorInfo);
   }
 

@@ -83,12 +83,12 @@ export const useGameEasterEgg = () => {
         notificationTimerRef.current = null;
         notification.info({
           key: GAME_EASTER_EGG_NOTIFICATION_KEY,
-          message: '要不要休息一下？',
+          title: '要不要休息一下？',
           description: '看了这么多文章，要不要玩个小游戏放松一下？',
           icon: <ReadOutlined style={{ color: themeVars.colors.primary }} />,
           duration: 0,
           placement: 'topRight',
-          btn: (
+          actions: (
             <Space size={8} style={{ marginTop: '8px' }}>
               <Button
                 type="link"

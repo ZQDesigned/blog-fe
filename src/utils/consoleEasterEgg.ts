@@ -186,14 +186,22 @@ export function showConsoleEasterEgg(): void {
 }
 
 // 额外的交互式函数，用户可以在控制台调用
-(window as any).showEasterEgg = () => {
+declare global {
+  interface Window {
+    showEasterEgg: () => void;
+    showRandomArt: () => void;
+    rainbowLog: (text: string) => void;
+  }
+}
+
+window.showEasterEgg = () => {
   showConsoleEasterEgg();
 };
 
-(window as any).showRandomArt = () => {
+window.showRandomArt = () => {
   console.log('%c' + getRandomAsciiArt(), CONSOLE_STYLES.ascii);
 };
 
-(window as any).rainbowLog = (text: string) => {
+window.rainbowLog = (text: string) => {
   rainbowText(text || 'Hello World!');
 };

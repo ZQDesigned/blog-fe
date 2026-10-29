@@ -179,7 +179,7 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
           </Button>,
         ]}
       >
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Space size="middle">
             {statusTag}
             {status === 'online' ? <CloudOutlined style={{ color: themeVars.colors.success }} /> : null}
@@ -190,7 +190,7 @@ const DataErrorFallback: React.FC<DataErrorFallbackProps> = ({ context, error, o
               错误详情：{error.message}
             </Typography.Text>
           ) : null}
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             <Typography.Text>
               联系 QQ：
               <a

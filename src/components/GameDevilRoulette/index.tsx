@@ -379,7 +379,7 @@ const GameDevilRoulette: React.FC = () => {
     return { ammo, liveCount, blankCount };
   }, []);
 
-  const sleep = (ms: number) => new Promise<void>(resolve => schedule(() => resolve(), ms));
+  const sleep = useCallback((ms: number) => new Promise<void>(resolve => schedule(() => resolve(), ms)), [schedule]);
 
   const queueDealerTurn = useCallback(
     (delay = AI_DELAY) => {
@@ -425,8 +425,9 @@ const GameDevilRoulette: React.FC = () => {
   }, [state]);
 
   useEffect(() => {
+    const pendingTimers = timers.current;
     return () => {
-      timers.current.forEach(id => window.clearTimeout(id));
+      pendingTimers.forEach(id => window.clearTimeout(id));
     };
   }, []);
 
@@ -469,7 +470,7 @@ const GameDevilRoulette: React.FC = () => {
     refillingRef.current = false;
     updateState(prev => ({ ...prev, isBusy: false }));
     checkTurn();
-  }, [addLog, checkTurn, distributeItems, loadAmmo, updateState]);
+  }, [addLog, checkTurn, distributeItems, loadAmmo, sleep, updateState]);
 
   const switchTurn = useCallback(
     (force = false) => {
@@ -500,7 +501,7 @@ const GameDevilRoulette: React.FC = () => {
     [addLog, checkTurn, queueDealerTurn, updateState],
   );
 
-  const useItem = useCallback(
+  const activateItem = useCallback(
     async (owner: Turn, index: number) => {
       if (gameOverRef.current || result.open) return;
       if (stateRef.current.isBusy) return;
@@ -571,7 +572,7 @@ const GameDevilRoulette: React.FC = () => {
         checkTurn();
       }
     },
-    [addLog, checkTurn, queueDealerTurn, refill, updateState],
+    [addLog, checkTurn, queueDealerTurn, refill, result.open, sleep, updateState],
   );
 
   const fire = useCallback(
@@ -640,7 +641,7 @@ const GameDevilRoulette: React.FC = () => {
 
       updateState(prev => ({ ...prev, dealerKnowsNext: null }));
     },
-    [addLog, checkGameOver, checkTurn, refill, schedule, switchTurn, updateState],
+    [addLog, checkGameOver, checkTurn, queueDealerTurn, refill, schedule, sleep, switchTurn, updateState],
   );
 
   const dealerTurn = useCallback(async () => {
@@ -658,22 +659,22 @@ const GameDevilRoulette: React.FC = () => {
     const liveProb = liveCount / current.ammo.length;
 
     const cigIdx = current.dealerItems.findIndex(i => i.id === 'cigarette');
-    if (cigIdx !== -1 && current.dealerHealth < current.maxHealth) return useItem('dealer', cigIdx);
+    if (cigIdx !== -1 && current.dealerHealth < current.maxHealth) return activateItem('dealer', cigIdx);
 
     const magIdx = current.dealerItems.findIndex(i => i.id === 'magnifier');
-    if (magIdx !== -1 && current.dealerKnowsNext === null) return useItem('dealer', magIdx);
+    if (magIdx !== -1 && current.dealerKnowsNext === null) return activateItem('dealer', magIdx);
 
     if (current.dealerKnowsNext === 1 || (current.dealerKnowsNext === null && liveProb >= 0.7)) {
       const sawIdx = current.dealerItems.findIndex(i => i.id === 'saw');
-      if (sawIdx !== -1 && !current.isSawedOff) return useItem('dealer', sawIdx);
+      if (sawIdx !== -1 && !current.isSawedOff) return activateItem('dealer', sawIdx);
       const hcIdx = current.dealerItems.findIndex(i => i.id === 'handcuff');
-      if (hcIdx !== -1 && !current.isHandcuffed) return useItem('dealer', hcIdx);
+      if (hcIdx !== -1 && !current.isHandcuffed) return activateItem('dealer', hcIdx);
     }
 
     if (stateRef.current.dealerKnowsNext === 1) return fire('opponent');
     if (stateRef.current.dealerKnowsNext === 0) return fire('self');
     return liveProb > 0.5 ? fire('opponent') : fire('self');
-  }, [fire, useItem]);
+  }, [activateItem, checkTurn, fire, refill, result.open]);
 
   useEffect(() => {
     dealerTurnRef.current = dealerTurn;
@@ -805,7 +806,7 @@ const GameDevilRoulette: React.FC = () => {
                 key={`${item.id}-${idx}`}
                 $variant="player"
                 disabled={controlsLocked}
-                onClick={() => useItem('player', idx)}
+                onClick={() => activateItem('player', idx)}
                 $disabled={controlsLocked}
               >
                 <div style={{ fontSize: 20 }}>{item.icon}</div>
@@ -854,7 +855,7 @@ const GameDevilRoulette: React.FC = () => {
         centered
         title={result.title}
         closable={false}
-        maskClosable={false}
+        mask={{ closable: false }}
       >
         <p>{result.desc}</p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

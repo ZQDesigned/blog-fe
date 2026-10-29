@@ -237,7 +237,7 @@ const ExternalLinkGuardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         open={Boolean(pendingRequest)}
         closable={false}
         keyboard={false}
-        maskClosable={false}
+        mask={{ closable: false }}
         footer={[
           <Button key="cancel" size="large" onClick={dismissCurrentExternalNavigation}>
             取消
@@ -249,11 +249,11 @@ const ExternalLinkGuardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         onCancel={dismissCurrentExternalNavigation}
         title={null}
         width={560}
-        maskStyle={{
+        styles={{ mask: {
           background: withThemeAlpha(themeVars.colors.text, 0.52),
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
-        }}
+        } }}
       >
         <ModalContent>
           <WarningHeader>

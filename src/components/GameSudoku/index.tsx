@@ -308,7 +308,7 @@ const GameSudoku: React.FC = () => {
         {current.map((row, i) =>
           row.map((num, j) => (
             <Cell
-              key={`\${i}-\${j}`}
+              key={`${i}-${j}`}
               onClick={() => game[i][j] === 0 && setSelectedCell([i, j])}
               $isFixed={game[i][j] !== 0}
               $isSelected={selectedCell?.[0] === i && selectedCell?.[1] === j}

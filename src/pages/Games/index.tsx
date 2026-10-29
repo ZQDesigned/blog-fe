@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import styled from '@emotion/styled';
 import { Card, Modal, Typography } from 'antd';
 import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
 import { themeVars, withThemeAlpha } from '../../theme';
-import Game2048 from '../../components/Game2048';
-import GameSnake from '../../components/GameSnake';
-import GameTetris from '../../components/GameTetris';
-import GameMinesweeper from '../../components/GameMinesweeper';
-import GameSudoku from '../../components/GameSudoku';
-import GameReversi from '../../components/GameReversi';
-import GameHanoi from '../../components/GameHanoi';
-import GameGo from '../../components/GameGo';
-import GameDevilRoulette from '../../components/GameDevilRoulette';
+import PageLoading from '../../components/PageLoading';
 import LazyImage from '../../components/LazyImage';
 import { useTitle } from '../../hooks/useTitle';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
+
+const Game2048 = lazy(() => import('../../components/Game2048'));
+const GameSnake = lazy(() => import('../../components/GameSnake'));
+const GameTetris = lazy(() => import('../../components/GameTetris'));
+const GameMinesweeper = lazy(() => import('../../components/GameMinesweeper'));
+const GameSudoku = lazy(() => import('../../components/GameSudoku'));
+const GameReversi = lazy(() => import('../../components/GameReversi'));
+const GameHanoi = lazy(() => import('../../components/GameHanoi'));
+const GameGo = lazy(() => import('../../components/GameGo'));
+const GameDevilRoulette = lazy(() => import('../../components/GameDevilRoulette'));
 
 const { Title } = Typography;
 
@@ -32,7 +34,7 @@ const GamesGrid = styled.div`
   margin-top: ${themeVars.spacing.lg};
 `;
 
-const GameCard = styled(motion(Card))`
+const GameCard = styled(motion.create(Card))`
   cursor: pointer;
   transition: transform 0.2s ease;
 
@@ -86,7 +88,7 @@ const CategoryTitle = styled(Title)`
   }
 `;
 
-const WebGameCard = styled(motion(Card))`
+const WebGameCard = styled(motion.create(Card))`
   cursor: pointer;
   transition: transform 0.2s ease;
   background: ${themeVars.colors.secondary};
@@ -356,10 +358,12 @@ const GamesPage: React.FC = () => {
             </GameTitle>
           )
         }
-        destroyOnClose
-        maskStyle={isMobile ? { background: withThemeAlpha(themeVars.colors.text, 0.85) } : undefined}
+        destroyOnHidden
+        styles={{ mask: isMobile ? { background: withThemeAlpha(themeVars.colors.text, 0.85) } : undefined }}
       >
-        {selectedGameData?.component && <selectedGameData.component />}
+        <Suspense fallback={<PageLoading tip="游戏加载中" />}>
+          {selectedGameData?.component && <selectedGameData.component />}
+        </Suspense>
       </StyledModal>
     </GamesContainer>
   );

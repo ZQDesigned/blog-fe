@@ -319,7 +319,7 @@ const FloatSidebar: React.FC = () => {
                 </OnlineStatus>
               </ProfileHeader>
               <ProfileContent>
-                <Space direction="vertical" size="small">
+                <Space orientation="vertical" size="small">
                   <Tag
                     style={{
                       color: themeVars.colors.primary,

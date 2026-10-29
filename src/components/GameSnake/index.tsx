@@ -99,29 +99,29 @@ const GameSnake: React.FC = () => {
   const gameLoopRef = useRef<number | undefined>(undefined);
   const nextDirectionRef = useRef<Direction>(INITIAL_DIRECTION);
 
-  const generateFood = useCallback(() => {
+  const generateFood = useCallback((occupied: Position[]) => {
     let newFood: Position;
     do {
       newFood = {
         x: Math.floor(Math.random() * BOARD_SIZE),
         y: Math.floor(Math.random() * BOARD_SIZE),
       };
-    } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+    } while (occupied.some(segment => segment.x === newFood.x && segment.y === newFood.y));
     setFood(newFood);
-  }, [snake]);
+  }, []);
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setSnake(INITIAL_SNAKE);
     setDirection(INITIAL_DIRECTION);
     nextDirectionRef.current = INITIAL_DIRECTION;
     setScore(0);
     setGameOver(false);
     setIsPaused(false);
-    generateFood();
+    generateFood(INITIAL_SNAKE);
     if (containerRef.current) {
       containerRef.current.focus();
     }
-  };
+  }, [generateFood]);
 
   const moveSnake = useCallback(() => {
     setSnake(prevSnake => {
@@ -159,7 +159,7 @@ const GameSnake: React.FC = () => {
 
       if (ateFood) {
         setScore(prev => prev + 10);
-        generateFood();
+        generateFood(newSnake);
       }
 
       return newSnake;
@@ -209,7 +209,7 @@ const GameSnake: React.FC = () => {
 
   useEffect(() => {
     resetGame();
-  }, []);
+  }, [resetGame]);
 
   useEffect(() => {
     if (!gameOver && !isPaused) {
@@ -278,7 +278,7 @@ const GameSnake: React.FC = () => {
         onCancel={handleModalClose}
         okText="再来一局"
         cancelText="关闭"
-        maskClosable={false}
+        mask={{ closable: false }}
         closable={true}
       >
         <p>游戏结束了！最终得分：{score}</p>

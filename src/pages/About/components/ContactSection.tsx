@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Space, Modal, Typography } from 'antd';
 import styled from '@emotion/styled';
 import { themeVars } from '../../../theme';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../../../components/DynamicIcon';
 
 const { Link } = Typography;
 
@@ -63,14 +63,13 @@ const ContactSection: React.FC<{ items: ContactItemProps[] }> = ({ items }) => {
 
   // 动态获取图标组件
   const getIcon = (iconName: string) => {
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent /> : null;
+    return <DynamicIcon name={iconName} />;
   };
 
   return (
     <>
       <ContactCard title="联系方式">
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           {items.map((item, index) => (
             item.link ? (
               <Link key={index} href={item.link} target="_blank">
@@ -108,4 +107,4 @@ const ContactSection: React.FC<{ items: ContactItemProps[] }> = ({ items }) => {
   );
 };
 
-export default ContactSection; 
+export default ContactSection;

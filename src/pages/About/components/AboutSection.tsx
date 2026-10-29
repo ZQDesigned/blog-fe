@@ -12,7 +12,7 @@ interface AboutSectionProps {
   delay?: number;
 }
 
-const StyledCard = styled(motion(Card))`
+const StyledCard = styled(motion.create(Card))`
   min-width: 0;
   .ant-card-body { padding: clamp(16px, 3vw, 24px); }
   h3.ant-typography { font-family: ${themeVars.typography.fontFamilyHeading}; font-weight: 400; font-size: 28px; }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import ImageLoading from '../ImageLoading';
@@ -37,28 +37,37 @@ const LoadingWrapper = styled.div`
   background-color: transparent;
 `;
 
-const LazyImage: React.FC<LazyImageProps> = ({
+const ImageContent: React.FC<LazyImageProps> = ({
   src,
   alt,
   loadingSize,
   loadingColor,
-  containerClassName,
+  loading = 'lazy',
+  decoding = 'async',
+  onLoad,
+  onError,
   ...imgProps
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const [isLoading, setIsLoading] = useState(Boolean(src));
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    setCurrentSrc(src);
+    // Cached images may finish before their load event is observed.
+    if (src && imageRef.current?.complete) setIsLoading(false);
   }, [src]);
 
-  const handleLoad = () => {
+  const handleLoad: NonNullable<LazyImageProps['onLoad']> = event => {
     setIsLoading(false);
+    onLoad?.(event);
+  };
+
+  const handleError: NonNullable<LazyImageProps['onError']> = event => {
+    setIsLoading(false);
+    onError?.(event);
   };
 
   return (
-    <ImageContainer className={containerClassName}>
+    <>
       <AnimatePresence mode="wait">
         {isLoading && (
           <LoadingWrapper
@@ -71,15 +80,26 @@ const LazyImage: React.FC<LazyImageProps> = ({
       <StyledImage
         {...imgProps}
         key={`image-${src}`}
-        src={currentSrc}
+        ref={imageRef}
+        src={src}
         alt={alt}
+        loading={loading}
+        decoding={decoding}
         onLoad={handleLoad}
+        onError={handleError}
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
         transition={{ duration: 0.3 }}
       />
-    </ImageContainer>
+    </>
   );
 };
 
-export default LazyImage; 
+const LazyImage: React.FC<LazyImageProps> = ({ containerClassName, ...props }) => (
+  <ImageContainer className={containerClassName}>
+    {/* Reset load state with the source and ignore events from the old image. */}
+    <ImageContent key={props.src} {...props} />
+  </ImageContainer>
+);
+
+export default LazyImage;

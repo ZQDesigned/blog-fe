@@ -194,7 +194,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
       open={open}
       width={320}
     >
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="large" style={{ width: '100%' }}>
         <div>
           <Title level={5}>背景设置</Title>
           <PreviewContainer>

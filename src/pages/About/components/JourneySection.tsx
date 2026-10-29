@@ -46,7 +46,7 @@ const JourneySection: React.FC<JourneySectionProps> = ({ data, delay = 0 }) => {
           <Timeline 
             mode="alternate"
             items={journey.milestones.map((milestone, index) => ({
-              children: (
+              content: (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}

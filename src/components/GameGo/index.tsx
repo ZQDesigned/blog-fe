@@ -15,7 +15,7 @@ const GameContainer = styled.div`
   margin: 0 auto;
 `;
 
-const BoardSizeSelector = styled(Select)`
+const BoardSizeSelector = styled(Select<'9' | '19'>)`
   width: 120px;
   margin-bottom: ${themeVars.spacing.md};
 `;
@@ -41,7 +41,6 @@ const GoGameProxy: React.FC = () => {
     <GameContainer>
       <BoardSizeSelector
         value={boardSize}
-        // @ts-ignore
         onChange={handleBoardSizeChange}
         options={[
           { label: '9×9棋盘', value: '9' },
@@ -51,7 +50,7 @@ const GoGameProxy: React.FC = () => {
       {boardSize === '19' ? <GameGo19 /> : <GameGo9 />}
       {isPCDevice && boardSize === '9' && (
         <Alert
-          message="提示：您正在使用PC端浏览器，可以切换到19×19棋盘来获得完整的游戏体验"
+          title="提示：您正在使用PC端浏览器，可以切换到19×19棋盘来获得完整的游戏体验"
           type="warning"
           showIcon
           style={{ marginTop: themeVars.spacing.md }}

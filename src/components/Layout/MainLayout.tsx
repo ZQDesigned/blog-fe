@@ -21,7 +21,8 @@ import { useBackgroundSettings } from '../../hooks/useBackgroundSettings';
 import { useStandaloneMode } from '../../hooks/useStandaloneMode';
 import { getFooterProfile } from '../../services/api';
 import { FooterProfile } from '../../types/types';
-import * as Icons from '@ant-design/icons';
+import DynamicIcon from '../DynamicIcon';
+import { shouldForwardProp } from '../../utils/styled';
 
 const { Header, Content} = Layout;
 const { Paragraph } = Typography;
@@ -29,7 +30,7 @@ const ContextMenu = lazy(() => import('../ContextMenu'));
 const SettingsDrawer = lazy(() => import('../SettingsDrawer'));
 const FloatSidebar = lazy(() => import('../FloatSidebar'));
 
-const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandalone?: boolean }>`
+const StyledLayout = styled(Layout, { shouldForwardProp })<{ $backgroundUrl?: string | null; $isStandalone?: boolean }>`
   min-height: 100vh;
   width: 100%;
   position: relative;
@@ -52,7 +53,7 @@ const StyledLayout = styled(Layout)<{ $backgroundUrl?: string | null; $isStandal
   }
 `;
 
-const StyledHeader = styled(Header)<{ $scrolled: boolean; $hasBackground: boolean; $backgroundUrl?: string | null }>`
+const StyledHeader = styled(Header, { shouldForwardProp })<{ $scrolled: boolean; $hasBackground: boolean; $backgroundUrl?: string | null }>`
   background: ${themeVars.colors.overlayGlass};
   border-bottom: 1px solid ${themeVars.colors.border};
   position: fixed;
@@ -106,7 +107,7 @@ const StyledAvatar = styled(Avatar)`
   }
 `;
 
-const StyledContent = styled(Content)<{ $isStandalone?: boolean; $hasWallpaper?: boolean }>`
+const StyledContent = styled(Content, { shouldForwardProp })<{ $isStandalone?: boolean; $hasWallpaper?: boolean }>`
   position: relative;
   min-width: 0;
   padding: 0;
@@ -120,7 +121,7 @@ const StyledContent = styled(Content)<{ $isStandalone?: boolean; $hasWallpaper?:
   }
 `;
 
-const StyledMenu = styled(Menu)<{ $scrolled: boolean }>`
+const StyledMenu = styled(Menu, { shouldForwardProp })<{ $scrolled: boolean }>`
   flex: 1;
   border-bottom: none;
   min-width: 0;
@@ -417,10 +418,7 @@ export const MainLayout: React.FC = () => {
 
   // 获取图标组件
   const getIcon = (iconName?: string) => {
-    if (!iconName) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const IconComponent = (Icons as any)[iconName];
-    return IconComponent ? <IconComponent className="link-icon" /> : null;
+    return <DynamicIcon name={iconName} className="link-icon" />;
   };
 
   // 监听路由变化，自动滚动到顶部
