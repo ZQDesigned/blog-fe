@@ -212,14 +212,14 @@ export const openExternalNavigationDirectly = (request: ExternalNavigationReques
   }
 
   const shouldOpenInCurrentTab =
-    request.mode === 'same-tab' || !request.target || request.target === '_self';
+    request.mode === 'same-tab' || request.target === '_self';
 
   if (shouldOpenInCurrentTab) {
     window.location.assign(request.href);
     return null;
   }
 
-  return getNativeWindowOpen()(request.href, request.target, request.features);
+  return getNativeWindowOpen()(request.href, request.target || '_blank', request.features);
 };
 
 export const dismissCurrentExternalNavigation = () => {

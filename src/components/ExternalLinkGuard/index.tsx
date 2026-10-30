@@ -190,17 +190,15 @@ const ExternalLinkGuardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       event.preventDefault();
       event.stopPropagation();
 
+      const opensSeparateTab = isMiddleClick || event.metaKey || event.ctrlKey || event.shiftKey;
       requestExternalNavigation(anchor.href || href, {
         mode:
-          isMiddleClick ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
+          opensSeparateTab ||
           anchor.target === '_blank' ||
           (!!anchor.target && anchor.target !== '_self')
             ? 'new-tab'
             : 'same-tab',
-        target: anchor.target || undefined,
+        target: opensSeparateTab ? '_blank' : anchor.target || undefined,
       });
     };
 
