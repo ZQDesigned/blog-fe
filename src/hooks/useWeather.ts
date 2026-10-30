@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../utils/storage';
 import { useState, useEffect } from 'react';
 
 interface WeatherData {
@@ -51,8 +52,8 @@ export const useWeather = () => {
     const fetchLocation = async () => {
       try {
         // 先检查本地缓存
-        const cachedLocation = localStorage.getItem('weather_location');
-        const cachedTimestamp = localStorage.getItem('weather_location_timestamp');
+        const cachedLocation = safeLocalStorage.getItem('weather_location');
+        const cachedTimestamp = safeLocalStorage.getItem('weather_location_timestamp');
         
         // 如果缓存存在且未过期（24小时内）
         if (cachedLocation && cachedTimestamp) {
@@ -66,8 +67,8 @@ export const useWeather = () => {
               }
             } catch (e) {
               console.error('Invalid cached location data:', e);
-              localStorage.removeItem('weather_location');
-              localStorage.removeItem('weather_location_timestamp');
+              safeLocalStorage.removeItem('weather_location');
+              safeLocalStorage.removeItem('weather_location_timestamp');
             }
           }
         }
@@ -104,8 +105,8 @@ export const useWeather = () => {
             };
             
             // 保存到本地缓存
-            localStorage.setItem('weather_location', JSON.stringify(locationData));
-            localStorage.setItem('weather_location_timestamp', Date.now().toString());
+            safeLocalStorage.setItem('weather_location', JSON.stringify(locationData));
+            safeLocalStorage.setItem('weather_location_timestamp', Date.now().toString());
             
             setLocation(locationData);
           } else {
@@ -120,7 +121,7 @@ export const useWeather = () => {
         console.error('Location fetch error:', err);
         
         // 如果发生错误，尝试使用缓存的位置信息
-        const cachedLocation = localStorage.getItem('weather_location');
+        const cachedLocation = safeLocalStorage.getItem('weather_location');
         if (cachedLocation) {
           try {
             const parsedLocation = JSON.parse(cachedLocation);
@@ -130,8 +131,8 @@ export const useWeather = () => {
             }
           } catch (e) {
             console.error('Invalid cached location data:', e);
-            localStorage.removeItem('weather_location');
-            localStorage.removeItem('weather_location_timestamp');
+            safeLocalStorage.removeItem('weather_location');
+            safeLocalStorage.removeItem('weather_location_timestamp');
           }
         }
       }
@@ -174,8 +175,8 @@ export const useWeather = () => {
           setError(null);
           
           // 缓存天气数据
-          localStorage.setItem('weather_data', JSON.stringify(weatherData));
-          localStorage.setItem('weather_timestamp', Date.now().toString());
+          safeLocalStorage.setItem('weather_data', JSON.stringify(weatherData));
+          safeLocalStorage.setItem('weather_timestamp', Date.now().toString());
         } else {
           throw new Error(getQWeatherErrorMessage(data.code));
         }
@@ -185,8 +186,8 @@ export const useWeather = () => {
         console.error('Weather fetch error:', err);
         
         // 如果发生错误，尝试使用缓存的天气数据
-        const cachedWeather = localStorage.getItem('weather_data');
-        const cachedTimestamp = localStorage.getItem('weather_timestamp');
+        const cachedWeather = safeLocalStorage.getItem('weather_data');
+        const cachedTimestamp = safeLocalStorage.getItem('weather_timestamp');
         
         if (cachedWeather && cachedTimestamp) {
           try {
@@ -203,8 +204,8 @@ export const useWeather = () => {
             }
           } catch (e) {
             console.error('Invalid cached weather data:', e);
-            localStorage.removeItem('weather_data');
-            localStorage.removeItem('weather_timestamp');
+            safeLocalStorage.removeItem('weather_data');
+            safeLocalStorage.removeItem('weather_timestamp');
           }
         }
       } finally {

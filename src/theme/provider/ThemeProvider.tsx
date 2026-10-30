@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../../utils/storage';
 import React, {
   useCallback,
   useEffect,
@@ -62,7 +63,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return;
     }
 
-    window.localStorage.setItem(themeConfig.settings.storageKey, mode);
+    safeLocalStorage.setItem(themeConfig.settings.storageKey, mode);
   }, [mode, themeConfig.settings.storageKey]);
 
   useEffect(() => {

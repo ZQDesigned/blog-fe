@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../../utils/storage';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CursorContext, type CursorStyle } from './CursorContext';
 
@@ -44,7 +45,7 @@ const readStoredCursorEnabled = (): boolean => {
     return true;
   }
 
-  const stored = window.localStorage.getItem(CURSOR_STORAGE_KEY);
+  const stored = safeLocalStorage.getItem(CURSOR_STORAGE_KEY);
   if (stored === null) {
     return true;
   }
@@ -57,7 +58,7 @@ const readStoredCursorStyle = (): CursorStyle => {
     return 'orb';
   }
 
-  const stored = window.localStorage.getItem(CURSOR_STYLE_STORAGE_KEY);
+  const stored = safeLocalStorage.getItem(CURSOR_STYLE_STORAGE_KEY);
   if (!stored) {
     return 'orb';
   }
@@ -72,7 +73,7 @@ const readStoredUseCustomPalette = (): boolean => {
     return false;
   }
 
-  const stored = window.localStorage.getItem(CURSOR_USE_CUSTOM_PALETTE_KEY);
+  const stored = safeLocalStorage.getItem(CURSOR_USE_CUSTOM_PALETTE_KEY);
   if (stored === null) {
     return false;
   }
@@ -100,7 +101,7 @@ const readStoredPalette = (): CursorPalette => {
     return { ...EMPTY_PALETTE };
   }
 
-  const raw = window.localStorage.getItem(CURSOR_PALETTE_STORAGE_KEY);
+  const raw = safeLocalStorage.getItem(CURSOR_PALETTE_STORAGE_KEY);
   if (!raw) {
     return { ...EMPTY_PALETTE };
   }
@@ -244,7 +245,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    window.localStorage.setItem(CURSOR_STORAGE_KEY, String(enabled));
+    safeLocalStorage.setItem(CURSOR_STORAGE_KEY, String(enabled));
   }, [enabled]);
 
   useEffect(() => {
@@ -252,7 +253,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    window.localStorage.setItem(CURSOR_STYLE_STORAGE_KEY, style);
+    safeLocalStorage.setItem(CURSOR_STYLE_STORAGE_KEY, style);
   }, [style]);
 
   useEffect(() => {
@@ -260,7 +261,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    window.localStorage.setItem(
+    safeLocalStorage.setItem(
       CURSOR_USE_CUSTOM_PALETTE_KEY,
       String(useCustomPalette),
     );
@@ -271,7 +272,7 @@ export const CursorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    window.localStorage.setItem(
+    safeLocalStorage.setItem(
       CURSOR_PALETTE_STORAGE_KEY,
       JSON.stringify(palette),
     );

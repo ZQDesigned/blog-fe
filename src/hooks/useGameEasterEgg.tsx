@@ -1,3 +1,4 @@
+import { safeLocalStorage, safeSessionStorage } from '../utils/storage';
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Space, notification } from 'antd';
@@ -30,16 +31,16 @@ export const useGameEasterEgg = () => {
   useEffect(() => {
     if (isStandalone) return;
 
-    const lastRefreshTime = localStorage.getItem(PAGE_REFRESH_KEY);
+    const lastRefreshTime = safeLocalStorage.getItem(PAGE_REFRESH_KEY);
     const currentTime = new Date().getTime();
 
     // 如果是首次访问或者距离上次刷新超过30分钟，重置计数器
     if (!lastRefreshTime || currentTime - parseInt(lastRefreshTime) > 30 * 60 * 1000) {
-      localStorage.setItem(ARTICLE_READ_COUNT_KEY, '0');
+      safeLocalStorage.setItem(ARTICLE_READ_COUNT_KEY, '0');
     }
 
     // 更新刷新时间
-    localStorage.setItem(PAGE_REFRESH_KEY, currentTime.toString());
+    safeLocalStorage.setItem(PAGE_REFRESH_KEY, currentTime.toString());
   }, [isStandalone]);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export const useGameEasterEgg = () => {
       return;
     }
 
-    const lastShownTime = localStorage.getItem(GAME_SHOWN_TIME_KEY);
+    const lastShownTime = safeLocalStorage.getItem(GAME_SHOWN_TIME_KEY);
     const currentTime = new Date().getTime();
 
     // 如果距离上次显示不足6小时，不再显示
@@ -62,22 +63,22 @@ export const useGameEasterEgg = () => {
     }
 
     // 防止同一路由在短时间内重复计数（例如 StrictMode 或重复挂载）
-    const lastCountedPath = sessionStorage.getItem(LAST_COUNTED_ARTICLE_PATH_KEY);
-    const lastCountedTime = Number(sessionStorage.getItem(LAST_COUNTED_ARTICLE_TIME_KEY) || '0');
+    const lastCountedPath = safeSessionStorage.getItem(LAST_COUNTED_ARTICLE_PATH_KEY);
+    const lastCountedTime = Number(safeSessionStorage.getItem(LAST_COUNTED_ARTICLE_TIME_KEY) || '0');
     if (lastCountedPath === location.pathname && currentTime - lastCountedTime < 5000) {
       return;
     }
 
     // 获取并增加阅读计数
-    const count = parseInt(localStorage.getItem(ARTICLE_READ_COUNT_KEY) || '0') + 1;
-    localStorage.setItem(ARTICLE_READ_COUNT_KEY, count.toString());
-    sessionStorage.setItem(LAST_COUNTED_ARTICLE_PATH_KEY, location.pathname);
-    sessionStorage.setItem(LAST_COUNTED_ARTICLE_TIME_KEY, currentTime.toString());
+    const count = parseInt(safeLocalStorage.getItem(ARTICLE_READ_COUNT_KEY) || '0') + 1;
+    safeLocalStorage.setItem(ARTICLE_READ_COUNT_KEY, count.toString());
+    safeSessionStorage.setItem(LAST_COUNTED_ARTICLE_PATH_KEY, location.pathname);
+    safeSessionStorage.setItem(LAST_COUNTED_ARTICLE_TIME_KEY, currentTime.toString());
 
     // 当阅读大于等于3篇文章时显示通知
     if (count >= 3) {
-      localStorage.setItem(GAME_SHOWN_TIME_KEY, currentTime.toString());
-      localStorage.setItem(ARTICLE_READ_COUNT_KEY, '0'); // 重置计数
+      safeLocalStorage.setItem(GAME_SHOWN_TIME_KEY, currentTime.toString());
+      safeLocalStorage.setItem(ARTICLE_READ_COUNT_KEY, '0'); // 重置计数
       // 延迟3秒显示，给用户一些阅读时间
       notificationTimerRef.current = window.setTimeout(() => {
         notificationTimerRef.current = null;

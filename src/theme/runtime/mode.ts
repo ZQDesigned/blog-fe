@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../../utils/storage';
 import type { ResolvedThemeMode, ThemeMode } from '../types';
 
 const isThemeMode = (value: string | null): value is ThemeMode =>
@@ -11,7 +12,7 @@ export const readStoredThemeMode = (
     return fallback;
   }
 
-  const storedMode = window.localStorage.getItem(storageKey);
+  const storedMode = safeLocalStorage.getItem(storageKey);
   return isThemeMode(storedMode) ? storedMode : fallback;
 };
 

@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../utils/storage';
 import { useState, useEffect, useCallback } from 'react';
 
 export type BackgroundType = 'default' | 'anime';
@@ -12,11 +13,11 @@ interface UseBackgroundSettingsReturn {
 
 export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
   const [backgroundType, setBackgroundType] = useState<BackgroundType>(() => {
-    const saved = localStorage.getItem('backgroundType');
+    const saved = safeLocalStorage.getItem('backgroundType');
     return (saved as BackgroundType) || 'default';
   });
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(() => {
-    const saved = localStorage.getItem('backgroundUrl');
+    const saved = safeLocalStorage.getItem('backgroundUrl');
     return saved || null;
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
       const timestamp = Date.now();
       const url = `https://www.loliapi.com/acg/?timestamp=${timestamp}`;
       setBackgroundUrl(url);
-      localStorage.setItem('backgroundUrl', url);
+      safeLocalStorage.setItem('backgroundUrl', url);
     } catch (error) {
       console.error('Failed to fetch background:', error);
     } finally {
@@ -38,7 +39,7 @@ export const useBackgroundSettings = (): UseBackgroundSettingsReturn => {
 
   // 当背景类型改变时的处理
   useEffect(() => {
-    localStorage.setItem('backgroundType', backgroundType);
+    safeLocalStorage.setItem('backgroundType', backgroundType);
     if (backgroundType === 'anime' && !backgroundUrl) {
       fetchNewBackground();
     }
