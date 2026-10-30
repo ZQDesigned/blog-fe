@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { Card, Typography, Space, Tag, Spin, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMediaQuery } from 'react-responsive';
 import { themeVars, withThemeAlpha } from '../../theme';
 import LazyImage from '../LazyImage';
 import { useWeather } from '../../hooks/useWeather';
@@ -174,8 +175,24 @@ const WeatherTitle = styled.div`
   }
 `;
 
-const FloatSidebar: React.FC = () => {
+const WeatherContent: React.FC = () => {
   const { weather, loading: weatherLoading, error: weatherError } = useWeather();
+  if (weatherLoading) {
+    return <div style={{ textAlign: 'center', padding: themeVars.spacing.md }}><Spin size="small" /></div>;
+  }
+  if (weatherError) return <WeatherError>{weatherError}</WeatherError>;
+  if (!weather) return <WeatherError>暂无天气数据</WeatherError>;
+  return (
+    <WeatherInfo>
+      <WeatherRow><span>{formatDate(new Date(weather.updateTime).getTime())}</span></WeatherRow>
+      <WeatherRow><span>温度 {weather.temp}°C</span><span>湿度 {weather.humidity}%</span></WeatherRow>
+      <WeatherRow><span>{weather.text}/{weather.windDir}</span><span>{weather.city}</span></WeatherRow>
+    </WeatherInfo>
+  );
+};
+
+const FloatSidebar: React.FC = () => {
+  const isSidebarSupported = useMediaQuery({ minWidth: 1501 });
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [sidebarData, setSidebarData] = useState<FloatSidebarData | null>(null);
@@ -236,40 +253,6 @@ const FloatSidebar: React.FC = () => {
     return () => window.clearTimeout(timeoutId);
   }, [isHovering]);
 
-  const renderWeatherContent = () => {
-    if (weatherLoading) {
-      return (
-        <div style={{ textAlign: 'center', padding: themeVars.spacing.md }}>
-          <Spin size="small" />
-        </div>
-      );
-    }
-
-    if (weatherError) {
-      return <WeatherError>{weatherError}</WeatherError>;
-    }
-
-    if (!weather) {
-      return <WeatherError>暂无天气数据</WeatherError>;
-    }
-
-    return (
-      <WeatherInfo>
-        <WeatherRow>
-          <span>{formatDate(new Date(weather.updateTime).getTime())}</span>
-        </WeatherRow>
-        <WeatherRow>
-          <span>温度 {weather.temp}°C</span>
-          <span>湿度 {weather.humidity}%</span>
-        </WeatherRow>
-        <WeatherRow>
-          <span>{weather.text}/{weather.windDir}</span>
-          <span>{weather.city}</span>
-        </WeatherRow>
-      </WeatherInfo>
-    );
-  };
-
   if (loading || !sidebarData) {
     return null;
   }
@@ -281,7 +264,7 @@ const FloatSidebar: React.FC = () => {
         onMouseLeave={() => setIsHovering(false)}
       />
       <AnimatePresence>
-        {(isExpanded || isHovering) && (
+        {isSidebarSupported && (isExpanded || isHovering) && (
           <SidebarContainer
             initial={{ x: 300 }}
             animate={{ x: 0 }}
@@ -362,7 +345,7 @@ const FloatSidebar: React.FC = () => {
                   </WeatherTitle>
                 }
               >
-                {renderWeatherContent()}
+                <WeatherContent />
               </WeatherCard>
             )}
           </SidebarContainer>

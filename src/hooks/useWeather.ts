@@ -41,6 +41,25 @@ const validateWeatherData = (data: unknown): boolean => {
     && 'windDir' in data && typeof data.windDir === 'string';
 };
 
+const readCachedWeather = (maxAge: number, city: string): WeatherData | null => {
+  const raw = safeLocalStorage.getItem('weather_data');
+  const timestamp = Number(safeLocalStorage.getItem('weather_timestamp'));
+  const age = Date.now() - timestamp;
+  if (!raw || !Number.isFinite(timestamp) || age < 0 || age >= maxAge) return null;
+  try {
+    const data: unknown = JSON.parse(raw);
+    if (validateWeatherData(data) && typeof data === 'object' && data !== null
+      && 'city' in data && data.city === city
+      && 'updateTime' in data && typeof data.updateTime === 'string') {
+      return data as WeatherData;
+    }
+  } catch {
+    safeLocalStorage.removeItem('weather_data');
+    safeLocalStorage.removeItem('weather_timestamp');
+  }
+  return null;
+};
+
 export const useWeather = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +68,7 @@ export const useWeather = () => {
 
   // 获取用户位置信息
   useEffect(() => {
+    const controller = new AbortController();
     const fetchLocation = async () => {
       try {
         // 先检查本地缓存
@@ -74,12 +94,13 @@ export const useWeather = () => {
         }
 
         // 使用 ipapi.co 获取用户位置信息（免费版本每月30k次请求）
-        const ipResponse = await fetch('https://ipapi.co/json/');
+        const ipResponse = await fetch('https://ipapi.co/json/', { signal: controller.signal });
         if (!ipResponse.ok) {
           throw new Error('无法获取位置信息，请检查网络连接');
         }
         
         const ipData = await ipResponse.json();
+        if (controller.signal.aborted) return;
         
         if (ipData.city) {
           // 使用和风天气 API 搜索城市
@@ -91,10 +112,12 @@ export const useWeather = () => {
           // 使用城市名称和省份进行更精确的定位
           const cityQuery = `${ipData.city}${ipData.region ? ',' + ipData.region : ''}`;
           const cityResponse = await fetch(
-            `https://geoapi.qweather.com/v2/city/lookup?key=${API_KEY}&location=${encodeURIComponent(cityQuery)}`
+            `https://geoapi.qweather.com/v2/city/lookup?key=${API_KEY}&location=${encodeURIComponent(cityQuery)}`,
+            { signal: controller.signal },
           );
           
           const cityData = await cityResponse.json();
+          if (controller.signal.aborted) return;
 
           if (cityData.code === '200' && cityData.location?.[0]) {
             const locationData = {
@@ -116,8 +139,10 @@ export const useWeather = () => {
           throw new Error('无法确定您的位置信息');
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         const errorMessage = err instanceof Error ? err.message : '位置信息获取失败';
         setError(errorMessage);
+        setLoading(false);
         console.error('Location fetch error:', err);
         
         // 如果发生错误，尝试使用缓存的位置信息
@@ -139,22 +164,32 @@ export const useWeather = () => {
     };
 
     fetchLocation();
+    return () => controller.abort();
   }, []);
 
   // 获取天气信息
   useEffect(() => {
-    const fetchWeather = async () => {
+    const controller = new AbortController();
+    const fetchWeather = async (refresh = false) => {
       if (!location) return;
 
       try {
         setLoading(true);
+        const cachedWeather = readCachedWeather(30 * 60 * 1000, location.name);
+        if (!refresh && cachedWeather) {
+          setWeather(cachedWeather);
+          setError(null);
+          return;
+        }
         const API_KEY = import.meta.env.VITE_QWEATHER_API_KEY;
         
         const response = await fetch(
-          `https://devapi.qweather.com/v7/weather/now?key=${API_KEY}&location=${location.id}`
+          `https://devapi.qweather.com/v7/weather/now?key=${API_KEY}&location=${location.id}`,
+          { signal: controller.signal },
         );
 
         const data = await response.json();
+        if (controller.signal.aborted) return;
 
         if (data.code === '200' && data.now) {
           // 验证返回的数据是否完整
@@ -181,43 +216,30 @@ export const useWeather = () => {
           throw new Error(getQWeatherErrorMessage(data.code));
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         const errorMessage = err instanceof Error ? err.message : '未知错误';
         setError(errorMessage);
         console.error('Weather fetch error:', err);
         
         // 如果发生错误，尝试使用缓存的天气数据
-        const cachedWeather = safeLocalStorage.getItem('weather_data');
-        const cachedTimestamp = safeLocalStorage.getItem('weather_timestamp');
-        
-        if (cachedWeather && cachedTimestamp) {
-          try {
-            const timestamp = parseInt(cachedTimestamp);
-            // 只使用1小时内的缓存数据
-            if (Date.now() - timestamp < 60 * 60 * 1000) {
-              const parsedWeather = JSON.parse(cachedWeather);
-              if (validateWeatherData(parsedWeather)) {
-                setWeather(parsedWeather);
-                setError('使用缓存的天气数据');
-              } else {
-                throw Object.assign(new Error('缓存的天气数据无效'), { cause: err });
-              }
-            }
-          } catch (e) {
-            console.error('Invalid cached weather data:', e);
-            safeLocalStorage.removeItem('weather_data');
-            safeLocalStorage.removeItem('weather_timestamp');
-          }
+        const cachedWeather = readCachedWeather(60 * 60 * 1000, location.name);
+        if (cachedWeather) {
+          setWeather(cachedWeather);
+          setError('使用缓存的天气数据');
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
     if (location) {
       fetchWeather();
       // 每30分钟更新一次天气
-      const interval = setInterval(fetchWeather, 30 * 60 * 1000);
-      return () => clearInterval(interval);
+      const interval = setInterval(() => { void fetchWeather(true); }, 30 * 60 * 1000);
+      return () => {
+        controller.abort();
+        clearInterval(interval);
+      };
     }
   }, [location]);
 
