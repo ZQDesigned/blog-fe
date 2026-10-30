@@ -37,10 +37,21 @@ const isTrustedMailDomain = (domain: string) => {
 };
 
 const getMailtoRecipients = (url: URL) => {
-  return decodeURIComponent(url.pathname)
-    .split(/[;,]/)
-    .map((recipient) => recipient.trim())
-    .filter(Boolean);
+  try {
+    const lists = [decodeURIComponent(url.pathname)];
+    for (const field of url.search.slice(1).split('&')) {
+      const [key, ...value] = field.split('=');
+      if (['to', 'cc', 'bcc'].includes(decodeURIComponent(key).toLowerCase())) {
+        // Unlike form encoding, mailto uses a literal '+' in email addresses.
+        lists.push(decodeURIComponent(value.join('=')));
+      }
+    }
+    return lists.flatMap(list => list.split(/[;,]/))
+      .map(recipient => recipient.trim())
+      .filter(Boolean);
+  } catch {
+    return null;
+  }
 };
 
 const getEmailDomain = (recipient: string) => {
@@ -107,6 +118,7 @@ export const getExternalNavigationInfo = (href: string): ExternalNavigationInfo 
     if (url.protocol === 'mailto:') {
       const recipients = getMailtoRecipients(url);
       const isTrusted =
+        recipients !== null &&
         recipients.length > 0 &&
         recipients.every((recipient) => {
           const domain = getEmailDomain(recipient);
@@ -117,7 +129,7 @@ export const getExternalNavigationInfo = (href: string): ExternalNavigationInfo 
         href,
         protocol: url.protocol,
         kind: 'email',
-        displayTarget: recipients.join(', ') || decodeURIComponent(url.pathname) || href,
+        displayTarget: recipients?.join(', ') || url.pathname || href,
         displayLabel: '邮箱地址',
         isTrusted,
       };
