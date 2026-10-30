@@ -1,57 +1,84 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 
-interface RequestCache {
-  [key: string]: {
-    promise: Promise<unknown>;
-    timestamp: number;
-  }
+interface CacheEntry {
+  key: string;
+  promise: Promise<unknown>;
+  controller: AbortController;
+  pending: boolean;
+  expiresAt: number;
+  consumers: Set<Set<CacheEntry>>;
 }
 
-const cache: RequestCache = {};
-const CACHE_TIME = 2000; // 缓存时间 2 秒
+const cache = new Map<string, CacheEntry>();
+const CACHE_TIME = 2000;
+
+const releaseConsumers = (entry: CacheEntry) => {
+  entry.consumers.forEach(consumer => consumer.delete(entry));
+  entry.consumers.clear();
+};
 
 export function useDedupeRequest() {
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const ownedEntries = useRef(new Set<CacheEntry>());
 
-  const dedupe = useCallback(<T>(
-    key: string,
-    requestFn: () => Promise<T>
-  ): Promise<T> => {
-    const now = Date.now();
-
-    // 如果存在缓存且未过期，返回缓存的 Promise
-    if (
-      cache[key] &&
-      now - cache[key].timestamp < CACHE_TIME
-    ) {
-      return cache[key].promise as Promise<T>;
-    }
-
-    // 取消之前的请求（如果存在）
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // 创建新的 AbortController
-    abortControllerRef.current = new AbortController();
-
-    // 创建新的请求
-    const promise = requestFn()
-      .finally(() => {
-        // 请求完成后清除缓存
-        setTimeout(() => {
-          delete cache[key];
-        }, CACHE_TIME);
+  useEffect(() => {
+    const consumer = ownedEntries.current;
+    return () => {
+      consumer.forEach(entry => {
+        entry.consumers.delete(consumer);
+        // StrictMode may immediately resubscribe during effect replay.
+        queueMicrotask(() => {
+          if (entry.pending && entry.consumers.size === 0 && cache.get(entry.key) === entry) {
+            cache.delete(entry.key);
+            entry.controller.abort();
+          }
+        });
       });
-
-    // 缓存请求
-    cache[key] = {
-      promise,
-      timestamp: now
+      consumer.clear();
     };
-
-    return promise;
   }, []);
 
-  return dedupe;
+  return useCallback(<T>(
+    key: string,
+    requestFn: (signal: AbortSignal) => Promise<T>,
+  ): Promise<T> => {
+    const current = cache.get(key);
+    const consumer = ownedEntries.current;
+    if (current && (current.pending || current.expiresAt > Date.now())) {
+      if (current.pending) {
+        current.consumers.add(consumer);
+        consumer.add(current);
+      }
+      return current.promise as Promise<T>;
+    }
+
+    const controller = new AbortController();
+    const promise = Promise.resolve()
+      .then(() => requestFn(controller.signal))
+      .then(data => {
+        entry.pending = false;
+        releaseConsumers(entry);
+        entry.expiresAt = Date.now() + CACHE_TIME;
+        setTimeout(() => {
+          if (cache.get(key) === entry) cache.delete(key);
+        }, CACHE_TIME);
+        return data;
+      }, error => {
+        entry.pending = false;
+        releaseConsumers(entry);
+        if (cache.get(key) === entry) cache.delete(key);
+        throw error;
+      });
+
+    const entry: CacheEntry = {
+      key,
+      promise,
+      controller,
+      pending: true,
+      expiresAt: 0,
+      consumers: new Set([consumer]),
+    };
+    consumer.add(entry);
+    cache.set(key, entry);
+    return promise;
+  }, []);
 }

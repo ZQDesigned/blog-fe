@@ -119,10 +119,10 @@ export default function Blog() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([dedupe('categories', () => blogApi.getCategories()), dedupe('tags', () => blogApi.getTags())])
+    Promise.all([dedupe('categories', signal => blogApi.getCategories(signal)), dedupe('tags', signal => blogApi.getTags(signal))])
       .then(([nextCategories, nextTags]) => {
         if (active) { setCategories(nextCategories); setTags(nextTags); }
-      }).catch(err => console.error('Failed to load metadata:', err));
+      }).catch(err => { if ((err as Error).name !== 'AbortError') console.error('Failed to load metadata:', err); });
     return () => { active = false; };
   }, [dedupe]);
 
@@ -132,7 +132,7 @@ export default function Blog() {
     setLoading(true);
     try {
       const params = { category, tag, page: currentPage.toString(), pageSize: pageSize.toString(), keyword: '' };
-      const data = await dedupe(`blogs-${JSON.stringify(params)}`, () => blogApi.getList(params));
+      const data = await dedupe(`blogs-${JSON.stringify(params)}`, signal => blogApi.getList(params, signal));
       if (sequence !== requestSequence.current) return;
       setBlogs(data.content);
       setTotal(data.total);

@@ -29,7 +29,7 @@ const Home: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      const data: HomeData = await dedupe('home-content', () => homeApi.getContent());
+      const data: HomeData = await dedupe('home-content', signal => homeApi.getContent(signal));
       setHomeData(data);
 
       if (data.meta) {
@@ -40,6 +40,7 @@ const Home: React.FC = () => {
         }
       }
     } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
       console.error('Failed to load home content:', err);
       setError(err as Error);
     } finally {

@@ -208,9 +208,10 @@ const FloatSidebar: React.FC = () => {
     const loadSidebarData = async () => {
       try {
         setLoading(true);
-        const data = await dedupe('sidebar-data', () => homeApi.getSidebarData());
+        const data = await dedupe('sidebar-data', signal => homeApi.getSidebarData(signal));
         setSidebarData(data);
       } catch (error) {
+        if ((error as Error).name === 'AbortError') return;
         console.error('Failed to load sidebar data:', error);
       } finally {
         setLoading(false);

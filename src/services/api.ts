@@ -66,9 +66,9 @@ export interface TagData {
 
 export const blogApi = {
   // 获取博客列表
-  getList: async (params: BlogQuery) => {
+  getList: async (params: BlogQuery, signal?: AbortSignal) => {
     // @ts-expect-error 类型断言
-    const response = await http.get<BlogListResponse>('/api/blog/list', params);
+    const response = await http.get<BlogListResponse>('/api/blog/list', params, signal);
     return {
       content: response.content,
       total: response.totalElements,
@@ -82,12 +82,12 @@ export const blogApi = {
     http.get<BlogData>(`/api/blog/${id}`, undefined, signal),
 
   // 获取博客分类列表
-  getCategories: () =>
-    http.get<CategoryData[]>('/api/category/list'),
+  getCategories: (signal?: AbortSignal) =>
+    http.get<CategoryData[]>('/api/category/list', undefined, signal),
 
   // 获取博客标签列表
-  getTags: () =>
-    http.get<TagData[]>('/api/tag/list'),
+  getTags: (signal?: AbortSignal) =>
+    http.get<TagData[]>('/api/tag/list', undefined, signal),
 
   // 增加博客阅读量
   increaseViewCount: (id: number) =>
@@ -128,8 +128,8 @@ export const projectApi = {
 // 首页相关接口
 export const homeApi = {
   // 获取首页内容
-  getContent: () =>
-    http.get<HomeData>('/api/home/content'),
+  getContent: (signal?: AbortSignal) =>
+    http.get<HomeData>('/api/home/content', undefined, signal),
 
   // 获取首页统计数据
   getStats: () =>
@@ -141,8 +141,8 @@ export const homeApi = {
     }>('/api/home/stats'),
 
   // 获取浮动侧边栏数据
-  getSidebarData: () =>
-    http.get<FloatSidebarData>('/api/home/sidebar'),
+  getSidebarData: (signal?: AbortSignal) =>
+    http.get<FloatSidebarData>('/api/home/sidebar', undefined, signal),
 };
 
 // 获取页脚个人资料数据
@@ -153,6 +153,6 @@ export const getFooterProfile = () => {
 // 关于我页面接口
 export const aboutApi = {
   // 获取关于我页面内容
-  getAboutMe: () =>
-    http.get<AboutMeData>('/api/about/me'),
+  getAboutMe: (signal?: AbortSignal) =>
+    http.get<AboutMeData>('/api/about/me', undefined, signal),
 };

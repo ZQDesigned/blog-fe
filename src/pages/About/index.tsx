@@ -49,9 +49,10 @@ const About: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      const data = await dedupe('about-data', () => aboutApi.getAboutMe());
+      const data = await dedupe('about-data', signal => aboutApi.getAboutMe(signal));
       setAboutData(data);
     } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
       console.error('Failed to load about data:', err);
       setError(err as Error);
     } finally {
