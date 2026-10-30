@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Space, Tag, Button, Skeleton } from 'antd';
 import { ArrowLeftOutlined, EyeOutlined, ClockCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
@@ -73,11 +73,16 @@ const BlogDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const requestSequence = useRef(0);
+  const abortController = useRef<AbortController | null>(null);
 
   // 使用 useTitle hook
   useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
 
   const loadBlog = useCallback(async () => {
+    const sequence = ++requestSequence.current;
+    abortController.current?.abort();
+    setBlog(null);
     if (!id) {
       setError(new Error('未提供文章 ID'));
       setLoading(false);
@@ -92,11 +97,16 @@ const BlogDetail: React.FC = () => {
       return;
     }
 
+    const controller = new AbortController();
+    abortController.current = controller;
+    const isCurrentRequest = () => sequence === requestSequence.current && !controller.signal.aborted;
+
     try {
       setError(null);
       setNotFound(false);
       setLoading(true);
-      const data = await blogApi.getDetail(blogId);
+      const data = await blogApi.getDetail(blogId, controller.signal);
+      if (!isCurrentRequest()) return;
       setBlog(data);
       setNotFound(false);
 
@@ -104,6 +114,7 @@ const BlogDetail: React.FC = () => {
         console.error('Failed to increase blog view count:', err);
       });
     } catch (err) {
+      if (!isCurrentRequest() || (err as Error).name === 'AbortError') return;
       console.error('Failed to load blog:', err);
       const message = (err as Error).message ?? '';
       if (message.includes('不存在') || message.toLowerCase().includes('not found')) {
@@ -114,12 +125,16 @@ const BlogDetail: React.FC = () => {
         setError(err as Error);
       }
     } finally {
-      setLoading(false);
+      if (isCurrentRequest()) setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
     void loadBlog();
+    return () => {
+      requestSequence.current += 1;
+      abortController.current?.abort();
+    };
   }, [loadBlog]);
 
   const handleBack = () => {

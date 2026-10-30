@@ -78,8 +78,8 @@ export const blogApi = {
   },
 
   // 获取博客详情
-  getDetail: (id: number) =>
-    http.get<BlogData>(`/api/blog/${id}`),
+  getDetail: (id: number, signal?: AbortSignal) =>
+    http.get<BlogData>(`/api/blog/${id}`, undefined, signal),
 
   // 获取博客分类列表
   getCategories: () =>
