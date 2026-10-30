@@ -35,6 +35,14 @@ const disableCustomCursorForVisualTests = async (page: Page) => {
   });
 };
 
+const prepareImages = async (page: Page) => {
+  // Full-page captures should compare loaded images, not lazy-load timing.
+  await page.locator('img[loading="lazy"]').evaluateAll(images => {
+    images.forEach(image => { (image as HTMLImageElement).loading = 'eager'; });
+  });
+  await page.evaluate(() => Promise.all([...document.images].map(image => image.decode().catch(() => undefined))));
+};
+
 const cases = [
   { name: 'home', path: '/' },
   { name: 'blog-list', path: '/blog' },
@@ -59,6 +67,7 @@ for (const viewport of viewports) {
       await installDisableMotionCss(page);
 
       await page.goto(item.path, { waitUntil: 'networkidle' });
+      await prepareImages(page);
       // The parser can replace styles injected before <head> exists.
       await page.addStyleTag({ content: disableMotionCss });
       await page.evaluate(() => document.fonts.ready);
@@ -93,6 +102,7 @@ for (const viewport of viewports) {
       await disableCustomCursorForVisualTests(page);
       await installDisableMotionCss(page);
       await page.goto(item.path, { waitUntil: 'networkidle' });
+      await prepareImages(page);
       await page.addStyleTag({ content: disableMotionCss });
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(1600);

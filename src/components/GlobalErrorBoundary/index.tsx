@@ -2,6 +2,7 @@ import React from 'react';
 import { Result, Button } from 'antd';
 import { CONTACT_EMAIL, CONTACT_QQ } from '../../constants/contact';
 import { themeVars } from '../../theme';
+import { isChunkLoadError, reportChunkFailure } from '../../utils/chunkRecovery';
 
 type GlobalErrorBoundaryProps = {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ class GlobalErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    if (isChunkLoadError(error)) { reportChunkFailure(error, true); return; }
     // 将错误信息输出到控制台，便于排查
     console.error('应用运行时出现未捕获错误:', error, errorInfo);
   }
@@ -35,6 +37,7 @@ class GlobalErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      if (isChunkLoadError(this.state.error)) return null;
       const contactQQ = CONTACT_QQ;
       const contactEmail = CONTACT_EMAIL;
       const currentUrl = typeof window !== 'undefined' ? window.location.href : '';

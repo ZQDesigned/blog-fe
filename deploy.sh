@@ -60,13 +60,13 @@ else
   SCP_CMD="sshpass -p \"$REMOTE_PASSWORD\" scp -P \"$REMOTE_PORT\""
 fi
 
-# 清理远程服务器上的旧文件
-eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'cd \"$REMOTE_PATH\" && rm -rf ./*'"
+# 保留旧哈希资源，避免仍打开旧版本的访客加载分包失败。
+eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'mkdir -p \"$REMOTE_PATH\"'"
 
 if [ $? -eq 0 ]; then
-  echo "远程文件清理完成！"
+  echo "远程部署目录已就绪，保留历史资源。"
 else
-  echo "远程文件清理失败，请检查服务器配置。"
+  echo "远程部署目录准备失败，请检查服务器配置。"
   exit 1
 fi
 
@@ -82,7 +82,7 @@ fi
 echo "文件上传成功，开始在远程服务器上解压..."
 
 # 解压并部署
-eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'cd \"$REMOTE_PATH\" && unzip -o \"$ARCHIVE_NAME\" && rm -f \"$ARCHIVE_NAME\" && echo \"项目部署完成！dist 中的文件已解压到 $REMOTE_PATH\"'"
+eval "$SSH_CMD \"$REMOTE_USER@$REMOTE_HOST\" 'cd \"$REMOTE_PATH\" && unzip -o \"$ARCHIVE_NAME\" -x index.html && unzip -p \"$ARCHIVE_NAME\" index.html > .index.html.next && test -s .index.html.next && mv -f .index.html.next index.html && rm -f \"$ARCHIVE_NAME\" && echo \"项目部署完成！入口已在资源就绪后切换。\"'"
 
 if [ $? -eq 0 ]; then
   echo "远程解压成功，部署完成！"

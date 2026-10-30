@@ -11,13 +11,17 @@ import '@fontsource/jetbrains-mono/latin-400.css'
 import { showConsoleEasterEgg } from './utils/consoleEasterEgg'
 import Index from './components/GlobalErrorBoundary'
 import { initializeThemeRuntime } from './theme'
+import { installChunkRecovery } from './utils/chunkRecovery'
+import ChunkRecoveryNotice from './components/ChunkRecoveryNotice'
 
 // 显示控制台彩蛋
 showConsoleEasterEgg();
 initializeThemeRuntime();
+installChunkRecovery();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <ChunkRecoveryNotice />
     <Index>
       <MotionConfig isValidProp={isPropValid}>
         <App />

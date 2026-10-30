@@ -423,11 +423,14 @@ export const MainLayout: React.FC = () => {
 
   // 监听路由变化，自动滚动到顶部
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, [location.pathname]);
+    if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    const previous = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    return () => { window.history.scrollRestoration = previous; };
+  }, []);
 
   const handleMenuClick = (path: string) => {
     navigate(path);

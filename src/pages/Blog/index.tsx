@@ -14,6 +14,9 @@ import { useDedupeRequest } from '../../hooks/useDedupeRequest';
 import PageLoading from '../../components/PageLoading';
 import DataErrorFallback from '../../components/DataErrorFallback';
 import { EditorialTitle, Eyebrow } from '../../components/Editorial';
+import ArticleSearch from './components/ArticleSearch';
+import { useBlogListPosition } from '../../hooks/useBlogListPosition';
+import { blogListKey, forgetListPosition } from '../../utils/readingState';
 
 const Container = styled.div`
   width: min(100%, 1200px);
@@ -109,12 +112,15 @@ export default function Blog() {
   const [error, setError] = useState<Error | null>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [tags, setTags] = useState<TagData[]>([]);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const viewMode = searchParams.get('view') === 'grid' ? 'grid' : 'list';
+  const pageParam = Number(searchParams.get('page') || '1');
+  const currentPage = Number.isSafeInteger(pageParam) && pageParam > 0 && pageParam <= 1000000 ? pageParam : 1;
+  const pageSize = 12;
   const requestSequence = useRef(0);
   const category = searchParams.get('category') || undefined;
   const tag = searchParams.get('tag') || undefined;
+  const keyword = (searchParams.get('keyword') || '').trim().slice(0, 200);
+  const savePosition = useBlogListPosition(blogListKey(location.search), !loading && !error);
   useTitle('博客', { restoreOnUnmount: true });
 
   useEffect(() => {
@@ -131,27 +137,31 @@ export default function Blog() {
     setError(null);
     setLoading(true);
     try {
-      const params = { category, tag, page: currentPage.toString(), pageSize: pageSize.toString(), keyword: '' };
+      const params = { category, tag, page: currentPage.toString(), pageSize: pageSize.toString(), keyword };
       const data = await dedupe(`blogs-${JSON.stringify(params)}`, signal => blogApi.getList(params, signal));
       if (sequence !== requestSequence.current) return;
       setBlogs(data.content);
       setTotal(data.total);
     } catch (err) { if (sequence === requestSequence.current) setError(err as Error); }
     finally { if (sequence === requestSequence.current) setLoading(false); }
-  }, [category, tag, currentPage, pageSize, dedupe]);
+  }, [category, tag, currentPage, keyword, dedupe]);
 
   useEffect(() => {
     void loadBlogs();
     return () => { requestSequence.current += 1; };
   }, [loadBlogs]);
 
-  const setFilter = (key: 'category' | 'tag', value?: string) => {
+  const updateQuery = (updates: Record<string, string | undefined>, replace = false) => {
     const next = new URLSearchParams(searchParams);
-    if (value) next.set(key, value); else next.delete(key);
-    setCurrentPage(1);
-    setSearchParams(next);
+    Object.entries(updates).forEach(([key, value]) => { if (value) next.set(key, value); else next.delete(key); });
+    if (next.toString() === searchParams.toString()) return;
+    savePosition();
+    forgetListPosition(blogListKey(next.toString()));
+    setSearchParams(next, { replace });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
-  const readArticle = (blog: BlogData) => navigate(`/blog/${blog.id}${location.search}`);
+  const setFilter = (key: 'category' | 'tag', value?: string) => updateQuery({ [key]: value, page: undefined });
+  const readArticle = (blog: BlogData) => { savePosition(); navigate(`/blog/${blog.id}${location.search}`); };
 
   return <Container>
     <Heading>
@@ -161,20 +171,24 @@ export default function Blog() {
     </Heading>
     <Controls>
       <div className="filters">
+        <ArticleSearch value={keyword} onSearch={(value, replace) => updateQuery({ keyword: value, page: undefined }, replace)} />
         <Select<string> aria-label="按分类筛选" allowClear placeholder="全部分类" value={category}
           onChange={value => setFilter('category', value)} options={categories.map(item => ({ label: `${item.name} (${item.articleCount})`, value: item.name }))} />
         <Select<string[]> aria-label="按标签筛选" mode="multiple" allowClear placeholder="全部标签" value={tag ? tag.split(',') : []}
           onChange={values => setFilter('tag', values.join(','))} maxTagCount="responsive"
           options={tags.map(item => ({ label: `${item.name} (${item.articleCount})`, value: item.name }))} />
       </div>
-      <Radio.Group className="view-mode-controls" value={viewMode} onChange={e => setViewMode(e.target.value)} size="small" aria-label="文章展示方式">
+      <Radio.Group className="view-mode-controls" value={viewMode} onChange={e => updateQuery({ view: e.target.value === 'grid' ? 'grid' : undefined })} size="small" aria-label="文章展示方式">
         <Radio.Button value="list"><UnorderedListOutlined /> 列表视图</Radio.Button>
         <Radio.Button value="grid"><AppstoreOutlined /> 网格视图</Radio.Button>
       </Radio.Group>
     </Controls>
+    {keyword && !loading && !error && <p role="status" style={{ color: themeVars.colors.lightText, marginTop: 20, fontSize: 13 }}>
+      “{keyword}”的搜索结果，共 {total} 篇文章
+    </p>}
     {error ? <DataErrorFallback context="博客列表" error={error} onRetry={loadBlogs} />
       : loading ? <PageLoading tip="正在加载博客列表" />
-        : blogs.length === 0 ? <Empty description="暂时没有匹配的文章" style={{ margin: '64px 0' }} />
+        : blogs.length === 0 ? <Empty description={keyword ? '没有找到匹配的文章，试试其他关键词' : '暂时没有匹配的文章'} style={{ margin: '64px 0' }} />
           : <>
             <BlogGrid $isGrid={viewMode === 'grid'}>{blogs.map(blog => <Entry key={blog.id} $isGrid={viewMode === 'grid'}>
               <time className="date">{blog.createTime.split(' ')[0]}</time>
@@ -188,7 +202,7 @@ export default function Blog() {
               </div>
             </Entry>)}</BlogGrid>
             <PaginationBar><Pagination current={currentPage} pageSize={pageSize} total={total}
-              onChange={(page, size) => { setCurrentPage(page); setPageSize(size); }} showSizeChanger={false} /></PaginationBar>
+              onChange={page => updateQuery({ page: page === 1 ? undefined : String(page) })} showSizeChanger={false} /></PaginationBar>
           </>}
     <Modal title={selectedBlog?.title} open={!!selectedBlog} onCancel={() => setSelectedBlog(null)} footer={null} width={800}>
       {selectedBlog && <>

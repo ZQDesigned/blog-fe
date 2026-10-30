@@ -1,10 +1,15 @@
 import React from 'react';
+import type { Ref } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import styled from '@emotion/styled';
 import { themeVars, withThemeAlpha } from '../../theme';
+import { ReadingHeading, ReadingCode } from './ReadingElements';
+
+const readingComponents = { h1: ReadingHeading, h2: ReadingHeading, h3: ReadingHeading,
+  h4: ReadingHeading, h5: ReadingHeading, h6: ReadingHeading, pre: ReadingCode };
 
 interface MarkdownContainerProps {
   className?: string;
@@ -20,6 +25,33 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
   & * { user-select: text; }
   /* The first content element, ignoring Emotion's injected style tags. */
   > :not(style):not(:not(style) ~ *) { margin-top: 0; }
+  .reading-heading { position: relative; scroll-margin-top: 112px; }
+  html[data-standalone='true'] & .reading-heading { scroll-margin-top: 24px; }
+  .heading-anchor {
+    position: absolute; left: -26px; top: 0.3em; width: 24px; height: 24px;
+    border: 0; padding: 0; background: none; color: ${themeVars.colors.primary};
+    opacity: 0; font-size: 14px; cursor: pointer;
+  }
+  .reading-heading:hover .heading-anchor, .heading-anchor:focus-visible { opacity: 1; }
+  .reading-sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  .reading-code-block {
+    margin-bottom: ${themeVars.spacing.md}; background: ${themeVars.colors.secondary};
+    border-radius: 8px; overflow: hidden;
+  }
+  .reading-code-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 16px; border-bottom: 1px solid ${themeVars.colors.border};
+    color: ${themeVars.colors.lightText}; font-size: 12px; font-family: ${themeVars.typography.fontFamilyBase};
+    button { border: 0; background: transparent; color: ${themeVars.colors.primary}; cursor: pointer; padding: 4px; }
+  }
+  .reading-code-block pre { margin: 0; border-radius: 0; }
+  @media (max-width: 640px) {
+    .reading-heading { padding-right: 28px; }
+    .heading-anchor { left: auto; right: 0; opacity: 0.5; }
+  }
   @media (max-width: 640px) { font-size: 16px; }
 
   h1, h2, h3, h4, h5, h6 {
@@ -136,14 +168,17 @@ const MarkdownContainer = styled.div<MarkdownContainerProps>`
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  readingTools?: boolean;
+  ref?: Ref<HTMLDivElement>;
 }
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className }) => {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className, readingTools = false, ref }) => {
   return (
-    <MarkdownContainer className={className}>
+    <MarkdownContainer className={className} ref={ref}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
+        components={readingTools ? readingComponents : undefined}
       >
         {content}
       </ReactMarkdown>

@@ -10,6 +10,9 @@ import { blogApi } from '../../services/api';
 import { BlogData } from '../../types/types';
 import DataErrorFallback from '../../components/DataErrorFallback';
 import { EditorialTitle, Eyebrow } from '../../components/Editorial';
+import ArticleOutline from '../../components/ArticleOutline';
+import { useArticleOutline } from '../../hooks/useArticleOutline';
+import { useArticleProgress } from '../../hooks/useArticleProgress';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -64,6 +67,15 @@ const StyledMarkdownRenderer = styled(MarkdownRenderer)`
   border-top: 1px solid ${themeVars.colors.border};
 `;
 
+const ResumePrompt = styled.div`
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px;
+  margin-top: 28px; padding: 16px 18px; border: 1px solid ${themeVars.colors.border};
+  border-radius: ${themeVars.borderRadius.small}; background: ${themeVars.colors.secondary};
+  font-size: 13px; color: ${themeVars.colors.lightText};
+  .resume-message { flex: 1; min-width: 180px; }
+  button { border: 0; background: none; color: ${themeVars.colors.primary}; cursor: pointer; padding: 4px 0; }
+`;
+
 const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -75,6 +87,9 @@ const BlogDetail: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const requestSequence = useRef(0);
   const abortController = useRef<AbortController | null>(null);
+  const articleBody = useRef<HTMLDivElement>(null);
+  const { headings, activeId } = useArticleOutline(articleBody, blog?.content, location.hash);
+  const progress = useArticleProgress(articleBody, blog?.id, blog?.updateTime);
 
   // 使用 useTitle hook
   useTitle(blog?.title || '加载中...', { restoreOnUnmount: true });
@@ -211,7 +226,12 @@ const BlogDetail: React.FC = () => {
           ))}
         </Space>
 
-        <StyledMarkdownRenderer content={blog.content} />
+        {progress.saved && progress.saved.id === String(blog.id) && progress.saved.revision === blog.updateTime && !location.hash && <ResumePrompt>
+          <div className="resume-message">上次读到约 {Math.round(progress.saved.ratio * 100)}%</div>
+          <button type="button" onClick={progress.resume}>继续阅读</button>
+        </ResumePrompt>}
+        <ArticleOutline headings={headings} activeId={activeId} />
+        <StyledMarkdownRenderer content={blog.content} ref={articleBody} readingTools />
       </ContentWrapper>
     </Container>
   );
